@@ -294,6 +294,7 @@ puntaje_jugador = 0
     
 while True:
   event, values = window.Read(timeout = 1000) # 10 milisegundos
+  window.Element('turno').Update('jugador' if turno_jugador else 'computadora')
   if (not turno_jugador):
     jugada = jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fichas_usadas_pc, posiciones_bloqueadas, bolsa_de_fichas)
     if (jugada > 0):
@@ -301,7 +302,7 @@ while True:
       window.Element('puntaje_computadora').Update(puntaje_pc)
       primer_jugada = False
     turno_jugador = True
-    print(puntaje_pc)      
+    window.Element('turno').Update('jugador' if turno_jugador else 'computadora')      
   if (event != '__TIMEOUT__'):
     if (event in (None, 'Terminar')):
         break
@@ -386,8 +387,6 @@ while True:
             primer_posicion = (event[0] + 1, event[1]) if not orientacion[1] else (event[0], event[1] + 1)
           else:
             ultima_posicion = (event[0] - 1, event[1]) if not orientacion[1] else (event[0], event[1] - 1)
-  window.Element('turno').Update('jugador' if turno_jugador else 'computadora')
-  window.Element('palabra_actual').Update(palabra_formada(letras_jugador, posiciones_ocupadas))
-  print(event)
+    window.Element('palabra_actual').Update(palabra_formada(letras_jugador, posiciones_ocupadas))
 
 window.Close()
