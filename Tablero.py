@@ -336,7 +336,8 @@ while True:
           primer_posicion = ultima_posicion = event
     else:
       if (event in (primer_posicion, ultima_posicion)):
-        window.Element(event).Update(casillas_especiales[event]['texto'] if event in casillas_especiales else ' ', button_color = casillas_especiales[event]['color'] if event in casillas_especiales else ('white', 'green'), disabled = False)      
+        window.Element(event).Update(casillas_especiales[event]['texto'] if event in casillas_especiales else ' ', button_color = casillas_especiales[event]['color'] if event in casillas_especiales else ('white', 'green'), disabled = False)   
+        window.Element(posiciones_ocupadas[event]).Update(button_color = ('white', 'green'), disabled = False)
         del posiciones_ocupadas[event]
         if (len(posiciones_ocupadas) <= 1):
           orientacion[0] = True
