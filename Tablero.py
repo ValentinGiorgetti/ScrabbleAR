@@ -57,7 +57,7 @@ def verificar_palabra(letras, posiciones_ocupadas, posiciones_bloqueadas, centro
       #    for posicion in posiciones_ocupadas:
       #      posiciones_bloqueadas += [posicion]
       #    return True
-      sg.Popup(f'Palabra formada: {str}')
+      sg.Popup(f'Palabra formada por el jugador: {str}')
       return True
     else:
       sg.Popup('Palabra inválida')
@@ -75,6 +75,7 @@ def sumar_casilla(casillas_especiales, posicion, letra, puntos_jugada, multiplic
 
 def jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fichas_usadas_pc, posiciones_bloqueadas, bolsa_de_fichas):
   orientacion = random.randint(0, 100) % 2 == 0   # Si es par la orientacion es horizontal
+  abecedario = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
   print(letras_pc)
   puntos_jugada = [0]
   multiplicador = [0]
@@ -115,6 +116,7 @@ def jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fic
         sumar_casilla(casillas_especiales, (i, j), letra, puntos_jugada, multiplicador, posiciones_bloqueadas) 
         j += 1 if orientacion else 0
         i += 1 if not orientacion else 0
+    fichas_usadas_pc.clear()
     for letra in palabra:
       x = random.randint(8, 14)
       while (x in fichas_usadas_pc):
@@ -122,14 +124,24 @@ def jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fic
       window.Element(x).Update(button_color = ('white', 'red'), disabled = True)
       fichas_usadas_pc += [x]
       letras_pc.remove(letra)
+      letra_nueva = random.choice(abecedario)
+      while (bolsa_de_fichas[letra_nueva]['cantidad_fichas'] <= 0):
+        letra_nueva = random.choice(abecedario)
+      letras_pc += [letra_nueva]
+      bolsa_de_fichas[letra_nueva]['cantidad_fichas'] -= 1
     print(puntos_jugada[0], '*', multiplicador[0])
+    for i in range(8, 15):
+      window.Element(i).Update(button_color = ('white', 'green'), disabled = False)
+    sg.Popup(f'Palabra formada por la computadora: {palabra}')
+    print('nuevas letras', letras_pc)
     if (puntos_jugada[0] < 0):
       return 0
     else:
       return puntos_jugada[0] if multiplicador[0] == 0 else puntos_jugada[0] * multiplicador[0]
   else:
-    abecedario = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
     letras_pc.clear()
+    for letra in fichas_usadas_pc:
+      bolsa_de_fichas[letra]['cantidad_fichas'] += 1
     fichas_usadas_pc.clear()
     for i in range(8, 15):
       window.Element(i).Update(button_color = ('white', 'green'), disabled = False)
@@ -206,7 +218,6 @@ def repartir_fichas(bolsa_de_fichas, letras):
 def contar_puntos_jugador(posiciones_ocupadas, casillas_especiales, bolsa_de_fichas, letras_jugador):
   multiplicador = 0
   puntos = 0
-  print(posiciones_ocupadas)
   for posicion in posiciones_ocupadas:
     puntos += bolsa_de_fichas[letras_jugador[posiciones_ocupadas[posicion]]]['puntaje_ficha']
     if (posicion in casillas_especiales):
@@ -219,6 +230,11 @@ def contar_puntos_jugador(posiciones_ocupadas, casillas_especiales, bolsa_de_fic
   else:
     return puntos if multiplicador == 0 else puntos * multiplicador
     
+def fichas_totales(bolsa_de_fichas):
+  total = 0
+  for letra in bolsa_de_fichas:
+    total += bolsa_de_fichas[letra]['cantidad_fichas']  
+  return total  
 
 nivel = 2
 FILAS = COLUMNAS = 17
@@ -235,8 +251,10 @@ for letra in abecedario:
 letras_jugador = []
 letras_pc = []
 
+print('Fichas totales:', fichas_totales(bolsa_de_fichas))
 repartir_fichas(bolsa_de_fichas, letras_jugador)
 repartir_fichas(bolsa_de_fichas, letras_pc)
+print('Fichas totales:', fichas_totales(bolsa_de_fichas))
 
 tablero_juego = [[sg.Button('', size = (4, 2), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'green')) for j in range(COLUMNAS)] for i in range(FILAS)]
 
@@ -293,7 +311,7 @@ puntaje_pc = 0
 puntaje_jugador = 0
     
 while True:
-  event, values = window.Read(timeout = 1000) # 10 milisegundos
+  event, values = window.Read(timeout = 1000) # milisegundos
   window.Element('turno').Update('jugador' if turno_jugador else 'computadora')
   if (not turno_jugador):
     jugada = jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fichas_usadas_pc, posiciones_bloqueadas, bolsa_de_fichas)
@@ -302,7 +320,8 @@ while True:
       window.Element('puntaje_computadora').Update(puntaje_pc)
       primer_jugada = False
     turno_jugador = True
-    window.Element('turno').Update('jugador' if turno_jugador else 'computadora')      
+    window.Element('turno').Update('jugador' if turno_jugador else 'computadora')
+    print('Fichas totales:', fichas_totales(bolsa_de_fichas))
   if (event != '__TIMEOUT__'):
     if (event in (None, 'Terminar')):
         break
@@ -387,6 +406,7 @@ while True:
             primer_posicion = (event[0] + 1, event[1]) if not orientacion[1] else (event[0], event[1] + 1)
           else:
             ultima_posicion = (event[0] - 1, event[1]) if not orientacion[1] else (event[0], event[1] - 1)
+      print('Fichas totales:', fichas_totales(bolsa_de_fichas))
     window.Element('palabra_actual').Update(palabra_formada(letras_jugador, posiciones_ocupadas))
 
 window.Close()
