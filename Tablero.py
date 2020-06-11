@@ -291,9 +291,9 @@ posiciones_bloqueadas = []
 fichas_usadas_pc = []
 puntaje_pc = 0
 puntaje_jugador = 0
-
+    
 while True:
-  event, values = window.Read()
+  event, values = window.Read(timeout = 1000) # 10 milisegundos
   if (not turno_jugador):
     jugada = jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fichas_usadas_pc, posiciones_bloqueadas, bolsa_de_fichas)
     if (jugada > 0):
@@ -301,90 +301,91 @@ while True:
       window.Element('puntaje_computadora').Update(puntaje_pc)
       primer_jugada = False
     turno_jugador = True
-    print(puntaje_pc)
-  if (event in (None, 'Terminar')):
-      break
-  if (event == 'cambiar'):
-    if (len(posiciones_ocupadas) > 0):
-      sg.Popup('Primero debe levantar sus fichas')
-    else:
-      for letra in letras_jugador:
-        bolsa_de_fichas[letra]['cantidad_fichas'] += 1
-      letra_seleccionada = False              
-      orientacion = [True, False]  
-      primer_posicion = ultima_posicion = ()      
-      posiciones_ocupadas = OrderedDict()
-      turno_jugador = False
-      letras_jugador = []
-      repartir_fichas(bolsa_de_fichas, letras_jugador)
-      for i in range (7):
-        window.Element(i).Update(letras_jugador[i], disabled = False, button_color = ('white', 'green'))
-      sg.Popup('Se repartieron nuevas fichas al jugador')
-  if (event == 'pasar'):
-    if (len(posiciones_ocupadas) > 0):
-      sg.Popup('Primero debe levantar sus fichas')
-    else:
+    print(puntaje_pc)      
+  if (event != '__TIMEOUT__'):
+    if (event in (None, 'Terminar')):
+        break
+    if (event == 'cambiar'):
+      if (len(posiciones_ocupadas) > 0):
+        sg.Popup('Primero debe levantar sus fichas')
+      else:
+        for letra in letras_jugador:
+          bolsa_de_fichas[letra]['cantidad_fichas'] += 1
+        letra_seleccionada = False              
+        orientacion = [True, False]  
+        primer_posicion = ultima_posicion = ()      
+        posiciones_ocupadas = OrderedDict()
+        turno_jugador = False
+        letras_jugador = []
+        repartir_fichas(bolsa_de_fichas, letras_jugador)
+        for i in range (7):
+          window.Element(i).Update(letras_jugador[i], disabled = False, button_color = ('white', 'green'))
+        sg.Popup('Se repartieron nuevas fichas al jugador')
+    if (event == 'pasar'):
+      if (len(posiciones_ocupadas) > 0):
+        sg.Popup('Primero debe levantar sus fichas')
+      else:
+        if (letra_seleccionada):
+          window.Element(letra).Update(button_color = ('white', 'green'))
+          letra_seleccionada = False
+        turno_jugador = False
+    if (event == 'confirmar'):
       if (letra_seleccionada):
         window.Element(letra).Update(button_color = ('white', 'green'))
         letra_seleccionada = False
-      turno_jugador = False
-  if (event == 'confirmar'):
-    if (letra_seleccionada):
-      window.Element(letra).Update(button_color = ('white', 'green'))
-      letra_seleccionada = False
-    if (verificar_palabra(letras_jugador, posiciones_ocupadas, posiciones_bloqueadas, centro, primer_jugada)):
-      puntaje_jugador += contar_puntos_jugador(posiciones_ocupadas, casillas_especiales, bolsa_de_fichas, letras_jugador)
-      letra_seleccionada = False              
-      orientacion = [True, False]  
-      primer_posicion = ultima_posicion = ()
-      agregar_posiciones_bloqueadas(posiciones_ocupadas, posiciones_bloqueadas)
-      for posicion in posiciones_ocupadas:
-        letra = random.choice(abecedario)
-        while (bolsa_de_fichas[letra]['cantidad_fichas'] <= 0):
+      if (verificar_palabra(letras_jugador, posiciones_ocupadas, posiciones_bloqueadas, centro, primer_jugada)):
+        puntaje_jugador += contar_puntos_jugador(posiciones_ocupadas, casillas_especiales, bolsa_de_fichas, letras_jugador)
+        letra_seleccionada = False              
+        orientacion = [True, False]  
+        primer_posicion = ultima_posicion = ()
+        agregar_posiciones_bloqueadas(posiciones_ocupadas, posiciones_bloqueadas)
+        for posicion in posiciones_ocupadas:
           letra = random.choice(abecedario)
-        letras_jugador[posiciones_ocupadas[posicion]] = letra
-        window.Element(posiciones_ocupadas[posicion]).Update(letra, disabled = False, button_color = ('white', 'green'))
-        bolsa_de_fichas[letra]['cantidad_fichas'] -= 1
-      posiciones_ocupadas = OrderedDict()
-      turno_jugador = False
-      primer_jugada = False
-      window.Element('puntaje_jugador').Update(puntaje_jugador)
+          while (bolsa_de_fichas[letra]['cantidad_fichas'] <= 0):
+            letra = random.choice(abecedario)
+          letras_jugador[posiciones_ocupadas[posicion]] = letra
+          window.Element(posiciones_ocupadas[posicion]).Update(letra, disabled = False, button_color = ('white', 'green'))
+          bolsa_de_fichas[letra]['cantidad_fichas'] -= 1
+        posiciones_ocupadas = OrderedDict()
+        turno_jugador = False
+        primer_jugada = False
+        window.Element('puntaje_jugador').Update(puntaje_jugador)
+      else:
+        print('palabra incorrecta')
+    if (event in range(7)):
+      if (letra_seleccionada):
+        window.Element(letra).Update(button_color = ('white', 'green'))
+      window.Element(event).Update(button_color = ('white', 'red'))
+      letra = event
+      letra_seleccionada = True
     else:
-      print('palabra incorrecta')
-  if (event in range(7)):
-    if (letra_seleccionada):
-      window.Element(letra).Update(button_color = ('white', 'green'))
-    window.Element(event).Update(button_color = ('white', 'red'))
-    letra = event
-    letra_seleccionada = True
-  else:
-    if (letra_seleccionada):
-      if (posicion_valida(event, posiciones_ocupadas, orientacion, posiciones_bloqueadas)):
-        if (event in posiciones_ocupadas):
+      if (letra_seleccionada):
+        if (posicion_valida(event, posiciones_ocupadas, orientacion, posiciones_bloqueadas)):
+          if (event in posiciones_ocupadas):
+            window.Element(posiciones_ocupadas[event]).Update(button_color = ('white', 'green'), disabled = False)
+          else:
+            ultima_posicion = event
+          window.Element(event).Update(letras_jugador[letra], button_color = ('white', 'red'))
+          posiciones_ocupadas[event] = letra
+          window.Element(letra).Update(disabled = True)
+          letra_seleccionada = False
+          if (len(posiciones_ocupadas) == 1):
+            primer_posicion = ultima_posicion = event
+      else:
+        if (event in (primer_posicion, ultima_posicion)):
+          window.Element(event).Update(casillas_especiales[event]['texto'] if event in casillas_especiales else ' ', button_color = casillas_especiales[event]['color'] if event in casillas_especiales else ('white', 'green'), disabled = False)   
           window.Element(posiciones_ocupadas[event]).Update(button_color = ('white', 'green'), disabled = False)
-        else:
-          ultima_posicion = event
-        window.Element(event).Update(letras_jugador[letra], button_color = ('white', 'red'))
-        posiciones_ocupadas[event] = letra
-        window.Element(letra).Update(disabled = True)
-        letra_seleccionada = False
-        if (len(posiciones_ocupadas) == 1):
-          primer_posicion = ultima_posicion = event
-    else:
-      if (event in (primer_posicion, ultima_posicion)):
-        window.Element(event).Update(casillas_especiales[event]['texto'] if event in casillas_especiales else ' ', button_color = casillas_especiales[event]['color'] if event in casillas_especiales else ('white', 'green'), disabled = False)   
-        window.Element(posiciones_ocupadas[event]).Update(button_color = ('white', 'green'), disabled = False)
-        del posiciones_ocupadas[event]
-        if (len(posiciones_ocupadas) <= 1):
-          orientacion[0] = True
-          orientacion[1] = False
-          if (len(posiciones_ocupadas) == 0):
-            primer_posicion = ()
-            ultima_posicion = ()
-        if (event == primer_posicion):
-          primer_posicion = (event[0] + 1, event[1]) if not orientacion[1] else (event[0], event[1] + 1)
-        else:
-          ultima_posicion = (event[0] - 1, event[1]) if not orientacion[1] else (event[0], event[1] - 1)
+          del posiciones_ocupadas[event]
+          if (len(posiciones_ocupadas) <= 1):
+            orientacion[0] = True
+            orientacion[1] = False
+            if (len(posiciones_ocupadas) == 0):
+              primer_posicion = ()
+              ultima_posicion = ()
+          if (event == primer_posicion):
+            primer_posicion = (event[0] + 1, event[1]) if not orientacion[1] else (event[0], event[1] + 1)
+          else:
+            ultima_posicion = (event[0] - 1, event[1]) if not orientacion[1] else (event[0], event[1] - 1)
   window.Element('turno').Update('jugador' if turno_jugador else 'computadora')
   window.Element('palabra_actual').Update(palabra_formada(letras_jugador, posiciones_ocupadas))
   print(event)
