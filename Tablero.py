@@ -133,12 +133,8 @@ def jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fic
     fichas_usadas_pc.clear()
     for i in range(8, 15):
       window.Element(i).Update(button_color = ('white', 'green'), disabled = False)
-    for i in range(7):
-      letra = random.choice(abecedario)
-      while (bolsa_de_fichas[letra] == 0):
-        letra = random.choice(abecedario)
-      letras_pc += [letra]
-      bolsa_de_fichas[letra]['cantidad_fichas'] -= 1
+    repartir_fichas(bolsa_de_fichas, letras_pc)
+    sg.Popup('Se repartieron nuevas fichas a la computadora')
     print('nuevas letras', letras_pc)
     return 0
 
@@ -159,7 +155,7 @@ def colocar_posiciones_especiales(nivel, casillas_especiales, FILAS, COLUMNAS, c
   for i in range(FILAS):
     for j in range(COLUMNAS):
       posicion = (i, j)
-      posicion_invertida=(j,i)
+      posicion_invertida = (j, i)
       if(j == i):
         tablero_juego[i][j] = sg.Button('F +2', size = (4, 2), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'blue'))
         casillas_especiales[(i, j)] = {'color' : ('white', 'blue'), 'texto' : 'F +2', 'modificador' : 2}
@@ -192,21 +188,37 @@ def colocar_posiciones_especiales(nivel, casillas_especiales, FILAS, COLUMNAS, c
           casillas_especiales[(i, j)] = {'color': ('white', 'purple'), 'texto' : 'P x3', 'modificador' : 13 if posicion in multiplicador_nivel_dificil else 12}
           
   tablero_juego[centro[0]][centro[1]] = sg.Button('Inicio', size = (4, 2), key = (centro[0], centro[1]), pad = (0.5, 0.5), button_color = ('white', 'yellow'))
-  casillas_especiales[(centro[0], centro[1])] = {'color' : ('white', 'yellow'), 'modificador' : 1}        
+  casillas_especiales[(centro[0], centro[1])] = {'color' : ('white', 'yellow'), 'texto' : 'Inicio', 'modificador' : 1}        
 
 def agregar_posiciones_bloqueadas(posiciones_ocupadas, posiciones_bloqueadas):
   for posicion in posiciones_ocupadas:
     posiciones_bloqueadas += [posicion]
 
-def repartir_fichas(bolsa_de_fichas, letras_jugador, letras_pc):
+def repartir_fichas(bolsa_de_fichas, letras):
   abecedario = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
   for i in range(7):
     letra = random.choice(abecedario)
-    letras_jugador += [letra]
+    while (bolsa_de_fichas[letra]['cantidad_fichas'] <= 0):
+      letra = random.choice(abecedario)
+    letras += [letra]
     bolsa_de_fichas[letra]['cantidad_fichas'] -= 1
-    letra = random.choice(abecedario)
-    letras_pc += [letra]
-    bolsa_de_fichas[letra]['cantidad_fichas'] -= 1
+
+def contar_puntos_jugador(posiciones_ocupadas, casillas_especiales, bolsa_de_fichas, letras_jugador):
+  multiplicador = 0
+  puntos = 0
+  print(posiciones_ocupadas)
+  for posicion in posiciones_ocupadas:
+    puntos += bolsa_de_fichas[letras_jugador[posiciones_ocupadas[posicion]]]['puntaje_ficha']
+    if (posicion in casillas_especiales):
+      if (casillas_especiales[posicion]['modificador'] < 10):
+        puntos += casillas_especiales[posicion]['modificador']
+      else:
+        multiplicador += (casillas_especiales[posicion]['modificador'] % 10)
+  if (puntos < 0):
+    return 0
+  else:
+    return puntos if multiplicador == 0 else puntos * multiplicador
+    
 
 nivel = 2
 FILAS = COLUMNAS = 17
@@ -223,14 +235,15 @@ for letra in abecedario:
 letras_jugador = []
 letras_pc = []
 
-repartir_fichas(bolsa_de_fichas, letras_jugador, letras_pc)
+repartir_fichas(bolsa_de_fichas, letras_jugador)
+repartir_fichas(bolsa_de_fichas, letras_pc)
 
 tablero_juego = [[sg.Button('', size = (4, 2), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'green')) for j in range(COLUMNAS)] for i in range(FILAS)]
 
 casillas_especiales = {}
 colocar_posiciones_especiales(nivel, casillas_especiales, FILAS, COLUMNAS, centro)
 
-fichas_jugador = [sg.Button(letras_jugador[i], size= (4, 2), key = i, pad = (0.5, 0.5), button_color = ('white', 'green')) for i in range(7)]
+fichas_jugador = [sg.Button(letras_jugador[i], size = (4, 2), key = i, pad = (0.5, 0.5), button_color = ('white', 'green')) for i in range(7)]
 
 fichas_pc = [sg.Button('?', size= (4, 2), key = i + 8, pad = (0.5, 0.5), button_color = ('white', 'green')) for i in range(7)]
 
@@ -291,7 +304,19 @@ while True:
   if (event in (None, 'Terminar')):
       break
   if (event == 'cambiar'):
-    pass
+    if (len(posiciones_ocupadas) > 0):
+      sg.Popup('Primero debe levantar sus fichas')
+    else:
+      letra_seleccionada = False              
+      orientacion = [True, False]  
+      primer_posicion = ultima_posicion = ()      
+      posiciones_ocupadas = OrderedDict()
+      turno_jugador = False
+      letras_jugador = []
+      repartir_fichas(bolsa_de_fichas, letras_jugador)
+      for i in range (7):
+        window.Element(i).Update(letras_jugador[i])
+      sg.Popup('Se repartieron nuevas fichas al jugador')
   if (event == 'pasar'):
     if (len(posiciones_ocupadas) > 0):
       sg.Popup('Primero debe levantar sus fichas')
@@ -305,14 +330,15 @@ while True:
       window.Element(letra).Update(button_color = ('white', 'green'))
       letra_seleccionada = False
     if (verificar_palabra(letras_jugador, posiciones_ocupadas, posiciones_bloqueadas, centro, primer_jugada)):
+      puntaje_jugador += contar_puntos_jugador(posiciones_ocupadas, casillas_especiales, bolsa_de_fichas, letras_jugador)
       letra_seleccionada = False              
       orientacion = [True, False]  
-      letras = []
       primer_posicion = ultima_posicion = ()
       agregar_posiciones_bloqueadas(posiciones_ocupadas, posiciones_bloqueadas)
       posiciones_ocupadas = OrderedDict()
       turno_jugador = False
       primer_jugada = False
+      window.Element('puntaje_jugador').Update(puntaje_jugador)
     else:
       print('palabra incorrecta')
   if (event in range(7)):
