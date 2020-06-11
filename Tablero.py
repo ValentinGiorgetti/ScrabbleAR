@@ -315,7 +315,7 @@ while True:
       letras_jugador = []
       repartir_fichas(bolsa_de_fichas, letras_jugador)
       for i in range (7):
-        window.Element(i).Update(letras_jugador[i])
+        window.Element(i).Update(letras_jugador[i], disabled = False, button_color = ('white', 'green'))
       sg.Popup('Se repartieron nuevas fichas al jugador')
   if (event == 'pasar'):
     if (len(posiciones_ocupadas) > 0):
