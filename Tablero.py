@@ -49,14 +49,16 @@ def verificar_palabra(letras, posiciones_ocupadas, posiciones_bloqueadas, centro
     for clave in posiciones_ocupadas:
       str += letras[posiciones_ocupadas[clave]]
     if (es_palabra(str)):
-      analisis = parse(str).split('/')
-      print(analisis)
-      for tipo_palabra in palabras_validas:
-        if (analisis[1] in palabras_validas[tipo_palabra]):
-          sg.Popup(f'Palabra formada: {str}')
-          for posicion in posiciones_ocupadas:
-            posiciones_bloqueadas += [posicion]
-          return True
+      #analisis = parse(str).split('/')
+      #print(analisis)
+      #for tipo_palabra in palabras_validas:
+      #  if (analisis[1] in palabras_validas[tipo_palabra]):
+      #    sg.Popup(f'Palabra formada: {str}')
+      #    for posicion in posiciones_ocupadas:
+      #      posiciones_bloqueadas += [posicion]
+      #    return True
+      sg.Popup(f'Palabra formada: {str}')
+      return True
     else:
       sg.Popup('Palabra inválida')
       return False
@@ -160,34 +162,34 @@ def colocar_posiciones_especiales(nivel, casillas_especiales, FILAS, COLUMNAS, c
       posicion_invertida=(j,i)
       if(j == i):
         tablero_juego[i][j] = sg.Button('F +2', size = (4, 2), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'blue'))
-        casillas_especiales[(i, j)] = {'color' : ('white', 'blue'), 'modificador' : 2}
+        casillas_especiales[(i, j)] = {'color' : ('white', 'blue'), 'texto' : 'F +2', 'modificador' : 2}
       elif(i + j == FILAS - 1):
         tablero_juego[i][j] = sg.Button('F +3', size = (4, 2), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'blue'))
-        casillas_especiales[(i, j)] = {'color': ('white', 'blue'), 'modificador' : 3}
+        casillas_especiales[(i, j)] = {'color': ('white', 'blue'), 'texto' : 'F +3', 'modificador' : 3}
       elif (nivel == 1):
         if ((posicion in malas_nivel_facil) or (posicion_invertida in malas_nivel_facil)):
           tablero_juego[i][j] = sg.Button('F ' + str(mala_actual), size = (4, 2), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'black'))
-          casillas_especiales[(i, j)] = {'color' : ('white', 'black'), 'modificador' : mala_actual}
+          casillas_especiales[(i, j)] = {'color' : ('white', 'black'), 'texto' : 'F ' + str(mala_actual), 'modificador' : mala_actual}
           mala_actual = mala_actual - 1 if mala_actual > -3 else -1
         elif ((posicion in multiplicador_nivel_facil) or (posicion_invertida in multiplicador_nivel_facil)):
           tablero_juego[i][j] = sg.Button('P x3' if posicion in multiplicador_nivel_facil else 'P x2', size = (4, 2), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'purple'))
-          casillas_especiales[(i, j)]={'color': ('white', 'purple'), 'modificador' : 13 if posicion in multiplicador_nivel_facil else 12}
+          casillas_especiales[(i, j)]={'color': ('white', 'purple'), 'texto' : 'P x3', 'modificador' : 13 if posicion in multiplicador_nivel_facil else 12}
       elif (nivel == 2):
         if ((posicion in malas_nivel_medio) or (posicion_invertida in malas_nivel_medio)):
           tablero_juego[i][j] = sg.Button('F ' + str(mala_actual), size = (4, 2), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'black'))
-          casillas_especiales[(i, j)] = {'color' : ('white', 'black'), 'modificador' : mala_actual}
+          casillas_especiales[(i, j)] = {'color' : ('white', 'black'), 'texto' : 'F ' + str(mala_actual), 'modificador' : mala_actual}
           mala_actual = mala_actual - 1 if mala_actual > -3 else -1
         elif (posicion in multiplicador_nivel_medio or posicion_invertida in multiplicador_nivel_medio):
           tablero_juego[i][j] = sg.Button('P x3' if posicion_invertida in multiplicador_nivel_medio else 'P x2', size = (4, 2), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'purple'))
-          casillas_especiales[(i, j)]={'color': ('white', 'purple'), 'modificador' : 13 if posicion_invertida in multiplicador_nivel_medio else 12}
+          casillas_especiales[(i, j)] = {'color': ('white', 'purple'), 'texto' : 'P x3', 'modificador' : 13 if posicion_invertida in multiplicador_nivel_medio else 12}
       elif (nivel == 3):
         if ((posicion in malas_nivel_dificil) or (posicion_invertida in malas_nivel_dificil)):
           tablero_juego[i][j] = sg.Button('F ' + str(mala_actual), size = (4, 2), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'black'))
-          casillas_especiales[(i, j)] = {'color' : ('white', 'black'), 'modificador' : mala_actual}
+          casillas_especiales[(i, j)] = {'color' : ('white', 'black'), 'texto' : 'F ' + str(mala_actual), 'modificador' : mala_actual}
           mala_actual = mala_actual - 1 if mala_actual > -3 else -1
         elif (posicion in multiplicador_nivel_dificil or posicion_invertida in multiplicador_nivel_dificil):
           tablero_juego[i][j] = sg.Button('P x3' if posicion in multiplicador_nivel_dificil else 'P x2', size = (4, 2), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'purple'))
-          casillas_especiales[(i, j)]={'color': ('white', 'purple'), 'modificador' : 13 if posicion in multiplicador_nivel_dificil else 12}
+          casillas_especiales[(i, j)] = {'color': ('white', 'purple'), 'texto' : 'P x3', 'modificador' : 13 if posicion in multiplicador_nivel_dificil else 12}
           
   tablero_juego[centro[0]][centro[1]] = sg.Button('Inicio', size = (4, 2), key = (centro[0], centro[1]), pad = (0.5, 0.5), button_color = ('white', 'yellow'))
   casillas_especiales[(centro[0], centro[1])] = {'color' : ('white', 'yellow'), 'modificador' : 1}        
@@ -334,14 +336,7 @@ while True:
           primer_posicion = ultima_posicion = event
     else:
       if (event in (primer_posicion, ultima_posicion)):
-        if (event in casillas_especiales):
-          if (event == centro and primer_jugada):
-              window.Element(event).Update(casillas_especiales[event]['texto'], button_color = casillas_especiales[event]['color'], disabled = False)
-          elif (event != centro):
-             window.Element(event).Update(casillas_especiales[event]['texto'], button_color = casillas_especiales[event]['color'], disabled = False)      
-        else:
-          window.Element(event).Update(' ', button_color = ('white', 'green'))
-        window.Element(posiciones_ocupadas[event]).Update(button_color = ('white', 'green'), disabled = False)
+        window.Element(event).Update(casillas_especiales[event]['texto'] if event in casillas_especiales else ' ', button_color = casillas_especiales[event]['color'] if event in casillas_especiales else ('white', 'green'), disabled = False)      
         del posiciones_ocupadas[event]
         if (len(posiciones_ocupadas) <= 1):
           orientacion[0] = True
