@@ -282,6 +282,7 @@ abecedario = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
 letra_seleccionada = False              
 orientacion = [True, False]   # Si define la orientación, orientacion[0] = True. Si la orientación es vertical, orientacion[1] = False, si es horizontal orientacion[1] = True.
 letras = []
+abecedario = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
 primer_posicion = ultima_posicion = ()
 posiciones_ocupadas = OrderedDict()
 primer_jugada = True
@@ -307,6 +308,8 @@ while True:
     if (len(posiciones_ocupadas) > 0):
       sg.Popup('Primero debe levantar sus fichas')
     else:
+      for letra in letras_jugador:
+        bolsa_de_fichas[letra]['cantidad_fichas'] += 1
       letra_seleccionada = False              
       orientacion = [True, False]  
       primer_posicion = ultima_posicion = ()      
@@ -335,6 +338,13 @@ while True:
       orientacion = [True, False]  
       primer_posicion = ultima_posicion = ()
       agregar_posiciones_bloqueadas(posiciones_ocupadas, posiciones_bloqueadas)
+      for posicion in posiciones_ocupadas:
+        letra = random.choice(abecedario)
+        while (bolsa_de_fichas[letra]['cantidad_fichas'] <= 0):
+          letra = random.choice(abecedario)
+        letras_jugador[posiciones_ocupadas[posicion]] = letra
+        window.Element(posiciones_ocupadas[posicion]).Update(letra, disabled = False, button_color = ('white', 'green'))
+        bolsa_de_fichas[letra]['cantidad_fichas'] -= 1
       posiciones_ocupadas = OrderedDict()
       turno_jugador = False
       primer_jugada = False
