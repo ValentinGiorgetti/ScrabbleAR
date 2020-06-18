@@ -319,7 +319,7 @@ posiciones_bloqueadas = []
 fichas_usadas_pc = []
 puntaje_pc = 0
 puntaje_jugador = 0
-contador_segundos = 12
+contador_segundos = 120
 comenzar = False
     
 while True:
