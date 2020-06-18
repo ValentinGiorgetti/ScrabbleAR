@@ -236,8 +236,18 @@ def fichas_totales(bolsa_de_fichas):
     total += bolsa_de_fichas[letra]['cantidad_fichas']  
   return total  
 
-nivel = 2
-FILAS = COLUMNAS = 17
+def imprimir_mensaje_fin(puntos_jugador, puntos_pc):
+  mensaje = '¡Fin de la partida!\n'
+  if (puntos_jugador > puntos_pc):
+    mensaje += f'Ganó el jugador con {puntos_jugador}'
+  if (puntos_jugador < puntos_pc):
+    mensaje += f'Ganó la computadora con {puntos_pc}'
+  if (puntos_jugador == puntos_pc):
+    mensaje += 'Hubo un empate'
+  sg.Popup(mensaje)
+
+nivel = 3
+FILAS = COLUMNAS = 15
 
 centro = (int(FILAS / 2), int(FILAS / 2))
 
@@ -267,11 +277,11 @@ fichas_pc = [sg.Button('?', size= (4, 2), key = i + 8, pad = (0.5, 0.5), button_
 
 layout = [[sg.Text('Fichas de la computadora')]] + [fichas_pc] + [[sg.Text(' ')]] + [x for x in tablero_juego] 
 layout += [[sg.Text('Fichas del jugador')]] + [fichas_jugador]
-layout += [[sg.Button('Posponer'), sg.Button('Pausa'), sg.Button('Terminar')]]
+layout += [[sg.Button('Comenzar', button_color = ('white', 'green')), sg.Button('Posponer'), sg.Button('Pausa'), sg.Button('Terminar')]]
 
 columna1 = layout
 
-columna2 = [[sg.Text('Tiempo restante'), sg.Text(' ', key = 'tiempo')],
+columna2 = [[sg.Text('Tiempo restante'), sg.Text('             ', key = 'tiempo')],
             [sg.Text('Puntajes')],
             [sg.Text('Jugador'), sg.Text('0       ', key = 'puntaje_jugador')],
             [sg.Text('Computadora'), sg.Text('0     ', key = 'puntaje_computadora')],
@@ -309,11 +319,13 @@ posiciones_bloqueadas = []
 fichas_usadas_pc = []
 puntaje_pc = 0
 puntaje_jugador = 0
+contador_segundos = 12
+comenzar = False
     
 while True:
   event, values = window.Read(timeout = 1000) # milisegundos
   window.Element('turno').Update('jugador' if turno_jugador else 'computadora')
-  if (not turno_jugador):
+  if (not turno_jugador and comenzar):
     jugada = jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fichas_usadas_pc, posiciones_bloqueadas, bolsa_de_fichas)
     if (jugada > 0):
       puntaje_pc += jugada
@@ -322,7 +334,10 @@ while True:
     turno_jugador = True
     window.Element('turno').Update('jugador' if turno_jugador else 'computadora')
     print('Fichas totales:', fichas_totales(bolsa_de_fichas))
-  if (event != '__TIMEOUT__'):
+  if (event == 'Comenzar'):
+    comenzar = True
+    window.Element('Comenzar').Update(disabled = True, button_color = ('white', 'red'))
+  if (event != '__TIMEOUT__' and comenzar):
     if (event in (None, 'Terminar')):
         break
     if (event == 'cambiar'):
@@ -407,6 +422,13 @@ while True:
           else:
             ultima_posicion = (event[0] - 1, event[1]) if not orientacion[1] else (event[0], event[1] - 1)
       print('Fichas totales:', fichas_totales(bolsa_de_fichas))
-    window.Element('palabra_actual').Update(palabra_formada(letras_jugador, posiciones_ocupadas))
+  if (comenzar):
+    window.Element('tiempo').Update(contador_segundos)
+    contador_segundos -= 1
+    if (contador_segundos == 0):
+      imprimir_mensaje_fin(puntaje_jugador, puntaje_pc)
+      break
+  window.Element('palabra_actual').Update(palabra_formada(letras_jugador, posiciones_ocupadas))
 
 window.Close()
+
