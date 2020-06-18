@@ -122,7 +122,7 @@ def jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fic
       while (x in fichas_usadas_pc):
         x = random.randint(8, 14)
       window.Element(x).Update(button_color = ('white', 'red'), disabled = True)
-      fichas_usadas_pc += [x]
+      fichas_usadas_pc += [letra]
       letras_pc.remove(letra)
       letra_nueva = random.choice(abecedario)
       while (bolsa_de_fichas[letra_nueva]['cantidad_fichas'] <= 0):
@@ -258,6 +258,8 @@ bolsa_de_fichas = {}
 for letra in abecedario:
   bolsa_de_fichas[letra] = {'cantidad_fichas' : 10, 'puntaje_ficha' : 1}
 
+fichas_en_bolsa = 260
+
 letras_jugador = []
 letras_pc = []
 
@@ -287,7 +289,7 @@ columna2 = [[sg.Text('Tiempo restante'), sg.Text('             ', key = 'tiempo'
             [sg.Text('Computadora'), sg.Text('0     ', key = 'puntaje_computadora')],
             [sg.Text('Turno actual'), sg.Text('                  ', key = 'turno')],
             [sg.Text('Palabra actual'), sg.Text('                 ', key = 'palabra_actual')],
-            [sg.Text('Cambios restantes'), sg.Text('3 ', key = 'cambios')],
+            [sg.Text('Cambios restantes'), sg.Text('3 ', key = 'cambios'), sg.Text('Cantidad de fichas en la bolsa'), sg.Text(fichas_en_bolsa, key = 'cantidad_fichas')],
             [sg.Button('Confirmar palabra', key = 'confirmar'), sg.Button('Cambiar fichas', key = 'cambiar'), sg.Button('Pasar', key = 'pasar')]]
 
 layout = [[sg.Column(columna1), sg.Column(columna2)]]  
@@ -319,7 +321,7 @@ posiciones_bloqueadas = []
 fichas_usadas_pc = []
 puntaje_pc = 0
 puntaje_jugador = 0
-contador_segundos = 120
+contador_segundos = 300
 comenzar = False
 cambios_restantes = 3
     
@@ -430,9 +432,10 @@ while True:
   if (comenzar):
     window.Element('tiempo').Update(contador_segundos)
     contador_segundos -= 1
+    window.Element('palabra_actual').Update(palabra_formada(letras_jugador, posiciones_ocupadas))
+    window.Element('cantidad_fichas').Update(fichas_totales(bolsa_de_fichas))
     if (contador_segundos == 0):
       imprimir_mensaje_fin(puntaje_jugador, puntaje_pc)
       break
-  window.Element('palabra_actual').Update(palabra_formada(letras_jugador, posiciones_ocupadas))
 
 window.Close()
