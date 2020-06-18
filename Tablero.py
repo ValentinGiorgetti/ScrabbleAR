@@ -287,8 +287,8 @@ columna2 = [[sg.Text('Tiempo restante'), sg.Text('             ', key = 'tiempo'
             [sg.Text('Computadora'), sg.Text('0     ', key = 'puntaje_computadora')],
             [sg.Text('Turno actual'), sg.Text('                  ', key = 'turno')],
             [sg.Text('Palabra actual'), sg.Text('                 ', key = 'palabra_actual')],
-            [sg.Button('Confirmar palabra', key = 'confirmar'), sg.Button('Cambiar fichas', key = 'cambiar'), sg.Button('Pasar', key = 'pasar')],
-            [sg.Text('Cambios restantes'), sg.Text(' ', key = 'cambios')]]
+            [sg.Text('Cambios restantes'), sg.Text('3 ', key = 'cambios')],
+            [sg.Button('Confirmar palabra', key = 'confirmar'), sg.Button('Cambiar fichas', key = 'cambiar'), sg.Button('Pasar', key = 'pasar')]]
 
 layout = [[sg.Column(columna1), sg.Column(columna2)]]  
 
@@ -321,6 +321,7 @@ puntaje_pc = 0
 puntaje_jugador = 0
 contador_segundos = 120
 comenzar = False
+cambios_restantes = 3
     
 while True:
   event, values = window.Read(timeout = 1000) # milisegundos
@@ -344,6 +345,7 @@ while True:
       if (len(posiciones_ocupadas) > 0):
         sg.Popup('Primero debe levantar sus fichas')
       else:
+        cambios_restantes -= 1
         for letra in letras_jugador:
           bolsa_de_fichas[letra]['cantidad_fichas'] += 1
         letra_seleccionada = False              
@@ -356,6 +358,9 @@ while True:
         for i in range (7):
           window.Element(i).Update(letras_jugador[i], disabled = False, button_color = ('white', 'green'))
         sg.Popup('Se repartieron nuevas fichas al jugador')
+        window.Element('cambios').Update(cambios_restantes)
+        if (cambios_restantes == 0):
+          window.Element('cambiar').Update(disabled = True, button_color = ('white', 'red'))
     if (event == 'pasar'):
       if (len(posiciones_ocupadas) > 0):
         sg.Popup('Primero debe levantar sus fichas')
@@ -431,4 +436,3 @@ while True:
   window.Element('palabra_actual').Update(palabra_formada(letras_jugador, posiciones_ocupadas))
 
 window.Close()
-
