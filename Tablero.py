@@ -73,7 +73,7 @@ def sumar_casilla(casillas_especiales, posicion, letra, puntos_jugada, multiplic
     else:
       multiplicador[0] += (casillas_especiales[posicion]['modificador'] % 10)
 
-def jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fichas_usadas_pc, posiciones_bloqueadas, bolsa_de_fichas):
+def jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fichas_usadas_pc, posiciones_bloqueadas, bolsa_de_fichas, cambios_restantes, window):
   orientacion = random.randint(0, 100) % 2 == 0   # Si es par la orientacion es horizontal
   abecedario = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
   print(letras_pc)
@@ -139,16 +139,19 @@ def jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fic
     else:
       return puntos_jugada[0] if multiplicador[0] == 0 else puntos_jugada[0] * multiplicador[0]
   else:
-    letras_pc.clear()
-    for letra in fichas_usadas_pc:
-      bolsa_de_fichas[letra]['cantidad_fichas'] += 1
-    fichas_usadas_pc.clear()
-    for i in range(8, 15):
-      window.Element(i).Update(button_color = ('white', 'green'), disabled = False)
-    repartir_fichas(bolsa_de_fichas, letras_pc)
-    sg.Popup('Se repartieron nuevas fichas a la computadora')
-    print('nuevas letras', letras_pc)
-    return 0
+    if (cambios_restantes[0] > 0):
+      cambios_restantes[0] -= 1
+      letras_pc.clear()
+      for letra in fichas_usadas_pc:
+        bolsa_de_fichas[letra]['cantidad_fichas'] += 1
+      fichas_usadas_pc.clear()
+      for i in range(8, 15):
+        window.Element(i).Update(button_color = ('white', 'green'), disabled = False)
+      repartir_fichas(bolsa_de_fichas, letras_pc)
+      sg.Popup('Se repartieron nuevas fichas a la computadora')
+      print('nuevas letras', letras_pc)
+      window.Element('cambios_pc').Update(cambios_restantes[0])
+    return 0    
 
 def colocar_posiciones_especiales(nivel, casillas_especiales, FILAS, COLUMNAS, centro):
   malas_nivel_facil =[(4, 8), (5, 9), (4, 10), (3, 9), (8, 14), (9, 13), (10, 14), (9, 15)]
@@ -207,7 +210,7 @@ def agregar_posiciones_bloqueadas(posiciones_ocupadas, posiciones_bloqueadas):
     posiciones_bloqueadas += [posicion]
 
 def repartir_fichas(bolsa_de_fichas, letras):
-  abecedario = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+  abecedario = list('AAAAABCDEEEEEFGHIIIIIJKLMNOOOOOPQRSTUUUUUVWXYZ')
   for i in range(7):
     letra = random.choice(abecedario)
     while (bolsa_de_fichas[letra]['cantidad_fichas'] <= 0):
@@ -289,7 +292,8 @@ columna2 = [[sg.Text('Tiempo restante'), sg.Text('             ', key = 'tiempo'
             [sg.Text('Computadora'), sg.Text('0     ', key = 'puntaje_computadora')],
             [sg.Text('Turno actual'), sg.Text('                  ', key = 'turno')],
             [sg.Text('Palabra actual'), sg.Text('                 ', key = 'palabra_actual')],
-            [sg.Text('Cambios restantes'), sg.Text('3 ', key = 'cambios'), sg.Text('Cantidad de fichas en la bolsa'), sg.Text(fichas_en_bolsa, key = 'cantidad_fichas')],
+            [sg.Text('Cambios restantes jugador'), sg.Text('3 ', key = 'cambios_jugador'), sg.Text('Cambios restantes pc'), sg.Text('3 ', key = 'cambios_pc')],
+            [sg.Text('Cantidad de fichas en la bolsa'), sg.Text(fichas_en_bolsa, key = 'cantidad_fichas')],
             [sg.Button('Confirmar palabra', key = 'confirmar'), sg.Button('Cambiar fichas', key = 'cambiar'), sg.Button('Pasar', key = 'pasar')]]
 
 layout = [[sg.Column(columna1), sg.Column(columna2)]]  
@@ -312,7 +316,6 @@ abecedario = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
 letra_seleccionada = False              
 orientacion = [True, False]   # Si define la orientación, orientacion[0] = True. Si la orientación es vertical, orientacion[1] = False, si es horizontal orientacion[1] = True.
 letras = []
-abecedario = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
 primer_posicion = ultima_posicion = ()
 posiciones_ocupadas = OrderedDict()
 primer_jugada = True
@@ -324,12 +327,18 @@ puntaje_jugador = 0
 contador_segundos = 300
 comenzar = False
 cambios_restantes = 3
+cambios_restantes_pc = [3]
     
 while True:
   event, values = window.Read(timeout = 1000) # milisegundos
+  if (event == None):
+    break
+  if (event == 'Terminar'):
+    imprimir_mensaje_fin(puntaje_jugador, puntaje_pc)
+    break
   window.Element('turno').Update('jugador' if turno_jugador else 'computadora')
   if (not turno_jugador and comenzar):
-    jugada = jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fichas_usadas_pc, posiciones_bloqueadas, bolsa_de_fichas)
+    jugada = jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fichas_usadas_pc, posiciones_bloqueadas, bolsa_de_fichas, cambios_restantes_pc, window)
     if (jugada > 0):
       puntaje_pc += jugada
       window.Element('puntaje_computadora').Update(puntaje_pc)
@@ -341,8 +350,6 @@ while True:
     comenzar = True
     window.Element('Comenzar').Update(disabled = True, button_color = ('white', 'red'))
   if (event != '__TIMEOUT__' and comenzar):
-    if (event in (None, 'Terminar')):
-        break
     if (event == 'cambiar'):
       if (len(posiciones_ocupadas) > 0):
         sg.Popup('Primero debe levantar sus fichas')
@@ -360,7 +367,7 @@ while True:
         for i in range (7):
           window.Element(i).Update(letras_jugador[i], disabled = False, button_color = ('white', 'green'))
         sg.Popup('Se repartieron nuevas fichas al jugador')
-        window.Element('cambios').Update(cambios_restantes)
+        window.Element('cambios_jugador').Update(cambios_restantes)
         if (cambios_restantes == 0):
           window.Element('cambiar').Update(disabled = True, button_color = ('white', 'red'))
     if (event == 'pasar'):
@@ -434,7 +441,7 @@ while True:
     contador_segundos -= 1
     window.Element('palabra_actual').Update(palabra_formada(letras_jugador, posiciones_ocupadas))
     window.Element('cantidad_fichas').Update(fichas_totales(bolsa_de_fichas))
-    if (contador_segundos == 0):
+    if (0 in (contador_segundos, cambios_restantes, cambios_restantes_pc[0])):
       imprimir_mensaje_fin(puntaje_jugador, puntaje_pc)
       break
 
