@@ -4,6 +4,7 @@ from pattern.es import parse, verbs, spelling, lexicon
 from collections import OrderedDict
 from itertools import permutations
 import sys
+from Jugador import Jugador
 
 def posicion_valida(event, posiciones_ocupadas, orientacion, posiciones_bloqueadas):
   if (not event in posiciones_bloqueadas):
@@ -49,14 +50,6 @@ def verificar_palabra(letras, posiciones_ocupadas, posiciones_bloqueadas, centro
     for clave in posiciones_ocupadas:
       str += letras[posiciones_ocupadas[clave]]
     if (es_palabra(str)):
-      #analisis = parse(str).split('/')
-      #print(analisis)
-      #for tipo_palabra in palabras_validas:
-      #  if (analisis[1] in palabras_validas[tipo_palabra]):
-      #    sg.Popup(f'Palabra formada: {str}')
-      #    for posicion in posiciones_ocupadas:
-      #      posiciones_bloqueadas += [posicion]
-      #    return True
       sg.Popup(f'Palabra formada por el jugador: {str}')
       return True
     else:
@@ -73,10 +66,10 @@ def sumar_casilla(casillas_especiales, posicion, letra, puntos_jugada, multiplic
     else:
       multiplicador[0] += (casillas_especiales[posicion]['modificador'] % 10)
 
-def jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fichas_usadas_pc, posiciones_bloqueadas, bolsa_de_fichas, cambios_restantes, window):
+def jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fichas_usadas_pc, posiciones_bloqueadas, bolsa_de_fichas, computadora, window):
   orientacion = random.randint(0, 100) % 2 == 0   # Si es par la orientacion es horizontal
   abecedario = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
-  print(letras_pc)
+  print('letras pc:', letras_pc)
   puntos_jugada = [0]
   multiplicador = [0]
   if (primer_jugada):
@@ -133,14 +126,13 @@ def jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fic
     for i in range(8, 15):
       window.Element(i).Update(button_color = ('white', 'green'), disabled = False)
     sg.Popup(f'Palabra formada por la computadora: {palabra}')
-    print('nuevas letras', letras_pc)
     if (puntos_jugada[0] < 0):
       return 0
     else:
       return puntos_jugada[0] if multiplicador[0] == 0 else puntos_jugada[0] * multiplicador[0]
   else:
-    if (cambios_restantes[0] > 0):
-      cambios_restantes[0] -= 1
+    if (computadora.get_cambios_restantes() > 0):
+      computadora.actualizar_cambios_restantes()
       letras_pc.clear()
       for letra in fichas_usadas_pc:
         bolsa_de_fichas[letra]['cantidad_fichas'] += 1
@@ -149,9 +141,11 @@ def jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fic
         window.Element(i).Update(button_color = ('white', 'green'), disabled = False)
       repartir_fichas(bolsa_de_fichas, letras_pc)
       sg.Popup('Se repartieron nuevas fichas a la computadora')
-      print('nuevas letras', letras_pc)
-      window.Element('cambios_pc').Update(cambios_restantes[0])
-    return 0    
+      print('nuevas letras pc', letras_pc)
+      window.Element('cambios_pc').Update(computadora.get_cambios_restantes())
+      return 0   
+    else:
+      return -1 
 
 def colocar_posiciones_especiales(nivel, casillas_especiales, FILAS, COLUMNAS, centro):
   malas_nivel_facil =[(4, 8), (5, 9), (4, 10), (3, 9), (8, 14), (9, 13), (10, 14), (9, 15)]
@@ -210,7 +204,7 @@ def agregar_posiciones_bloqueadas(posiciones_ocupadas, posiciones_bloqueadas):
     posiciones_bloqueadas += [posicion]
 
 def repartir_fichas(bolsa_de_fichas, letras):
-  abecedario = list('AAAAABCDEEEEEFGHIIIIIJKLMNOOOOOPQRSTUUUUUVWXYZ')
+  abecedario = list('AAAABCDEEEEFGHIIIIJKLMNOOOOPQRSTUUUUVWXYZ')
   for i in range(7):
     letra = random.choice(abecedario)
     while (bolsa_de_fichas[letra]['cantidad_fichas'] <= 0):
@@ -239,15 +233,87 @@ def fichas_totales(bolsa_de_fichas):
     total += bolsa_de_fichas[letra]['cantidad_fichas']  
   return total  
 
-def imprimir_mensaje_fin(puntos_jugador, puntos_pc):
-  mensaje = '¡Fin de la partida!\n'
-  if (puntos_jugador > puntos_pc):
-    mensaje += f'Ganó el jugador con {puntos_jugador}'
-  if (puntos_jugador < puntos_pc):
-    mensaje += f'Ganó la computadora con {puntos_pc}'
-  if (puntos_jugador == puntos_pc):
+def imprimir_mensaje_fin(jugador, computadora):
+  mensaje = '¡Fin de la partida!' + ('\n La computadora no puede formar ninguna palabra y no dispone de más cambios \n' if computadora.get_cambios_restantes() == -1 else '\n')
+  if (jugador.get_puntaje() > computadora.get_puntaje()):
+    mensaje += f'Ganó el jugador con {jugador.get_puntaje()}'
+  if (jugador.get_puntaje() < computadora.get_puntaje()):
+    mensaje += f'Ganó la computadora con {computadora.get_puntaje()} puntos'
+  if (jugador.get_puntaje() == computadora.get_puntaje()):
     mensaje += 'Hubo un empate'
   sg.Popup(mensaje)
+
+def cambiar_fichas(jugador, letras_jugador, bolsa_de_fichas, contador, window):
+  layout_cambiar_fichas = [[sg.Button('Cambiar todas', key = 'todas'), sg.Button('Cambiar algunas', key = 'algunas')],
+                           [sg.Text('Seleccione las fichas que quiere intercambiar')],
+                           [sg.Button(letras_jugador[i], size= (4, 2), key = i, pad = (0.5, 0.5), button_color = ('white', 'green'), disabled = True) for i in range(7)],
+                           [sg.Button('Aceptar', disabled = True, button_color = ('white', 'red')), sg.Button('Salir')]]
+  ventana = sg.Window('Cambiar fichas', layout_cambiar_fichas)
+
+  abecedario = list('AAAAABCDEEEEEFGHIIIIIJKLMNOOOOOPQRSTUUUUUVWXYZ')
+
+  seleccionadas = {}
+
+  cambio = algunas = False
+
+  while True:
+    event = ventana.Read(timeout = 1000)[0]
+    contador -= 1
+    window.Element('tiempo').Update(contador)
+    if (contador == 0):
+      break
+    if (event == '__TIMEOUT__'):
+      continue
+    if (event in ('Salir', None)):
+      break
+    if (event == 'todas'):
+      for letra in letras_jugador:
+        bolsa_de_fichas[letra]['cantidad_fichas'] += 1
+      letras_jugador.clear()
+      repartir_fichas(bolsa_de_fichas, letras_jugador)
+      for i in range (7):
+        window.Element(i).Update(letras_jugador[i], button_color = ('white', 'green'))
+      sg.Popup('Se cambiaron todas las fichas del jugador')
+      cambio = True
+      break
+    elif (event == 'algunas'):
+      if (not algunas):
+        ventana.Element('todas').Update(disabled = True, button_color = ('white', 'red'))
+        ventana.Element('Aceptar').Update(disabled = False, button_color = ('white', 'green')) 
+        for i in range(7):
+          ventana.Element(i).Update(disabled = False)
+        algunas = True
+      else:
+        ventana.Element('todas').Update(disabled = False, button_color = ('white', 'green'))
+        ventana.Element('Aceptar').Update(disabled = True, button_color = ('white', 'red')) 
+        for i in range(7):
+          ventana.Element(i).Update(disabled = True)
+        algunas = False
+    elif (event == 'Aceptar'):
+      if (len(seleccionadas) == 0):
+        sg.Popup('Debe seleccionar alguna letra')
+      else:
+        for i in seleccionadas:
+          bolsa_de_fichas[seleccionadas[i]]['cantidad_fichas'] += 1
+          letra = random.choice(abecedario)
+          while (bolsa_de_fichas[letra]['cantidad_fichas'] <= 0):
+            letra = random.choice(abecedario)
+          bolsa_de_fichas[letra]['cantidad_fichas'] -= 1
+          window.Element(i).Update(letra, button_color = ('white', 'green'))
+          letras_jugador[i] = letra
+        sg.Popup('Se cambiaron algunas fichas del jugador')
+        cambio = True
+        break
+    else:
+      if (event in seleccionadas):
+        ventana.Element(event).Update(button_color = ('white', 'green'))
+        del seleccionadas[event]
+      else:
+        ventana.Element(event).Update(button_color = ('white', 'red'))
+        seleccionadas[event] = letras_jugador[event]
+  ventana.Close()
+  
+  return (cambio, contador)
 
 nivel = 3
 FILAS = COLUMNAS = 15
@@ -286,7 +352,7 @@ layout += [[sg.Button('Comenzar', button_color = ('white', 'green')), sg.Button(
 
 columna1 = layout
 
-columna2 = [[sg.Text('Tiempo restante'), sg.Text('             ', key = 'tiempo')],
+columna2 = [[sg.Text('Tiempo restante'), sg.Text('        ', key = 'tiempo')],
             [sg.Text('Puntajes')],
             [sg.Text('Jugador'), sg.Text('0       ', key = 'puntaje_jugador')],
             [sg.Text('Computadora'), sg.Text('0     ', key = 'puntaje_computadora')],
@@ -302,17 +368,6 @@ window = sg.Window('Tablero', layout)
 
 abecedario = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ') 
 
-# layout_cambiar_fichas = [[sg.Button('Cambiar todas', key = 'todas'), sg.Button('Cambiar algunas', key = 'algunas')],
-#                          [sg.Text('Seleccione las fichas que quiere intercambiar', key = 'texto1', visible = False)],
-#                          [sg.Text('Fichas en la bolsa', key = 'texto2', visible = False)],
-#                          [sg.Button(abecedario[i] + ' x' + str(bolsa_de_fichas[abecedario[i]]), size= (4, 2), key = abecedario[i], pad = (0.5, 0.5), button_color = ('white', 'green')) for i in range(14)],
-#                          [sg.Button(abecedario[i] + ' x' + str(bolsa_de_fichas[abecedario[i]]), size= (4, 2), key = i, pad = (0.5, 0.5), button_color = ('white', 'green')) for i in range(14,26)]]
-
-# ventana_cambiar_fichas = sg.Window('Cambiar fichas', layout_cambiar_fichas)
-
-# ventana_cambiar_fichas.Read()
-# ventana_cambiar_fichas.Close()
-
 letra_seleccionada = False              
 orientacion = [True, False]   # Si define la orientación, orientacion[0] = True. Si la orientación es vertical, orientacion[1] = False, si es horizontal orientacion[1] = True.
 letras = []
@@ -322,30 +377,30 @@ primer_jugada = True
 turno_jugador = random.randint(0, 100) % 2 == 0 #   si el número aleatorio es par, comienza el jugador
 posiciones_bloqueadas = []
 fichas_usadas_pc = []
-puntaje_pc = 0
-puntaje_jugador = 0
 contador_segundos = 300
 comenzar = False
-cambios_restantes = 3
-cambios_restantes_pc = [3]
+
+computadora = Jugador()
+jugador = Jugador()
     
 while True:
   event, values = window.Read(timeout = 1000) # milisegundos
   if (event == None):
     break
   if (event == 'Terminar'):
-    imprimir_mensaje_fin(puntaje_jugador, puntaje_pc)
+    imprimir_mensaje_fin(jugador, computadora)
     break
   window.Element('turno').Update('jugador' if turno_jugador else 'computadora')
   if (not turno_jugador and comenzar):
-    jugada = jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fichas_usadas_pc, posiciones_bloqueadas, bolsa_de_fichas, cambios_restantes_pc, window)
-    if (jugada > 0):
-      puntaje_pc += jugada
-      window.Element('puntaje_computadora').Update(puntaje_pc)
+    jugada = jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fichas_usadas_pc, posiciones_bloqueadas, bolsa_de_fichas, computadora, window)
+    if (jugada >= 0):
+      computadora.actualizar_puntaje(jugada)
+      window.Element('puntaje_computadora').Update(computadora.get_puntaje())
       primer_jugada = False
+    else:
+      computadora.actualizar_cambios_restantes()
     turno_jugador = True
     window.Element('turno').Update('jugador' if turno_jugador else 'computadora')
-    print('Fichas totales:', fichas_totales(bolsa_de_fichas))
   if (event == 'Comenzar'):
     comenzar = True
     window.Element('Comenzar').Update(disabled = True, button_color = ('white', 'red'))
@@ -354,22 +409,19 @@ while True:
       if (len(posiciones_ocupadas) > 0):
         sg.Popup('Primero debe levantar sus fichas')
       else:
-        cambios_restantes -= 1
-        for letra in letras_jugador:
-          bolsa_de_fichas[letra]['cantidad_fichas'] += 1
-        letra_seleccionada = False              
-        orientacion = [True, False]  
-        primer_posicion = ultima_posicion = ()      
-        posiciones_ocupadas = OrderedDict()
-        turno_jugador = False
-        letras_jugador = []
-        repartir_fichas(bolsa_de_fichas, letras_jugador)
-        for i in range (7):
-          window.Element(i).Update(letras_jugador[i], disabled = False, button_color = ('white', 'green'))
-        sg.Popup('Se repartieron nuevas fichas al jugador')
-        window.Element('cambios_jugador').Update(cambios_restantes)
-        if (cambios_restantes == 0):
-          window.Element('cambiar').Update(disabled = True, button_color = ('white', 'red'))
+        print('Originales:', letras_jugador)
+        cambio, contador_segundos = cambiar_fichas(jugador, letras_jugador, bolsa_de_fichas, contador_segundos, window)
+        if (cambio):
+          jugador.actualizar_cambios_restantes()
+          window.Element('cambios_jugador').Update(jugador.get_cambios_restantes())
+          letra_seleccionada = False              
+          orientacion = [True, False]  
+          primer_posicion = ultima_posicion = ()      
+          posiciones_ocupadas = OrderedDict()
+          turno_jugador = False
+          if (jugador.get_cambios_restantes() == 0):
+            window.Element('cambiar').Update(disabled = True, button_color = ('white', 'red'))
+        print('Cambiadas:', letras_jugador)
     if (event == 'pasar'):
       if (len(posiciones_ocupadas) > 0):
         sg.Popup('Primero debe levantar sus fichas')
@@ -383,7 +435,7 @@ while True:
         window.Element(letra).Update(button_color = ('white', 'green'))
         letra_seleccionada = False
       if (verificar_palabra(letras_jugador, posiciones_ocupadas, posiciones_bloqueadas, centro, primer_jugada)):
-        puntaje_jugador += contar_puntos_jugador(posiciones_ocupadas, casillas_especiales, bolsa_de_fichas, letras_jugador)
+        jugador.actualizar_puntaje(contar_puntos_jugador(posiciones_ocupadas, casillas_especiales, bolsa_de_fichas, letras_jugador))
         letra_seleccionada = False              
         orientacion = [True, False]  
         primer_posicion = ultima_posicion = ()
@@ -398,7 +450,7 @@ while True:
         posiciones_ocupadas = OrderedDict()
         turno_jugador = False
         primer_jugada = False
-        window.Element('puntaje_jugador').Update(puntaje_jugador)
+        window.Element('puntaje_jugador').Update(jugador.get_puntaje())
       else:
         print('palabra incorrecta')
     if (event in range(7)):
@@ -435,14 +487,13 @@ while True:
             primer_posicion = (event[0] + 1, event[1]) if not orientacion[1] else (event[0], event[1] + 1)
           else:
             ultima_posicion = (event[0] - 1, event[1]) if not orientacion[1] else (event[0], event[1] - 1)
-      print('Fichas totales:', fichas_totales(bolsa_de_fichas))
   if (comenzar):
     window.Element('tiempo').Update(contador_segundos)
     contador_segundos -= 1
     window.Element('palabra_actual').Update(palabra_formada(letras_jugador, posiciones_ocupadas))
     window.Element('cantidad_fichas').Update(fichas_totales(bolsa_de_fichas))
-    if (0 in (contador_segundos, cambios_restantes, cambios_restantes_pc[0])):
-      imprimir_mensaje_fin(puntaje_jugador, puntaje_pc)
+    if (contador_segundos == 0 or computadora.get_cambios_restantes() == -1):
+      imprimir_mensaje_fin(jugador, computadora)
       break
 
 window.Close()
