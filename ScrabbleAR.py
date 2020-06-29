@@ -4,6 +4,14 @@ import pickle, json, os, PySimpleGUI as sg
 
 def menu():
 
+    '''
+    Función que muestra la ventana "menú", a partir de la cuál el usuario puede desplazarce a la ventana
+    de configuración (para modificar disintos parámetros del juego), a la venta de reglas del juego o
+    a la ventana que muestra el top de puntajes.
+
+    Esta función retorna un diccionario con la configuración seleccionada por el jugador al programa principal.
+    '''
+
     layout = [[sg.Text('Menú', size = (60, 1), justification = 'center', font = ("Consolas", 11))],
               [sg.Button('Configuración', key = configuracion), sg.Button('Ver reglas del juego', key = reglas), sg.Button('Ver top de puntajes', key = top_puntajes), sg.Button('Volver')]]
     window = sg.Window('Menú', layout, location = (600, 200))
@@ -28,7 +36,10 @@ def menu():
     return configuracion_seleccionada
 
 def reglas():
-
+    '''
+    Función que muestra una ventana con información sobre cada nivel: tipo de palabras válidas
+    y tamaño del tablero.
+    '''
     texto1 = 'Palabras válidas: cualquier palabra que la libería Pattern considere válida.\nTamño del tablero: 19 x 19.'
     texto2 = 'Palabras válidas: adjetivos y verbos.\nTamño del tablero: 17 x 17.'
     texto3 = 'Palabras válidas: adjetivos y verbos. \nTamño del tablero: 15 x 15.'
@@ -52,7 +63,11 @@ def reglas():
     window.Close()
 
 def top_puntajes():
-
+    '''
+    Función que muestra una ventana con el top 10 de los mejores puntajes.
+    Abre un archivo binario que contiene una lista de tuplas ('Computadora / Jugador', Objeto jugador) ordenada
+    por puntaje en forma descendente. Lo que hace es mostrar esa información en la ventana.
+    '''
     ruta = 'Componentes' + os.sep + 'Informacion guardada' + os.sep
 
     with open(ruta + 'top_puntajes', 'rb') as f:
@@ -75,9 +90,21 @@ def top_puntajes():
     
 
 def configuracion():
+    '''
+    Función que muestra una ventana donde el usuario puede modificar diferentes parámetros de la partida,
+    tales como el nivel, el tiempo, el puntaje y cantidad de fichas de cada letra. La configuración 
+    consiste en un diccionario donde se van almacenando la configuración seleccionada.
 
+    Siempre muestra la última configuración seleccionada, la cuál inicialmente coincide con la configuración 
+    por defecto (la configuración por defecto se obtiene de un archivo json). El usuario tiene la posibilidad 
+    de reestablecer las configuraciones a valores por defecto. Finalmente, se guarda la configuración seleccionada 
+    en un archivo json y se retorna el diccionario con la configuración seleccionada a la ventana "menú".
+    '''
     def informacion_letras(letras):
-        
+        '''
+        Función que es usada para actualizar un widget de la ventana el cuál muestra la información de las 
+        fichas, de acuerdo a la configuración actual.
+        '''
         if (len(letras) == 0):
             return 'Letras modificadas'
         texto = 'Letra   Puntos   Cantidad de fichas\n\n'
@@ -155,67 +182,84 @@ def configuracion():
     return configuracion_seleccionada
 
 def actualizar_top(top, jugador, computadora):
-
+    '''
+    Función usada para actualizar el top de los 10 mejores puntajes.
+    '''
     top += [('Jugador', jugador)]
     top += [('Computadora', computadora)]
 
     top = sorted(top, key = lambda x : x[1].get_puntaje(), reverse = True)
     top = top[:10]
 
-ruta = 'Componentes' + os.sep + 'Informacion guardada' + os.sep
+def main():
+    '''
+    Función principal que muestra una ventana con opciones para acceder al menú, reanundar una partida o iniciar una partida nueva.
 
-with open(ruta + 'partida_guardada', 'rb') as f:
-    partida = pickle.load(f)
+    La opción de reanudar una partida sólo estará habilitada en caso de que exista una partida guardada. En caso de que exista una 
+    partida guardada y el usuario quiera iniciar una nueva, se mostrará una ventana para confirmar la opción, ya que si se inicia una
+    nueva partida, la partida guardada se elimina.
 
-layout = [[sg.Text('ScrabbleAR')],
-          [sg.Button('Imagen scrabble', disabled = True)],
-          [sg.Button('Menú', key = menu), sg.Button('Reanudar partida', size = (7,2), key = 'reanudar', disabled = partida == None), sg.Button('Iniciar nueva partida', size = (11, 2), key = jugar), sg.Button('Salir')]]
-ventana = sg.Window('ScrabbleAR', layout)
+    La configuración de la partida será la última seleccionada.
 
-layout_confirmar = [[sg.Text('Hay una partida guardada, si inicia una nueva no podrá continuar con la anterior')],
-                    [sg.Button('Cancelar'), sg.Button('Continuar')]]
-window_confirmar = sg.Window('Partida nueva', layout_confirmar)
+    Una vez que la partida termina, se actualiza el top de puntajes y se guarda la información de la partida. En caso de que el usuario
+    no haya pospuesto la partida, se guardará None en el archivo "partida_guardada", lo cuál indica que no hay partida guardada.
+    '''
+    ruta = 'Componentes' + os.sep + 'Informacion guardada' + os.sep
 
-with open(ruta + 'ultima_configuracion.json') as f:
-    configuracion_seleccionada = json.load(f)
+    with open(ruta + 'partida_guardada', 'rb') as f:
+        partida = pickle.load(f)
 
-with open(ruta + 'top_puntajes', 'rb') as f:
-    top = pickle.load(f)
+    layout = [[sg.Text('ScrabbleAR')],
+              [sg.Button('Imagen scrabble', disabled = True)],
+              [sg.Button('Menú', key = menu), sg.Button('Reanudar partida', size = (7,2), key = 'reanudar', disabled = partida == None), sg.Button('Iniciar nueva partida', size = (11, 2), key = jugar), sg.Button('Salir')]]
+    ventana = sg.Window('ScrabbleAR', layout)
 
-ok = True
+    layout_confirmar = [[sg.Text('Hay una partida guardada, si inicia una nueva no podrá continuar con la anterior')],
+                        [sg.Button('Cancelar'), sg.Button('Continuar')]]
+    window_confirmar = sg.Window('Partida nueva', layout_confirmar)
 
-while True:
-    event = ventana.Read()[0]
-    if (event in (None, 'Salir')):
-        break
-    elif (event == menu):
-        ventana.Hide()
-        configuracion_seleccionada = menu()
-        ventana.UnHide() 
-    elif (event == jugar):
-        if (partida != None):
+    with open(ruta + 'ultima_configuracion.json') as f:
+        configuracion_seleccionada = json.load(f)
+
+    with open(ruta + 'top_puntajes', 'rb') as f:
+        top = pickle.load(f)
+
+    ok = True
+
+    while True:
+        event = ventana.Read()[0]
+        if (event in (None, 'Salir')):
+            break
+        elif (event == menu):
             ventana.Hide()
-            window_confirmar.UnHide()
-            opcion = window_confirmar.Read()[0]
-            window_confirmar.Hide()
-            ventana.UnHide()
-            ok = opcion == 'Continuar'
-        if (ok):
+            configuracion_seleccionada = menu()
+            ventana.UnHide() 
+        elif (event == jugar):
+            if (partida != None):
+                ventana.Hide()
+                window_confirmar.UnHide()
+                opcion = window_confirmar.Read()[0]
+                window_confirmar.Hide()
+                ventana.UnHide()
+                ok = opcion == 'Continuar'
+            if (ok):
+                ventana.Hide()
+                partida, jugador, computadora = jugar(configuracion_seleccionada, None)
+                actualizar_top(top, jugador, computadora)
+                with open(ruta + 'top_puntajes', 'wb') as f:
+                    pickle.dump(top, f)
+                ventana.UnHide()
+        elif (event == 'reanudar'):
             ventana.Hide()
-            partida, jugador, computadora = jugar(configuracion_seleccionada, None)
+            partida, jugador, computadora = jugar(configuracion_seleccionada, partida)
             actualizar_top(top, jugador, computadora)
             with open(ruta + 'top_puntajes', 'wb') as f:
                 pickle.dump(top, f)
             ventana.UnHide()
-    elif (event == 'reanudar'):
-        ventana.Hide()
-        partida, jugador, computadora = jugar(configuracion_seleccionada, partida)
-        actualizar_top(top, jugador, computadora)
-        with open(ruta + 'top_puntajes', 'wb') as f:
-            pickle.dump(top, f)
-        ventana.UnHide()
-    with open(ruta + 'partida_guardada', 'wb') as f:
-        pickle.dump(partida, f)
-    ventana.Element('reanudar').Update(disabled = partida == None)
+        with open(ruta + 'partida_guardada', 'wb') as f:
+            pickle.dump(partida, f)
+        ventana.Element('reanudar').Update(disabled = partida == None)
 
-ventana.Close()
+    ventana.Close()
+
+main()
