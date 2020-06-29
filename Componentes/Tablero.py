@@ -153,41 +153,50 @@ def jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fic
         j += 1 if orientacion else 0
         i += 1 if not orientacion else 0
     fichas_usadas_pc.clear()
+    quedan = quedan_fichas(bolsa_de_fichas, len(palabra))
     for letra in palabra:
       x = random.randint(8, 14)
       while (x in fichas_usadas_pc):
         x = random.randint(8, 14)
-        print('aca')
       window.Element(x).Update(button_color = ('white', 'red'))
       fichas_usadas_pc += [x]
       letras_pc.remove(letra)
-      letra_nueva = random.choice(abecedario)
-      while (bolsa_de_fichas[letra_nueva]['cantidad_fichas'] <= 0):
+      if (quedan):
         letra_nueva = random.choice(abecedario)
-      letras_pc += [letra_nueva]
-      bolsa_de_fichas[letra_nueva]['cantidad_fichas'] -= 1
-    print(puntos_jugada[0], '*', multiplicador[0])
-    for i in range(8, 15):
-      window.Element(i).Update(button_color = ('white', 'green'), disabled = True)
+        while (bolsa_de_fichas[letra_nueva]['cantidad_fichas'] <= 0):
+          letra_nueva = random.choice(abecedario)
+        letras_pc += [letra_nueva]
+        bolsa_de_fichas[letra_nueva]['cantidad_fichas'] -= 1
+    #print(puntos_jugada[0], '*', multiplicador[0])
+    if (quedan):
+      for i in range(8, 15):
+        window.Element(i).Update(button_color = ('white', 'green'), disabled = True)
+    else:
+      for i in range(4):
+        computadora.actualizar_cambios_restantes()
     puntos_jugada = 0 if puntos_jugada[0] < 0 else (puntos_jugada[0] if multiplicador[0] == 0 else puntos_jugada[0] * multiplicador[0])
     sg.Popup(f'Palabra formada por la computadora: {palabra}\nPuntos sumadados: {puntos_jugada}', title = 'Atención', non_blocking = True, auto_close_duration = 5, auto_close = True)
     return puntos_jugada
   else:
-    if (computadora.get_cambios_restantes() > 0):
-      computadora.actualizar_cambios_restantes()
-      for letra in letras_pc:
-        bolsa_de_fichas[letra]['cantidad_fichas'] += 1
-      letras_pc.clear()
-      fichas_usadas_pc.clear()
-      for i in range(8, 15):
-        window.Element(i).Update(button_color = ('white', 'green'), disabled = True)
-      repartir_fichas(bolsa_de_fichas, letras_pc)
-      sg.Popup('Se repartieron nuevas fichas a la computadora', title = 'Atención', non_blocking = True, auto_close_duration = 5, auto_close = True)
-      print('nuevas letras pc', letras_pc)
-      window.Element('cambios_pc').Update(computadora.get_cambios_restantes())
-      return 0   
+    if (quedan_fichas(bolsa_de_fichas)):
+      if (computadora.get_cambios_restantes() > 0):
+        computadora.actualizar_cambios_restantes()
+        for letra in letras_pc:
+          bolsa_de_fichas[letra]['cantidad_fichas'] += 1
+        letras_pc.clear()
+        fichas_usadas_pc.clear()
+        for i in range(8, 15):
+          window.Element(i).Update(button_color = ('white', 'green'), disabled = True)
+        repartir_fichas(bolsa_de_fichas, letras_pc)
+        sg.Popup('Se repartieron nuevas fichas a la computadora', title = 'Atención', non_blocking = True, auto_close_duration = 5, auto_close = True)
+        #print('nuevas letras pc', letras_pc)
+        window.Element('cambios_pc').Update(computadora.get_cambios_restantes())
+        return 0   
+      else:
+        return -1 
     else:
-      return -1 
+      for i in range(4):
+        computadora.actualizar_cambios_restantes()
 
 def colocar_posiciones_especiales(tablero_juego, nivel, casillas_especiales, FILAS, COLUMNAS, centro):
   '''
@@ -291,12 +300,15 @@ def imprimir_mensaje_fin(jugador, computadora):
   Función que muestra el mensaje de fin de la partida, detallando los puntos
   de la computadora y del jugador.
   '''
-  mensaje = '¡Fin de la partida!' + ('\n La computadora no puede formar ninguna palabra y no dispone de más cambios \n' if computadora.get_cambios_restantes() == -1 else '\n')
+  hay_cambios = computadora.get_cambios_restantes() >= 0 or jugador.get_cambios_restantes() >= 0
+  if (not hay_cambios):
+    aux = 'El jugador' if jugador.get_cambios_restantes() < 0 else 'La computadora'
+  mensaje = '¡Fin de la partida!\n' + (f'{aux} no puede formar ninguna palabra y no dispone de más cambios \n' if not hay_cambios else '\n')
   if (jugador.get_puntaje() > computadora.get_puntaje()):
-    mensaje += f'Ganó el jugador con {jugador.get_puntaje()}'
-  if (jugador.get_puntaje() < computadora.get_puntaje()):
+    mensaje += f'Ganó el jugador con {jugador.get_puntaje()} puntos'
+  elif (jugador.get_puntaje() < computadora.get_puntaje()):
     mensaje += f'Ganó la computadora con {computadora.get_puntaje()} puntos'
-  if (jugador.get_puntaje() == computadora.get_puntaje()):
+  else: 
     mensaje += 'Hubo un empate'
   sg.Popup(mensaje, title = 'Atención')
 
@@ -328,15 +340,18 @@ def cambiar_fichas(jugador, letras_jugador, bolsa_de_fichas, contador, window):
     if (event in ('Salir', None)):
       break
     if (event == 'todas'):
-      for letra in letras_jugador:
-        bolsa_de_fichas[letra]['cantidad_fichas'] += 1
-      letras_jugador.clear()
-      repartir_fichas(bolsa_de_fichas, letras_jugador)
-      for i in range (7):
-        window.Element(i).Update(letras_jugador[i], button_color = ('white', 'green'))
-      sg.Popup('Se cambiaron todas las fichas del jugador', title = 'Atención', non_blocking = True, auto_close_duration = 5, auto_close = True)
-      cambio = True
-      break
+      if (quedan_fichas(bolsa_de_fichas)):
+        for letra in letras_jugador:
+          bolsa_de_fichas[letra]['cantidad_fichas'] += 1
+        letras_jugador.clear()
+        repartir_fichas(bolsa_de_fichas, letras_jugador)
+        for i in range (7):
+          window.Element(i).Update(letras_jugador[i], button_color = ('white', 'green'))
+        sg.Popup('Se cambiaron todas las fichas del jugador', title = 'Atención', non_blocking = True, auto_close_duration = 5, auto_close = True)
+        cambio = True
+        break
+      else:
+        sg.Popup('No quedan suficientes fichas en la bolsa', title = 'Atención', non_blocking = True, auto_close_duration = 5, auto_close = True)
     elif (event == 'algunas'):
       if (not algunas):
         ventana.Element('todas').Update(disabled = True, button_color = ('white', 'red'))
@@ -354,17 +369,20 @@ def cambiar_fichas(jugador, letras_jugador, bolsa_de_fichas, contador, window):
       if (len(seleccionadas) == 0):
         sg.Popup('Debe seleccionar alguna letra', title = 'Atención', non_blocking = True, auto_close_duration = 5, auto_close = True)
       else:
-        for i in seleccionadas:
-          bolsa_de_fichas[seleccionadas[i]]['cantidad_fichas'] += 1
-          letra = random.choice(abecedario)
-          while (bolsa_de_fichas[letra]['cantidad_fichas'] <= 0):
+        if (quedan_fichas(bolsa_de_fichas, len(seleccionadas))):
+          for i in seleccionadas:
+            bolsa_de_fichas[seleccionadas[i]]['cantidad_fichas'] += 1
             letra = random.choice(abecedario)
-          bolsa_de_fichas[letra]['cantidad_fichas'] -= 1
-          window.Element(i).Update(letra, button_color = ('white', 'green'))
-          letras_jugador[i] = letra
-        sg.Popup('Se cambiaron algunas fichas del jugador', title = 'Atención', non_blocking = True, auto_close_duration = 5, auto_close = True)
-        cambio = True
-        break
+            while (bolsa_de_fichas[letra]['cantidad_fichas'] <= 0):
+              letra = random.choice(abecedario)
+            bolsa_de_fichas[letra]['cantidad_fichas'] -= 1
+            window.Element(i).Update(letra, button_color = ('white', 'green'))
+            letras_jugador[i] = letra
+          sg.Popup('Se cambiaron algunas fichas del jugador', title = 'Atención', non_blocking = True, auto_close_duration = 5, auto_close = True)
+          cambio = True
+          break
+        else:
+          sg.Popup('No quedan suficientes fichas en la bolsa', title = 'Atención', non_blocking = True, auto_close_duration = 5, auto_close = True)
     else:
       if (event in seleccionadas):
         ventana.Element(event).Update(button_color = ('white', 'green'))
@@ -384,6 +402,15 @@ def restaurar_tablero(window, posiciones):
     for posicion in posiciones:
         window.Element(posicion).Update(posiciones[posicion], button_color = ('white', 'red'))
 
+def quedan_fichas(bolsa_de_fichas, cantidad_fichas = 7):
+
+    contador = 0
+    for letra in bolsa_de_fichas:
+        contador += bolsa_de_fichas[letra]['cantidad_fichas']
+        if (contador >= cantidad_fichas):
+            return True
+    return False
+
 def jugar(configuracion, partida):
 
     '''
@@ -401,20 +428,16 @@ def jugar(configuracion, partida):
     Si "partida" es None, las variables se inicializarán con los valores correspondientes del diccionario "configuración".
     '''
 
-    if (partida != None):
-      for i in partida:
-        print(i, partida[i])
-
     nivel = configuracion['nivel'] if partida == None else partida['nivel']
     FILAS = COLUMNAS = 15 if nivel == 'dificil' else (17 if nivel == 'medio' else 19)
-    print('NIVEL', nivel, 'FILAS', FILAS)
+    #print('NIVEL', nivel, 'FILAS', FILAS)
     centro = (int(FILAS / 2), int(FILAS / 2))
     abecedario = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
     palabras_validas = configuracion['palabras validas'] if partida == None else partida['palabras validas']
     contador = configuracion['tiempo'] * 60 if partida == None else partida['contador'] # contador en segundos
     bolsa_de_fichas = {letra : {'cantidad_fichas' : int(configuracion['fichas'][letra]['cantidad_fichas']), 'puntaje_ficha' : int(configuracion['fichas'][letra]['puntaje'])} for letra in abecedario} if partida == None else partida['bolsa de fichas'] 
 
-    print('Fichas totales:', fichas_totales(bolsa_de_fichas))
+    #print('Fichas totales:', fichas_totales(bolsa_de_fichas))
     if (partida == None):
         letras_jugador = []
         letras_pc = []
@@ -423,7 +446,7 @@ def jugar(configuracion, partida):
     else:
         letras_jugador = partida['letras jugador']
         letras_pc = partida['letras computadora']
-    print('Fichas totales:', fichas_totales(bolsa_de_fichas))
+    #print('Fichas totales:', fichas_totales(bolsa_de_fichas))
 
     tablero_juego = [[sg.Button('', size = (4, 2), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'green')) for j in range(COLUMNAS)] for i in range(FILAS)]
 
@@ -522,7 +545,7 @@ def jugar(configuracion, partida):
           if (len(posiciones_ocupadas) > 0):
             sg.Popup('Primero debe levantar sus fichas', title = 'Atención', non_blocking = True, auto_close_duration = 5, auto_close = True)
           else:
-            print('Originales:', letras_jugador)
+            #print('Originales:', letras_jugador)
             cambio, contador = cambiar_fichas(jugador, letras_jugador, bolsa_de_fichas, contador, window)
             if (cambio):
               jugador.actualizar_cambios_restantes()
@@ -534,7 +557,7 @@ def jugar(configuracion, partida):
               turno_jugador = False
               if (jugador.get_cambios_restantes() == 0):
                 window.Element('cambiar').Update(disabled = True, button_color = ('white', 'red'))
-            print('Cambiadas:', letras_jugador)
+            #print('Cambiadas:', letras_jugador)
         elif (event == 'pasar'):
           if (len(posiciones_ocupadas) > 0):
             sg.Popup('Primero debe levantar sus fichas', title = 'Atención', non_blocking = True, auto_close_duration = 5, auto_close = True)
@@ -555,19 +578,23 @@ def jugar(configuracion, partida):
             orientacion = [True, False]  
             primer_posicion = ultima_posicion = ()
             posiciones_bloqueadas += [posicion for posicion in posiciones_ocupadas]
-            for posicion in posiciones_ocupadas:
-              letra = random.choice(abecedario)
-              while (bolsa_de_fichas[letra]['cantidad_fichas'] <= 0):
+            if (quedan_fichas(bolsa_de_fichas, len(posiciones_ocupadas))):
+              for posicion in posiciones_ocupadas:
                 letra = random.choice(abecedario)
-              letras_jugador[posiciones_ocupadas[posicion]] = letra
-              window.Element(posiciones_ocupadas[posicion]).Update(letra, disabled = False, button_color = ('white', 'green'))
-              bolsa_de_fichas[letra]['cantidad_fichas'] -= 1
-            posiciones_ocupadas = OrderedDict()
-            turno_jugador = False
-            primer_jugada = False
+                while (bolsa_de_fichas[letra]['cantidad_fichas'] <= 0):
+                  letra = random.choice(abecedario)
+                letras_jugador[posiciones_ocupadas[posicion]] = letra
+                window.Element(posiciones_ocupadas[posicion]).Update(letra, disabled = False, button_color = ('white', 'green'))
+                bolsa_de_fichas[letra]['cantidad_fichas'] -= 1
+              posiciones_ocupadas = OrderedDict()
+              turno_jugador = False
+              primer_jugada = False
+            else:
+              for i in range(4):
+                jugador.actualizar_cambios_restantes()
             window.Element('puntaje_jugador').Update(jugador.get_puntaje())
-          else:
-            print('palabra incorrecta')
+          #else:
+            #print('palabra incorrecta')
         elif (event in range(7)):
           if (letra_seleccionada):
             window.Element(letra).Update(button_color = ('white', 'green'))
@@ -604,13 +631,13 @@ def jugar(configuracion, partida):
               else:
                 ultima_posicion = (event[0] - 1, event[1]) if not orientacion[1] else (event[0], event[1] - 1)
       if (comenzar):
+        if (contador == 0 or computadora.get_cambios_restantes() < 0 or jugador.get_cambios_restantes() < 0):
+          imprimir_mensaje_fin(jugador, computadora)
+          break
         window.Element('tiempo').Update(datetime.timedelta(seconds = contador))
         contador -= 1
         window.Element('palabra_actual').Update(palabra_formada(letras_jugador, posiciones_ocupadas))
         window.Element('cantidad_fichas').Update(fichas_totales(bolsa_de_fichas))
-        if (contador == 0 or computadora.get_cambios_restantes() == -1):
-          imprimir_mensaje_fin(jugador, computadora)
-          break
 
     window.Close()
     return partida, jugador, computadora
