@@ -1,0 +1,2 @@
+PySimpleGUI==3.39.0
+Pattern==2.6
