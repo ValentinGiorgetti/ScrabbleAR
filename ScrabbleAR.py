@@ -195,8 +195,8 @@ def actualizar_top(top, jugador, computadora):
     '''
     ruta = 'Componentes' + os.sep + 'Informacion guardada' + os.sep
 
-    top += [('Jugador', jugador)]
-    top += [('Computadora', computadora)]
+    top += [('Jugador', jugador)] if jugador.get_puntaje() > 0 else []
+    top += [('Computadora', computadora)] if computadora.get_puntaje() > 0 else []
 
     top = sorted(top, key = lambda x : x[1].get_puntaje(), reverse = True)
     top = top[:10]
@@ -217,6 +217,7 @@ def main():
     Una vez que la partida termina, se actualiza el top de puntajes y se guarda la información de la partida. En caso de que el usuario
     no haya pospuesto la partida, se guardará None en el archivo "partida_guardada", lo cuál indica que no hay partida guardada.
     '''
+    
     ruta = 'Componentes' + os.sep + 'Informacion guardada' + os.sep
 
     with open(ruta + 'partida_guardada', 'rb') as f:
