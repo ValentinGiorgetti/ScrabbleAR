@@ -1,1 +1,1 @@
-__all__ = ['Jugador', 'Tablero']
+# __all__ = ['Jugador', 'Tablero']
