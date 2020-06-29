@@ -1,4 +1,5 @@
-import pickle, json, Tablero, Jugador, PySimpleGUI as sg
+from Componentes.Tablero import jugar
+import pickle, json, os, PySimpleGUI as sg
 
 def menu():
 
@@ -6,7 +7,7 @@ def menu():
               [sg.Button('Configuración', key = configuracion), sg.Button('Ver reglas del juego', key = reglas), sg.Button('Ver top de puntajes', key = top_puntajes), sg.Button('Volver')]]
     window = sg.Window('Menú', layout, location = (600, 200))
 
-    configuracion_seleccionada = {} 
+    configuracion_seleccionada = {}
 
     while True:
         event = window.Read()[0]    
@@ -51,7 +52,9 @@ def reglas():
 
 def top_puntajes():
 
-    with open('top10', 'rb') as f:
+    ruta = 'Componentes' + os.sep + 'Informacion guardada' + os.sep
+
+    with open(ruta + 'top_puntajes', 'rb') as f:
         top = pickle.load(f)
 
     temp = list(jugador[0] + ' ' + str(jugador[1].get_puntaje()) + ' puntos' for jugador in top)
@@ -81,10 +84,12 @@ def configuracion():
             texto += '   ' + str(letra) + '        ' + str(letras[letra]['puntaje']) + '                  ' + str(letras[letra]['cantidad_fichas']) + '\n'
         return texto
 
-    with open('ultima_configuracion.json') as f:
+    ruta = 'Componentes' + os.sep + 'Informacion guardada' + os.sep
+
+    with open(ruta + 'ultima_configuracion.json') as f:
         configuracion_seleccionada = json.load(f)
     
-    with open('configuracion_predeterminada.json') as f:
+    with open(ruta + 'configuracion_predeterminada.json') as f:
         configuracion_predeterminada = json.load(f)
 
     layout = [[sg.Text('Nivel de la partida', size = (80,1), justification = 'center', font = ('Consolas', 11))],
@@ -143,8 +148,8 @@ def configuracion():
 
     window.Close()
 
-    with open('ultima_configuracion.json', 'w') as f:
-        json.dump(configuracion_seleccionada, f)
+    with open(ruta + 'ultima_configuracion.json', 'w') as f:
+        json.dump(configuracion_seleccionada, f, indent = 2)
 
     return configuracion_seleccionada
 
@@ -156,23 +161,24 @@ def actualizar_top(top, jugador, computadora):
     top = sorted(top, key = lambda x : x[1].get_puntaje(), reverse = True)
     top = top[:10]
 
+ruta = 'Componentes' + os.sep + 'Informacion guardada' + os.sep
 
-with open('guardada', 'rb') as f:
+with open(ruta + 'partida_guardada', 'rb') as f:
     partida = pickle.load(f)
 
 layout = [[sg.Text('ScrabbleAR')],
           [sg.Button('Imagen scrabble', disabled = True)],
-          [sg.Button('Menú', key = menu), sg.Button('Reanudar partida', size = (7,2), key = 'reanudar', disabled = partida == None), sg.Button('Iniciar nueva partida', size = (11, 2), key = Tablero.jugar), sg.Button('Salir')]]
+          [sg.Button('Menú', key = menu), sg.Button('Reanudar partida', size = (7,2), key = 'reanudar', disabled = partida == None), sg.Button('Iniciar nueva partida', size = (11, 2), key = jugar), sg.Button('Salir')]]
 window = sg.Window('ScrabbleAR', layout)
 
 layout_confirmar = [[sg.Text('Hay una partida guardada, si inicia una nueva no podrá continuar con la anterior')],
                     [sg.Button('Cancelar'), sg.Button('Continuar')]]
 window_confirmar = sg.Window('Partida nueva', layout_confirmar)
 
-with open('ultima_configuracion.json') as f:
+with open(ruta + 'ultima_configuracion.json') as f:
     configuracion_seleccionada = json.load(f)
 
-with open('top10', 'rb') as f:
+with open(ruta + 'top_puntajes', 'rb') as f:
     top = pickle.load(f)
 
 ok = True
@@ -184,29 +190,30 @@ while True:
     elif (event == menu):
         window.Hide()
         configuracion_seleccionada = menu()
-        window.UnHide()
-    elif (event == Tablero.jugar):
+        window.UnHide() 
+    elif (event == jugar):
         if (partida != None):
             window.Hide()
+            window_confirmar.UnHide()
             opcion = window_confirmar.Read()[0]
-            window_confirmar.close()
+            window_confirmar.Hide()
             window.UnHide()
             ok = opcion == 'Continuar'
         if (ok):
             window.Hide()
-            partida, jugador, computadora = Tablero.jugar(configuracion_seleccionada, None)
+            partida, jugador, computadora = jugar(configuracion_seleccionada, None)
             actualizar_top(top, jugador, computadora)
-            with open('top10', 'wb') as f:
+            with open(ruta + 'top_puntajes', 'wb') as f:
                 pickle.dump(top, f)
             window.UnHide()
     elif (event == 'reanudar'):
         window.Hide()
-        partida, jugador, computadora = Tablero.jugar(configuracion_seleccionada, partida)
+        partida, jugador, computadora = jugar(configuracion_seleccionada, partida)
         actualizar_top(top, jugador, computadora)
-        with open('top10', 'wb') as f:
+        with open(ruta + 'top_puntajes', 'wb') as f:
             pickle.dump(top, f)
         window.UnHide()
-    with open('guardada', 'wb') as f:
+    with open(ruta + 'partida_guardada', 'wb') as f:
         pickle.dump(partida, f)
     window.Element('reanudar').Update(disabled = partida == None)
 
