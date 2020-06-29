@@ -494,7 +494,7 @@ def jugar(configuracion, partida):
                      'posiciones bloqueadas' : posiciones_bloqueadas, 
                      'fichas usadas pc' : fichas_usadas_pc,
                      'nivel' : nivel,
-                     'palabras_validas' : palabras_validas,
+                     'palabras validas' : palabras_validas,
                      'contador' : contador,
                      'bolsa de fichas' : bolsa_de_fichas,
                      'posiciones' : posiciones}
