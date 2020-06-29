@@ -427,6 +427,8 @@ def jugar(configuracion, partida):
 
     Si "partida" es None, las variables se inicializarán con los valores correspondientes del diccionario "configuración".
     '''
+    print(configuracion)
+    print(partida)
 
     nivel = configuracion['nivel'] if partida == None else partida['nivel']
     FILAS = COLUMNAS = 15 if nivel == 'dificil' else (17 if nivel == 'medio' else 19)
