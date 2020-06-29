@@ -44,18 +44,21 @@ def palabra_formada(letras, posiciones_ocupadas):
     str += letras[posiciones_ocupadas[clave]]
   return str
 
-def es_palabra(nivel, str):
+def es_palabra(nivel, palabras_validas, str):
   '''
   Función que retorna true en caso de que la palabra sea válida para el nivel correspondiente
   '''
   str = str.lower()
   if (nivel == 'facil'):
     return (str in verbs or (str in spelling and str in lexicon))
-  else:
+  elif (nivel == 'medio'):
     return (parse(str).split('/')[1] != 'NN' and (str in verbs or (str in spelling and str in lexicon))) 
+  elif (nivel == 'dificil'):
+    tipo = 'JJ' if palabras_validas == 'adjetivos' else 'VB'
+    return (parse(str).split('/')[1] == tipo and (str in verbs or (str in spelling and str in lexicon))) 
       
 
-def verificar_palabra(letras, posiciones_ocupadas, posiciones_bloqueadas, centro, primer_jugada, nivel):
+def verificar_palabra(letras, posiciones_ocupadas, posiciones_bloqueadas, centro, primer_jugada, nivel, palabras_validas):
   '''
   Función que verifica si la palabra ingresada por el usuario es válida, chequeando si la casilla de inicio está
   ocupada en caso de que sea la primer jugada de la partida, y chequeando que la palábra sea válida para el nivel
@@ -70,7 +73,7 @@ def verificar_palabra(letras, posiciones_ocupadas, posiciones_bloqueadas, centro
     str = ''
     for clave in posiciones_ocupadas:
       str += letras[posiciones_ocupadas[clave]]
-    if (es_palabra(nivel, str)):
+    if (es_palabra(nivel, palabras_validas, str)):
       return True
     else:
       sg.Popup('Palabra inválida', title = 'Atención', non_blocking = True, auto_close_duration = 5, auto_close = True)
@@ -92,7 +95,7 @@ def sumar_casilla(window, bolsa_de_fichas, casillas_especiales, posicion, letra,
     else:
       multiplicador[0] += (casillas_especiales[posicion]['modificador'] % 10)
 
-def jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fichas_usadas_pc, posiciones_bloqueadas, bolsa_de_fichas, computadora, window, FILAS, COLUMNAS, posiciones, nivel):
+def jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fichas_usadas_pc, posiciones_bloqueadas, bolsa_de_fichas, computadora, window, FILAS, COLUMNAS, posiciones, nivel, palabras_validas):
   '''
   Función que permite que la computadora pueda colocar en una orientación y posición random del tablero, la palabra de
   mayor longitud que pueda formar. De esta forma puede ganar puntos y competir contra el jugador.
@@ -123,12 +126,12 @@ def jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fic
     temp = ''.join(permutacion)
     for x in range(7, 1, -1):
       palabra = temp[0 : x + 1]
-      if (es_palabra(nivel, palabra)):
+      if (es_palabra(nivel, palabras_validas, palabra)):
         encontre = True
         break
   encontre = encontre and len(palabra) > 1
   if (encontre):
-    print(palabra, es_palabra(nivel, palabra))
+    print(palabra, es_palabra(nivel, palabras_validas, palabra))
     if (primer_jugada):
       for letra in palabra:
         sumar_casilla(window, bolsa_de_fichas, casillas_especiales, (i, j), letra, puntos_jugada, multiplicador, posiciones_bloqueadas, posiciones) 
@@ -250,7 +253,7 @@ def repartir_fichas(bolsa_de_fichas, letras):
   abecedario = list('AAAABCDEEEEFGHIIIIJKLMNOOOOPQRSTUUUUVWXYZ')    # las vocales se repiten para que sea más probable que "random.choice" elija una vocal
   for i in range(7):
     letra = random.choice(abecedario)
-    while (bolsa_de_fichas[letra]['cantidad_fichas'] <= 0):         # 
+    while (bolsa_de_fichas[letra]['cantidad_fichas'] <= 0):         
       letra = random.choice(abecedario)
     letras += [letra]
     bolsa_de_fichas[letra]['cantidad_fichas'] -= 1
@@ -407,6 +410,7 @@ def jugar(configuracion, partida):
     print('NIVEL', nivel, 'FILAS', FILAS)
     centro = (int(FILAS / 2), int(FILAS / 2))
     abecedario = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+    palabras_validas = configuracion['palabras validas'] if partida == None else partida['palabras validas']
     contador = configuracion['tiempo'] * 60 if partida == None else partida['contador'] # contador en segundos
     bolsa_de_fichas = {letra : {'cantidad_fichas' : int(configuracion['fichas'][letra]['cantidad_fichas']), 'puntaje_ficha' : int(configuracion['fichas'][letra]['puntaje'])} for letra in abecedario} if partida == None else partida['bolsa de fichas'] 
 
@@ -451,14 +455,15 @@ def jugar(configuracion, partida):
     letra = '' 
 
     columna2 = [[sg.Text('Tiempo restante'), sg.Text(datetime.timedelta(seconds = contador), key = 'tiempo')],
-                [sg.Text('Nivel:' + nivel)],
+                [sg.Text('Nivel: ' + nivel)],
+                [sg.Text('Palabras válidas: ' + ('adjetivos, sustantivos y verbos' if nivel == 'facil' else ('adjetivos y verbos' if nivel == 'medio' else palabras_validas)))],
                 [sg.Text('Puntajes')],
-                [sg.Text('Jugador'), sg.Text(str(jugador.get_puntaje()) + '     ', key = 'puntaje_jugador')],
-                [sg.Text('Computadora'), sg.Text(str(computadora.get_puntaje()) + '      ', key = 'puntaje_computadora')],
-                [sg.Text('Turno actual'), sg.Text('jugador' if turno_jugador else 'computadora', key = 'turno')],
-                [sg.Text('Palabra actual'), sg.Text('                 ', key = 'palabra_actual')],
-                [sg.Text('Cambios restantes jugador'), sg.Text(jugador.get_cambios_restantes(), key = 'cambios_jugador'), sg.Text('Cambios restantes pc'), sg.Text(computadora.get_cambios_restantes(), key = 'cambios_pc')],
-                [sg.Text('Cantidad de fichas en la bolsa'), sg.Text(fichas_totales(bolsa_de_fichas), key = 'cantidad_fichas')],
+                [sg.Text('Jugador:'), sg.Text(str(jugador.get_puntaje()) + '     ', key = 'puntaje_jugador')],
+                [sg.Text('Computadora:'), sg.Text(str(computadora.get_puntaje()) + '      ', key = 'puntaje_computadora')],
+                [sg.Text('Turno actual:'), sg.Text('jugador' if turno_jugador else 'computadora', key = 'turno')],
+                [sg.Text('Palabra actual:'), sg.Text('                 ', key = 'palabra_actual')],
+                [sg.Text('Cambios restantes jugador:'), sg.Text(jugador.get_cambios_restantes(), key = 'cambios_jugador'), sg.Text('Cambios restantes pc:'), sg.Text(computadora.get_cambios_restantes(), key = 'cambios_pc')],
+                [sg.Text('Cantidad de fichas en la bolsa:'), sg.Text(fichas_totales(bolsa_de_fichas), key = 'cantidad_fichas')],
                 [sg.Button('Confirmar palabra', key = 'confirmar'), sg.Button('Cambiar fichas', key = 'cambiar'), sg.Button('Pasar', key = 'pasar')]]
 
     layout = [[sg.Column(columna1), sg.Column(columna2)]]  
@@ -489,17 +494,18 @@ def jugar(configuracion, partida):
                      'posiciones bloqueadas' : posiciones_bloqueadas, 
                      'fichas usadas pc' : fichas_usadas_pc,
                      'nivel' : nivel,
+                     'palabras_validas' : palabras_validas,
                      'contador' : contador,
                      'bolsa de fichas' : bolsa_de_fichas,
                      'posiciones' : posiciones}
-          sg.Popup('Se guardaron los datos de la partida')
+          sg.Popup('Se guardaron los datos de la partida', title = 'Atención')
           break
       elif (event == 'Terminar'):
         imprimir_mensaje_fin(jugador, computadora)
         break
       window.Element('turno').Update('jugador' if turno_jugador else 'computadora')
       if (not turno_jugador and comenzar):
-        jugada = jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fichas_usadas_pc, posiciones_bloqueadas, bolsa_de_fichas, computadora, window, FILAS, COLUMNAS, posiciones, nivel)
+        jugada = jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fichas_usadas_pc, posiciones_bloqueadas, bolsa_de_fichas, computadora, window, FILAS, COLUMNAS, posiciones, nivel, palabras_validas)
         if (jugada >= 0):
           computadora.actualizar_puntaje(jugada)
           window.Element('puntaje_computadora').Update(computadora.get_puntaje())
@@ -541,9 +547,9 @@ def jugar(configuracion, partida):
           if (letra_seleccionada):
             window.Element(letra).Update(button_color = ('white', 'green'))
             letra_seleccionada = False
-          if (verificar_palabra(letras_jugador, posiciones_ocupadas, posiciones_bloqueadas, centro, primer_jugada, nivel)):
+          if (verificar_palabra(letras_jugador, posiciones_ocupadas, posiciones_bloqueadas, centro, primer_jugada, nivel, palabras_validas)):
             puntos_jugada = contar_puntos_jugador(posiciones_ocupadas, casillas_especiales, bolsa_de_fichas, letras_jugador)
-            sg.Popup(f'Palabra formada por el jugador: {str}\nPuntos sumadados: {puntos_jugada}', title = 'Atención', non_blocking = True, auto_close_duration = 5, auto_close = True)
+            sg.Popup(f'Palabra formada por el jugador: {palabra_formada(letras_jugador, posiciones_ocupadas)}\nPuntos sumadados: {puntos_jugada}', title = 'Atención', non_blocking = True, auto_close_duration = 5, auto_close = True)
             jugador.actualizar_puntaje(puntos_jugada)
             letra_seleccionada = False              
             orientacion = [True, False]  
