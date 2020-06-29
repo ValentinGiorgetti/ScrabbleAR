@@ -1,5 +1,6 @@
 {
   "nivel": "facil",
+  "palabras validas": "-",
   "tiempo": 60, 
   "fichas": {
     "A": {
