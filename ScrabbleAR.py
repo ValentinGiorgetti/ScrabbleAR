@@ -6,7 +6,7 @@ def menu():
               [sg.Button('Configuración', key = configuracion), sg.Button('Ver reglas del juego', key = reglas), sg.Button('Ver top de puntajes', key = top_puntajes), sg.Button('Volver')]]
     window = sg.Window('Menú', layout, location = (600, 200))
 
-    configuracion_seleccionada = {}
+    configuracion_seleccionada = {} 
 
     while True:
         event = window.Read()[0]    
