@@ -1,5 +1,7 @@
 {
   "nivel": "dificil",
+  "tiempo": 25,
+  "palabras validas": "verbos",
   "fichas": {
     "A": {
       "puntaje": 12,
@@ -105,6 +107,5 @@
       "puntaje": 1,
       "cantidad_fichas": 10
     }
-  },
-  "tiempo": 25
+  }
 }
