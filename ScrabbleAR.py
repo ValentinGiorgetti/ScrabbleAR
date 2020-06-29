@@ -1,5 +1,5 @@
 from Componentes.Tablero import jugar
-from Componentes.Jugador import Jugador
+from Jugador import Jugador
 import pickle, json, os, PySimpleGUI as sg
 
 def menu():
