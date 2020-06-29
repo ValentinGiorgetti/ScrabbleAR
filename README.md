@@ -17,4 +17,6 @@ Consideraciones a tener en cuenta:
 
 ~ Para comenzar la partida, el usuario debe presionar el boton comenzar. En ese momento empezará a correr el contador. Puede pausar o posponer la partida en cualquier momento del juego.
 
-~ El juego termina cuando el jugador presiona el botón de terminar o cuando la computadora no puede formar ninguna palabra y no tiene cambios disponibles.
+~ El juego termina cuando el jugador presiona el botón de terminar, cuando la computadora no puede formar ninguna palabra y no tiene cambios disponibles, o cuando ya no se pueden repartir nuevas fichas ya que la bolsa de fichas no dispone de una cantidad suficiente.
+
+~ En esta primer fecha nos centramos más en las funcionalidades del programa. Los aspectos estéticos los dejamos para más adelante, cuando tengamos bien todas las funcionalidades. La interfaz seguirá siendo similar, se cambiarán los colores / tamaños de diferentes widgets, fuentes de letras, se añadirán imágenes, etcétera.
