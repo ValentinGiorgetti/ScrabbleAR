@@ -1,5 +1,5 @@
 import random, PySimpleGUI as sg
-from Jugador import Jugador
+from Componentes.Jugador import Jugador
 from random import randint
 from pattern.es import parse, verbs, spelling, lexicon
 from collections import OrderedDict
