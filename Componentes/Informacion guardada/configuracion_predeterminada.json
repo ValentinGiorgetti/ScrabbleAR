@@ -1,5 +1,6 @@
 {
   "nivel": "facil",
+  "tiempo": 60,
   "fichas": {
     "A": {
       "puntaje": 1,
@@ -105,6 +106,5 @@
       "puntaje": 1,
       "cantidad_fichas": 10
     }
-  },
-  "tiempo": 60
+  }
 }
