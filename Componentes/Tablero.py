@@ -1,10 +1,10 @@
 import random, PySimpleGUI as sg
+from Componentes.Jugador import Jugador
 from random import randint
 from pattern.es import parse, verbs, spelling, lexicon
 from collections import OrderedDict
 from itertools import permutations
 import sys, datetime
-from Jugador import Jugador
 from functools import reduce
 
 def posicion_valida(event, posiciones_ocupadas, orientacion, posiciones_bloqueadas):
@@ -154,8 +154,9 @@ def jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fic
       x = random.randint(8, 14)
       while (x in fichas_usadas_pc):
         x = random.randint(8, 14)
+        print('aca')
       window.Element(x).Update(button_color = ('white', 'red'))
-      fichas_usadas_pc += [letra]
+      fichas_usadas_pc += [x]
       letras_pc.remove(letra)
       letra_nueva = random.choice(abecedario)
       while (bolsa_de_fichas[letra_nueva]['cantidad_fichas'] <= 0):
@@ -171,9 +172,9 @@ def jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fic
   else:
     if (computadora.get_cambios_restantes() > 0):
       computadora.actualizar_cambios_restantes()
-      letras_pc.clear()
-      for letra in fichas_usadas_pc:
+      for letra in letras_pc:
         bolsa_de_fichas[letra]['cantidad_fichas'] += 1
+      letras_pc.clear()
       fichas_usadas_pc.clear()
       for i in range(8, 15):
         window.Element(i).Update(button_color = ('white', 'green'), disabled = True)
