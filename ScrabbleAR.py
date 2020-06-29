@@ -1,4 +1,5 @@
 from Componentes.Tablero import jugar
+from Componentes.Jugador import Jugador
 import pickle, json, os, PySimpleGUI as sg
 
 def menu():
@@ -169,7 +170,7 @@ with open(ruta + 'partida_guardada', 'rb') as f:
 layout = [[sg.Text('ScrabbleAR')],
           [sg.Button('Imagen scrabble', disabled = True)],
           [sg.Button('Menú', key = menu), sg.Button('Reanudar partida', size = (7,2), key = 'reanudar', disabled = partida == None), sg.Button('Iniciar nueva partida', size = (11, 2), key = jugar), sg.Button('Salir')]]
-window = sg.Window('ScrabbleAR', layout)
+ventana = sg.Window('ScrabbleAR', layout)
 
 layout_confirmar = [[sg.Text('Hay una partida guardada, si inicia una nueva no podrá continuar con la anterior')],
                     [sg.Button('Cancelar'), sg.Button('Continuar')]]
@@ -184,37 +185,37 @@ with open(ruta + 'top_puntajes', 'rb') as f:
 ok = True
 
 while True:
-    event = window.Read()[0]
+    event = ventana.Read()[0]
     if (event in (None, 'Salir')):
         break
     elif (event == menu):
-        window.Hide()
+        ventana.Hide()
         configuracion_seleccionada = menu()
-        window.UnHide() 
+        ventana.UnHide() 
     elif (event == jugar):
         if (partida != None):
-            window.Hide()
+            ventana.Hide()
             window_confirmar.UnHide()
             opcion = window_confirmar.Read()[0]
             window_confirmar.Hide()
-            window.UnHide()
+            ventana.UnHide()
             ok = opcion == 'Continuar'
         if (ok):
-            window.Hide()
+            ventana.Hide()
             partida, jugador, computadora = jugar(configuracion_seleccionada, None)
             actualizar_top(top, jugador, computadora)
             with open(ruta + 'top_puntajes', 'wb') as f:
                 pickle.dump(top, f)
-            window.UnHide()
+            ventana.UnHide()
     elif (event == 'reanudar'):
-        window.Hide()
+        ventana.Hide()
         partida, jugador, computadora = jugar(configuracion_seleccionada, partida)
         actualizar_top(top, jugador, computadora)
         with open(ruta + 'top_puntajes', 'wb') as f:
             pickle.dump(top, f)
-        window.UnHide()
+        ventana.UnHide()
     with open(ruta + 'partida_guardada', 'wb') as f:
         pickle.dump(partida, f)
-    window.Element('reanudar').Update(disabled = partida == None)
+    ventana.Element('reanudar').Update(disabled = partida == None)
 
-window.Close()
+ventana.Close()
