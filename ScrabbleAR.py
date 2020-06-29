@@ -46,7 +46,7 @@ def reglas():
     ultimo_presionado = ''
 
     layout = [[sg.Text('Reglas del juego', size = (60, 1), justification = 'center', font = ("Consolas", 11))],
-              [sg.Text('                          '), sg.Button('Fácil', button_color = ('white', 'blue')), sg.Button('Medio', button_color = ('white', 'blue')), sg.Button('Difícil', button_color = ('white', 'blue'))],
+              [sg.Text('                          '), sg.Button('Facil', button_color = ('white', 'blue')), sg.Button('Medio', button_color = ('white', 'blue')), sg.Button('Dificil', button_color = ('white', 'blue'))],
               [sg.Multiline('Seleccione un nivel', key = 'nivel', disabled = True)],
               [sg.Button('Volver', button_color = ('white', 'blue'))]]
     window = sg.Window('Reglas', layout, location = (600, 200))
@@ -193,11 +193,16 @@ def actualizar_top(top, jugador, computadora):
     Función usada para actualizar el top de los 10 mejores puntajes.
     Esta función todavía no está terminada.
     '''
+    ruta = 'Componentes' + os.sep + 'Informacion guardada' + os.sep
+
     top += [('Jugador', jugador)]
     top += [('Computadora', computadora)]
 
     top = sorted(top, key = lambda x : x[1].get_puntaje(), reverse = True)
     top = top[:10]
+
+    with open(ruta + 'top_puntajes', 'wb') as f:
+        pickle.dump(top, f)
 
 def main():
     '''
@@ -254,8 +259,6 @@ def main():
                 ventana.Hide()
                 partida, jugador, computadora = jugar(configuracion_seleccionada, None)
                 actualizar_top(top, jugador, computadora)
-                with open(ruta + 'top_puntajes', 'wb') as f:
-                    pickle.dump(top, f)
                 ventana.UnHide()
                 if (configuracion_seleccionada['nivel'] == 'dificil'):
                     configuracion_seleccionada['palabras validas'] = random.choice(['adjetivos', 'verbos'])
@@ -263,8 +266,6 @@ def main():
             ventana.Hide()
             partida, jugador, computadora = jugar(configuracion_seleccionada, partida)
             actualizar_top(top, jugador, computadora)
-            with open(ruta + 'top_puntajes', 'wb') as f:
-                pickle.dump(top, f)
             ventana.UnHide()
             if (configuracion_seleccionada['nivel'] == 'dificil'):
                 configuracion_seleccionada['palabras validas'] = random.choice(['adjetivos', 'verbos'])
