@@ -257,6 +257,8 @@ def main():
                 with open(ruta + 'top_puntajes', 'wb') as f:
                     pickle.dump(top, f)
                 ventana.UnHide()
+                if (configuracion_seleccionada['nivel'] == 'dificil'):
+                    configuracion_seleccionada['palabras validas'] = random.choice(['adjetivos', 'verbos'])
         elif (event == 'reanudar'):
             ventana.Hide()
             partida, jugador, computadora = jugar(configuracion_seleccionada, partida)
@@ -264,6 +266,8 @@ def main():
             with open(ruta + 'top_puntajes', 'wb') as f:
                 pickle.dump(top, f)
             ventana.UnHide()
+            if (configuracion_seleccionada['nivel'] == 'dificil'):
+                configuracion_seleccionada['palabras validas'] = random.choice(['adjetivos', 'verbos'])
         with open(ruta + 'partida_guardada', 'wb') as f:
             pickle.dump(partida, f)
         ventana.Element('reanudar').Update(disabled = partida == None)
