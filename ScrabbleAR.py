@@ -40,7 +40,7 @@ def reglas():
     Función que muestra una ventana con información sobre cada nivel: tipo de palabras válidas
     y tamaño del tablero.
     '''
-    texto1 = 'Palabras válidas: cualquier palabra que la libería Pattern considere válida.\nTamaño del tablero: 19 x 19.'
+    texto1 = 'Palabras válidas: cualquier palabra que la librería Pattern considere válida.\nTamaño del tablero: 19 x 19.'
     texto2 = 'Palabras válidas: adjetivos y verbos.\nTamaño del tablero: 17 x 17.'
     texto3 = 'Palabras válidas: adjetivos o verbos, se selecciona en forma aleatoria.\nTamaño del tablero: 15 x 15.'
     ultimo_presionado = ''
