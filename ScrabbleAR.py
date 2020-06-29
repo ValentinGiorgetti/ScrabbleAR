@@ -1,6 +1,6 @@
 from Componentes.Tablero import jugar
 from Componentes.Jugador import Jugador
-import pickle, json, os, PySimpleGUI as sg
+import random, pickle, json, os, PySimpleGUI as sg
 
 def menu():
 
@@ -40,9 +40,9 @@ def reglas():
     Función que muestra una ventana con información sobre cada nivel: tipo de palabras válidas
     y tamaño del tablero.
     '''
-    texto1 = 'Palabras válidas: cualquier palabra que la libería Pattern considere válida.\nTamño del tablero: 19 x 19.'
-    texto2 = 'Palabras válidas: adjetivos y verbos.\nTamño del tablero: 17 x 17.'
-    texto3 = 'Palabras válidas: adjetivos y verbos. \nTamño del tablero: 15 x 15.'
+    texto1 = 'Palabras válidas: cualquier palabra que la libería Pattern considere válida.\nTamaño del tablero: 19 x 19.'
+    texto2 = 'Palabras válidas: adjetivos y verbos.\nTamaño del tablero: 17 x 17.'
+    texto3 = 'Palabras válidas: adjetivos o verbos, se selecciona en forma aleatoria.\nTamaño del tablero: 15 x 15.'
     ultimo_presionado = ''
 
     layout = [[sg.Text('Reglas del juego', size = (60, 1), justification = 'center', font = ("Consolas", 11))],
@@ -67,6 +67,8 @@ def top_puntajes():
     Función que muestra una ventana con el top 10 de los mejores puntajes.
     Abre un archivo binario que contiene una lista de tuplas ('Computadora / Jugador', Objeto jugador) ordenada
     por puntaje en forma descendente. Lo que hace es mostrar esa información en la ventana.
+
+    Esta función todavía no está terminada.
     '''
     ruta = 'Componentes' + os.sep + 'Informacion guardada' + os.sep
 
@@ -176,6 +178,11 @@ def configuracion():
 
     window.Close()
 
+    if (configuracion_seleccionada['nivel'] == 'dificil'):
+        configuracion_seleccionada['palabras validas'] = random.choice(['adjetivos', 'verbos'])
+    else:
+        configuracion_seleccionada['palabras validas'] = '-'
+
     with open(ruta + 'ultima_configuracion.json', 'w') as f:
         json.dump(configuracion_seleccionada, f, indent = 2)
 
@@ -184,6 +191,7 @@ def configuracion():
 def actualizar_top(top, jugador, computadora):
     '''
     Función usada para actualizar el top de los 10 mejores puntajes.
+    Esta función todavía no está terminada.
     '''
     top += [('Jugador', jugador)]
     top += [('Computadora', computadora)]
