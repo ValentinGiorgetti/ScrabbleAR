@@ -26,7 +26,7 @@ def menu():
             window.Hide()
             if (event == configuracion): 
                 configuracion_seleccionada = configuracion()
-                print(configuracion_seleccionada)
+                #print(configuracion_seleccionada)
             else:
                 event()
             window.UnHide()
@@ -67,8 +67,6 @@ def top_puntajes():
     Función que muestra una ventana con el top 10 de los mejores puntajes.
     Abre un archivo binario que contiene una lista de tuplas ('Computadora / Jugador', Objeto jugador) ordenada
     por puntaje en forma descendente. Lo que hace es mostrar esa información en la ventana.
-
-    Esta función todavía no está terminada.
     '''
     ruta = 'Componentes' + os.sep + 'Informacion guardada' + os.sep
 
@@ -79,7 +77,7 @@ def top_puntajes():
     strs = ''
     for i in temp:
         strs += i + '\n'
-    print(strs)
+    #print(strs)
 
     layout = [[sg.Text('Top 10 de los mejores puntajes')],
               [sg.Multiline(strs, disabled = True)],
@@ -191,7 +189,6 @@ def configuracion():
 def actualizar_top(top, jugador, computadora):
     '''
     Función usada para actualizar el top de los 10 mejores puntajes.
-    Esta función todavía no está terminada.
     '''
     ruta = 'Componentes' + os.sep + 'Informacion guardada' + os.sep
 
@@ -260,7 +257,7 @@ def main():
                 ventana.Hide()
                 partida, jugador, computadora = jugar(configuracion_seleccionada, None)
                 actualizar_top(top, jugador, computadora)
-                ventana.UnHide()
+                ventana.UnHide()        # esta línea en ocasiones da error, todavía no encontramos cuál es el error
                 if (configuracion_seleccionada['nivel'] == 'dificil'):
                     configuracion_seleccionada['palabras validas'] = random.choice(['adjetivos', 'verbos'])
         elif (event == 'reanudar'):
