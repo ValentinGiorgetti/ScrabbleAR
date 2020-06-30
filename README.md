@@ -27,3 +27,5 @@ Consideraciones a tener en cuenta:
 ~ El juego termina cuando el jugador presiona el botón de terminar, cuando la computadora no puede formar ninguna palabra y no tiene cambios disponibles, o cuando ya no se pueden repartir nuevas fichas ya que la bolsa de fichas no dispone de una cantidad suficiente.
 
 ~ En esta primer fecha nos centramos más en las funcionalidades del programa. Los aspectos estéticos los dejamos para más adelante, cuando tengamos bien todas las funcionalidades. La interfaz seguirá siendo similar, se cambiarán los colores / tamaños de diferentes widgets, fuentes de letras, se añadirán imágenes, etcétera.
+
+~ Si la pantalla de la computadora es pequeña, no se podrá visualizar la ventana completa (estamos tratando de solucionar eso).
