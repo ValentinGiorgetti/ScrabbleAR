@@ -220,38 +220,38 @@ def colocar_posiciones_especiales(tablero_juego, nivel, casillas_especiales, FIL
       posicion = (i, j)
       posicion_invertida = (j, i)
       if(j == i):
-        tablero_juego[i][j] = sg.Button('F +2', size = (4, 2), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'blue'))
+        tablero_juego[i][j] = sg.Button('F +2', size = (3, 1), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'blue'))
         casillas_especiales[(i, j)] = {'color' : ('white', 'blue'), 'texto' : 'F +2', 'modificador' : 2}
       elif(i + j == FILAS - 1):
-        tablero_juego[i][j] = sg.Button('F +3', size = (4, 2), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'blue'))
+        tablero_juego[i][j] = sg.Button('F +3', size = (3, 1), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'blue'))
         casillas_especiales[(i, j)] = {'color': ('white', 'blue'), 'texto' : 'F +3', 'modificador' : 3}
       elif (nivel == 'facil'):
         if ((posicion in malas_nivel_facil) or (posicion_invertida in malas_nivel_facil)):
-          tablero_juego[i][j] = sg.Button('F ' + str(mala_actual), size = (4, 2), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'black'))
+          tablero_juego[i][j] = sg.Button('F ' + str(mala_actual), size = (3, 1), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'black'))
           casillas_especiales[(i, j)] = {'color' : ('white', 'black'), 'texto' : 'F ' + str(mala_actual), 'modificador' : mala_actual}
           mala_actual = mala_actual - 1 if mala_actual > -3 else -1
         elif ((posicion in multiplicador_nivel_facil) or (posicion_invertida in multiplicador_nivel_facil)):
-          tablero_juego[i][j] = sg.Button('P x3' if posicion in multiplicador_nivel_facil else 'P x2', size = (4, 2), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'purple'))
+          tablero_juego[i][j] = sg.Button('P x3' if posicion in multiplicador_nivel_facil else 'P x2', size = (3, 1), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'purple'))
           casillas_especiales[(i, j)]={'color': ('white', 'purple'), 'texto' : 'P x3', 'modificador' : 13 if posicion in multiplicador_nivel_facil else 12}
       elif (nivel == 'medio'):
         if ((posicion in malas_nivel_medio) or (posicion_invertida in malas_nivel_medio)):
-          tablero_juego[i][j] = sg.Button('F ' + str(mala_actual), size = (4, 2), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'black'))
+          tablero_juego[i][j] = sg.Button('F ' + str(mala_actual), size = (3, 1), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'black'))
           casillas_especiales[(i, j)] = {'color' : ('white', 'black'), 'texto' : 'F ' + str(mala_actual), 'modificador' : mala_actual}
           mala_actual = mala_actual - 1 if mala_actual > -3 else -1
         elif (posicion in multiplicador_nivel_medio or posicion_invertida in multiplicador_nivel_medio):
-          tablero_juego[i][j] = sg.Button('P x3' if posicion_invertida in multiplicador_nivel_medio else 'P x2', size = (4, 2), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'purple'))
+          tablero_juego[i][j] = sg.Button('P x3' if posicion_invertida in multiplicador_nivel_medio else 'P x2', size = (3, 1), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'purple'))
           casillas_especiales[(i, j)] = {'color': ('white', 'purple'), 'texto' : 'P x3', 'modificador' : 13 if posicion_invertida in multiplicador_nivel_medio else 12}
       elif (nivel == 'dificil'):
         if ((posicion in malas_nivel_dificil) or (posicion_invertida in malas_nivel_dificil)):
-          tablero_juego[i][j] = sg.Button('F ' + str(mala_actual), size = (4, 2), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'black'))
+          tablero_juego[i][j] = sg.Button('F ' + str(mala_actual), size = (3, 1), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'black'))
           casillas_especiales[(i, j)] = {'color' : ('white', 'black'), 'texto' : 'F ' + str(mala_actual), 'modificador' : mala_actual}
           mala_actual = mala_actual - 1 if mala_actual > -3 else -1
         elif (posicion in multiplicador_nivel_dificil or posicion_invertida in multiplicador_nivel_dificil):
-          tablero_juego[i][j] = sg.Button('P x3' if posicion in multiplicador_nivel_dificil else 'P x2', size = (4, 2), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'purple'))
+          tablero_juego[i][j] = sg.Button('P x3' if posicion in multiplicador_nivel_dificil else 'P x2', size = (3, 1), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'purple'))
           casillas_especiales[(i, j)] = {'color': ('white', 'purple'), 'texto' : 'P x3', 'modificador' : 13 if posicion in multiplicador_nivel_dificil else 12}
           
-  tablero_juego[centro[0]][centro[1]] = sg.Button('Inicio', size = (4, 2), key = (centro[0], centro[1]), pad = (0.5, 0.5), button_color = ('white', 'yellow'))
-  casillas_especiales[(centro[0], centro[1])] = {'color' : ('white', 'yellow'), 'texto' : 'Inicio', 'modificador' : 1}          
+  tablero_juego[centro[0]][centro[1]] = sg.Button('Inicio', size = (3, 1), key = (centro[0], centro[1]), pad = (0.5, 0.5), button_color = ('black', 'yellow'))
+  casillas_especiales[(centro[0], centro[1])] = {'color' : ('black', 'yellow'), 'texto' : 'Inicio', 'modificador' : 1}          
 
 def repartir_fichas(bolsa_de_fichas, letras):
   '''
@@ -318,9 +318,11 @@ def cambiar_fichas(jugador, letras_jugador, bolsa_de_fichas, contador, window):
   En caso de haber hecho algún cambio, ctualiza las fichas del atril.
   '''
   layout_cambiar_fichas = [[sg.Button('Cambiar todas', key = 'todas'), sg.Button('Cambiar algunas', key = 'algunas')],
+                           [sg.Text('')],
                            [sg.Text('Seleccione las fichas que quiere intercambiar')],
-                           [sg.Button(letras_jugador[i], size= (4, 2), key = i, pad = (0.5, 0.5), button_color = ('white', 'green'), disabled = True) for i in range(7)],
-                           [sg.Button('Aceptar', disabled = True, button_color = ('white', 'red')), sg.Button('Salir')]]
+                           [sg.Button(letras_jugador[i], size= (3, 1), key = i, pad = (0.5, 0.5), disabled = True, button_color = ('white', 'green')) for i in range(7)],
+                           [sg.Text('')],
+                           [sg.Button('Aceptar', disabled = True), sg.Button('Salir')]]
   ventana = sg.Window('Cambiar fichas', layout_cambiar_fichas)
 
   abecedario = list('AAAAABCDEEEEEFGHIIIIIJKLMNOOOOOPQRSTUUUUUVWXYZ')
@@ -354,14 +356,14 @@ def cambiar_fichas(jugador, letras_jugador, bolsa_de_fichas, contador, window):
         sg.Popup('No quedan suficientes fichas en la bolsa', title = 'Atención', non_blocking = True, auto_close_duration = 5, auto_close = True)
     elif (event == 'algunas'):
       if (not algunas):
-        ventana.Element('todas').Update(disabled = True, button_color = ('white', 'red'))
-        ventana.Element('Aceptar').Update(disabled = False, button_color = ('white', 'green')) 
+        ventana.Element('todas').Update(disabled = True)
+        ventana.Element('Aceptar').Update(disabled = False) 
         for i in range(7):
           ventana.Element(i).Update(disabled = False)
         algunas = True
       else:
-        ventana.Element('todas').Update(disabled = False, button_color = ('white', 'green'))
-        ventana.Element('Aceptar').Update(disabled = True, button_color = ('white', 'red')) 
+        ventana.Element('todas').Update(disabled = False)
+        ventana.Element('Aceptar').Update(disabled = True) 
         for i in range(7):
           ventana.Element(i).Update(disabled = True)
         algunas = False
@@ -403,7 +405,9 @@ def restaurar_tablero(window, posiciones):
         window.Element(posicion).Update(posiciones[posicion], button_color = ('white', 'red'))
 
 def quedan_fichas(bolsa_de_fichas, cantidad_fichas = 7):
-
+    '''
+    Función que chequea si hay suficientes fichas en la bolsa para repartir.
+    '''
     contador = 0
     for letra in bolsa_de_fichas:
         contador += bolsa_de_fichas[letra]['cantidad_fichas']
@@ -427,8 +431,8 @@ def jugar(configuracion, partida):
 
     Si "partida" es None, las variables se inicializarán con los valores correspondientes del diccionario "configuración".
     '''
-    print(configuracion)
-    print(partida)
+    # print(configuracion)
+    # print(partida)
 
     nivel = configuracion['nivel'] if partida == None else partida['nivel']
     FILAS = COLUMNAS = 15 if nivel == 'dificil' else (17 if nivel == 'medio' else 19)
@@ -450,18 +454,18 @@ def jugar(configuracion, partida):
         letras_pc = partida['letras computadora']
     #print('Fichas totales:', fichas_totales(bolsa_de_fichas))
 
-    tablero_juego = [[sg.Button('', size = (4, 2), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'green')) for j in range(COLUMNAS)] for i in range(FILAS)]
+    tablero_juego = [[sg.Button('', size = (3, 1), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'green')) for j in range(COLUMNAS)] for i in range(FILAS)]
 
     casillas_especiales = {}
     colocar_posiciones_especiales(tablero_juego, nivel, casillas_especiales, FILAS, COLUMNAS, centro)
 
-    fichas_jugador = [sg.Button(letras_jugador[i], size = (4, 2), key = i, pad = (0.5, 0.5), button_color = ('white', 'green')) for i in range(7)]
+    fichas_jugador = [sg.Button(letras_jugador[i], size = (3, 1), key = i, pad = (0.5, 0.5), button_color = ('white', 'green')) for i in range(7)]
 
-    fichas_pc = [sg.Button('?', size= (4, 2), key = i + 8, pad = (0.5, 0.5), button_color = ('white', 'green'), disabled = True) for i in range(7)]
+    fichas_pc = [sg.Button('?', size= (3, 1), key = i + 8, pad = (0.5, 0.5), button_color = ('white', 'green'), disabled = True) for i in range(7)]
 
     layout = [[sg.Text('Fichas de la computadora')]] + [fichas_pc] + [[sg.Text(' ')]] + [x for x in tablero_juego] 
     layout += [[sg.Text('Fichas del jugador')]] + [fichas_jugador]
-    layout += [[sg.Button('Comenzar', button_color = ('white', 'green')), sg.Button('Posponer'), sg.Button('Pausa'), sg.Button('Terminar')]]
+    layout += [[sg.Button('Iniciar', button_color = None), sg.Button('Posponer'), sg.Button('Pausa', disabled = True, button_color = ('white', 'blue')), sg.Button('Terminar')]]
 
     columna1 = layout
 
@@ -489,6 +493,7 @@ def jugar(configuracion, partida):
                 [sg.Text('Palabra actual:'), sg.Text('                 ', key = 'palabra_actual')],
                 [sg.Text('Cambios restantes jugador:'), sg.Text(jugador.get_cambios_restantes(), key = 'cambios_jugador'), sg.Text('Cambios restantes pc:'), sg.Text(computadora.get_cambios_restantes(), key = 'cambios_pc')],
                 [sg.Text('Cantidad de fichas en la bolsa:'), sg.Text(fichas_totales(bolsa_de_fichas), key = 'cantidad_fichas')],
+                [sg.Text('')],
                 [sg.Button('Confirmar palabra', key = 'confirmar'), sg.Button('Cambiar fichas', key = 'cambiar'), sg.Button('Pasar', key = 'pasar')]]
 
     layout = [[sg.Column(columna1), sg.Column(columna2)]]  
@@ -505,9 +510,13 @@ def jugar(configuracion, partida):
       event = window.Read(timeout = 1000)[0] # milisegundos
       if (event == None):
         break
+      elif (event == 'Iniciar'):
+        comenzar = True
+        window.Element('Iniciar').Update(disabled = True, button_color = ('white', 'red'))
+        window.Element('Pausa').Update(disabled = False)
       elif (event == 'Pausa'):
           comenzar = not comenzar
-          window.Element('Pausa').Update(button_color = ('white', 'red') if not comenzar else ('white', 'blue'))
+          window.Element('Pausa').Update(button_color = ('white', 'red') if (not comenzar) else ('white', 'blue'))
       elif (event == 'Posponer'):
           partida = {'jugador' : jugador,
                      'letras jugador' : letras_jugador,
@@ -539,9 +548,6 @@ def jugar(configuracion, partida):
           computadora.actualizar_cambios_restantes()
         turno_jugador = True
         window.Element('turno').Update('jugador' if turno_jugador else 'computadora')
-      if (event == 'Comenzar'):
-        comenzar = True
-        window.Element('Comenzar').Update(disabled = True, button_color = ('white', 'red'))
       if (event != '__TIMEOUT__' and comenzar):
         if (event == 'cambiar'):
           if (len(posiciones_ocupadas) > 0):
