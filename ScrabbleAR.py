@@ -213,6 +213,8 @@ def main():
 
     Una vez que la partida termina, se actualiza el top de puntajes y se guarda la información de la partida. En caso de que el usuario
     no haya pospuesto la partida, se guardará None en el archivo "partida_guardada", lo cuál indica que no hay partida guardada.
+    
+    (falta implementar manejo de excepciones para el caso en que se haya borrado algún archivo)
     '''
     
     ruta = 'Componentes' + os.sep + 'Informacion guardada' + os.sep
@@ -257,7 +259,7 @@ def main():
                 ventana.Hide()
                 partida, jugador, computadora = jugar(configuracion_seleccionada, None)
                 actualizar_top(top, jugador, computadora)
-                ventana.UnHide()        # esta línea en ocasiones da error, todavía no encontramos cuál es el error
+                ventana.UnHide()        # esta línea en ocasiones da error, todavía no encontramos cuál es el problema
                 if (configuracion_seleccionada['nivel'] == 'dificil'):
                     configuracion_seleccionada['palabras validas'] = random.choice(['adjetivos', 'verbos'])
         elif (event == 'reanudar'):
