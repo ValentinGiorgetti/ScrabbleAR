@@ -1,5 +1,8 @@
 class Jugador:
-    
+  '''
+  Clase jugador con métodos para obtener y actualizar el puntaje
+  y los cambios restantes del jugador.
+  '''
   def __init__(self):
     self._puntaje = 0
     self._cambios_restantes = 3
