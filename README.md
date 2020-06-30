@@ -15,7 +15,7 @@ Consideraciones a tener en cuenta:
 
 ~ El usuario tiene la posibilidad de posponer una partida, la cuál será guardada para poder continuarla en otra ocasión. En caso de que el usuario inicie una nueva partida, si había una partida guardada, esta será eliminada.
 
-~ Para comenzar la partida, el usuario debe presionar el boton comenzar. En ese momento empezará a correr el contador. Puede pausar o posponer la partida en cualquier momento del juego.
+~ Para comenzar la partida, el usuario debe presionar el botón “Iniciar”. En ese momento empezará a correr el contador. Puede pausar o posponer la partida en cualquier momento del juego.
 
 ~ Casillas especiales: 
   
