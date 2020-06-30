@@ -315,7 +315,7 @@ def imprimir_mensaje_fin(jugador, computadora):
 def cambiar_fichas(jugador, letras_jugador, bolsa_de_fichas, contador, window):
   '''
   Esta función muestra una ventana para que el jugador pueda cambiar algunas o todas sus fichas.
-  En caso de haber hecho algún cambio, ctualiza las fichas del atril.
+  En caso de haber hecho algún cambio, actualiza las fichas del atril.
   '''
   layout_cambiar_fichas = [[sg.Button('Cambiar todas', key = 'todas'), sg.Button('Cambiar algunas', key = 'algunas')],
                            [sg.Text('')],
