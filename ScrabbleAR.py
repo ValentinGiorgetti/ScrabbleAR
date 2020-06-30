@@ -14,7 +14,7 @@ def menu():
 
     layout = [[sg.Text('Menú', size = (60, 1), justification = 'center', font = ("Consolas", 11))],
               [sg.Button('Configuración', key = configuracion), sg.Button('Ver reglas del juego', key = reglas), sg.Button('Ver top de puntajes', key = top_puntajes), sg.Button('Volver')]]
-    window = sg.Window('Menú', layout, location = (600, 200))
+    window = sg.Window('Menú', layout)
 
     configuracion_seleccionada = {}
 
@@ -49,7 +49,7 @@ def reglas():
               [sg.Text('                          '), sg.Button('Facil', button_color = ('white', 'blue')), sg.Button('Medio', button_color = ('white', 'blue')), sg.Button('Dificil', button_color = ('white', 'blue'))],
               [sg.Multiline('Seleccione un nivel', key = 'nivel', disabled = True)],
               [sg.Button('Volver', button_color = ('white', 'blue'))]]
-    window = sg.Window('Reglas', layout, location = (600, 200))
+    window = sg.Window('Reglas', layout)
 
     while True:
         event = window.Read()[0]
@@ -139,7 +139,7 @@ def configuracion():
               [sg.Multiline(informacion_letras(configuracion_seleccionada['fichas']), key = 'letras_modificadas', disabled = True, size = (25, 10))],
               [sg.Text('')],
               [sg.Button('Aceptar'), sg.Button('Restablecer\nconfiguración', size = (10,3), key = 'restablecer')]]
-    window = sg.Window('Configuración', layout, location = (800, 400))
+    window = sg.Window('Configuración', layout)
 
     while True:
         event, values = window.Read()
