@@ -334,7 +334,7 @@ def cambiar_fichas(jugador, letras_jugador, bolsa_de_fichas, contador, window):
   while True:
     event = ventana.Read(timeout = 1000)[0]
     contador -= 1
-    window.Element('tiempo').Update(contador)
+    window.Element('tiempo').Update(datetime.timedelta(seconds = contador))
     if (contador == 0):
       break
     if (event == '__TIMEOUT__'):
