@@ -245,8 +245,10 @@ def main():
             break
         elif (event == menu):
             ventana.Hide()
-            configuracion_seleccionada = menu()
-            ventana.UnHide() 
+            temp = menu()
+            if (temp != {}):
+                configuracion_seleccionada = temp
+            ventana.UnHide()
         elif (event == jugar):
             if (partida != None):
                 ventana.Hide()
