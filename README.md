@@ -25,7 +25,7 @@
   - Las casillas rotuladas "P x3" y "P x2" multiplican por 2 o por 3 respectivamente, el puntaje de la palabra formada.
   - Los multiplicadores pueden acumularse, es decir, si la palabra ocupa una casilla "P x3" y una "P x2", se multiplicará por 5 el puntaje de la palabra formada.
 
-*~* El juego termina cuando el jugador presiona el botón de terminar, cuando la computadora no puede formar ninguna palabra y no tiene cambios disponibles, o cuando ya no se pueden repartir nuevas fichas ya que la bolsa de fichas no dispone de una cantidad suficiente.
+*~* El juego termina cuando el jugador presiona el botón de terminar, cuando la computadora no puede formar ninguna palabra y no tiene cambios disponibles, cuando ya no se pueden repartir nuevas fichas ya que la bolsa de fichas no dispone de una cantidad suficiente, o cuando se acaba el tiempo límite de la partida.
 
 *~* En esta primer fecha nos centramos más en las funcionalidades del programa. Los aspectos estéticos los dejamos para más adelante, cuando tengamos bien todas las funcionalidades. La interfaz seguirá siendo similar, se cambiarán los colores / tamaños de diferentes widgets, fuentes de letras, se añadirán imágenes, etcétera.
 
