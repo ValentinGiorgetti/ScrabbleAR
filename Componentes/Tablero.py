@@ -87,13 +87,18 @@ def sumar_casilla(window, bolsa_de_fichas, casillas_especiales, posicion, letra,
   '''
   window.Element(posicion).Update(letra, button_color = ('white', 'red'))
   posiciones[posicion] = letra
-  puntos_jugada[0] += bolsa_de_fichas[letra]['puntaje_ficha']
   posiciones_bloqueadas += [posicion]
+  temp = bolsa_de_fichas[letra]['puntaje_ficha']
   if (posicion in casillas_especiales):
     if (casillas_especiales[posicion]['modificador'] < 10):
-      puntos_jugada[0] += casillas_especiales[posicion]['modificador']
+      puntos_jugada[0] += temp + casillas_especiales[posicion]['modificador']
+    elif (casillas_especiales[posicion]['modificador'] < 20):
+      puntos_jugada[0] += temp * (casillas_especiales[posicion]['modificador'] % 10)
     else:
-      multiplicador[0] += (casillas_especiales[posicion]['modificador'] % 10)
+      puntos_jugada[0] += temp
+      multiplicador[0] += (casillas_especiales[posicion]['modificador'] % 10)   
+  else:
+    puntos_jugada[0] += temp
 
 def jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fichas_usadas_pc, posiciones_bloqueadas, bolsa_de_fichas, computadora, window, FILAS, COLUMNAS, posiciones, nivel, palabras_validas):
   '''
@@ -111,7 +116,7 @@ def jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fic
   Finalmente se retornan los puntos ganados en la jugada.
   '''
   orientacion = random.randint(0, 100) % 2 == 0   # Si es par la orientacion es horizontal
-  abecedario = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+  abecedario = list('AAABCDEEEFGHIIIJKLMNOOOPQRSTUUUVWXYZ')
   print('letras pc:', letras_pc)
   puntos_jugada = [0]
   multiplicador = [0]
@@ -220,11 +225,11 @@ def colocar_posiciones_especiales(tablero_juego, nivel, casillas_especiales, FIL
       posicion = (i, j)
       posicion_invertida = (j, i)
       if(j == i):
-        tablero_juego[i][j] = sg.Button('F +2', size = (3, 1), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'blue'))
-        casillas_especiales[(i, j)] = {'color' : ('white', 'blue'), 'texto' : 'F +2', 'modificador' : 2}
+        tablero_juego[i][j] = sg.Button('F x2', size = (3, 1), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'blue'))      
+        casillas_especiales[(i, j)] = {'color' : ('white', 'blue'), 'texto' : 'F x2', 'modificador' : 12}                              
       elif(i + j == FILAS - 1):
-        tablero_juego[i][j] = sg.Button('F +3', size = (3, 1), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'blue'))
-        casillas_especiales[(i, j)] = {'color': ('white', 'blue'), 'texto' : 'F +3', 'modificador' : 3}
+        tablero_juego[i][j] = sg.Button('F x3', size = (3, 1), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'blue'))
+        casillas_especiales[(i, j)] = {'color': ('white', 'blue'), 'texto' : 'F x3', 'modificador' : 13}
       elif (nivel == 'facil'):
         if ((posicion in malas_nivel_facil) or (posicion_invertida in malas_nivel_facil)):
           tablero_juego[i][j] = sg.Button('F ' + str(mala_actual), size = (3, 1), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'black'))
@@ -232,7 +237,7 @@ def colocar_posiciones_especiales(tablero_juego, nivel, casillas_especiales, FIL
           mala_actual = mala_actual - 1 if mala_actual > -3 else -1
         elif ((posicion in multiplicador_nivel_facil) or (posicion_invertida in multiplicador_nivel_facil)):
           tablero_juego[i][j] = sg.Button('P x3' if posicion in multiplicador_nivel_facil else 'P x2', size = (3, 1), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'purple'))
-          casillas_especiales[(i, j)]={'color': ('white', 'purple'), 'texto' : 'P x3', 'modificador' : 13 if posicion in multiplicador_nivel_facil else 12}
+          casillas_especiales[(i, j)]={'color': ('white', 'purple'), 'texto' : 'P x3' if posicion in multiplicador_nivel_facil else 'P x2', 'modificador' : 23 if posicion in multiplicador_nivel_facil else 22}
       elif (nivel == 'medio'):
         if ((posicion in malas_nivel_medio) or (posicion_invertida in malas_nivel_medio)):
           tablero_juego[i][j] = sg.Button('F ' + str(mala_actual), size = (3, 1), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'black'))
@@ -240,7 +245,7 @@ def colocar_posiciones_especiales(tablero_juego, nivel, casillas_especiales, FIL
           mala_actual = mala_actual - 1 if mala_actual > -3 else -1
         elif (posicion in multiplicador_nivel_medio or posicion_invertida in multiplicador_nivel_medio):
           tablero_juego[i][j] = sg.Button('P x3' if posicion_invertida in multiplicador_nivel_medio else 'P x2', size = (3, 1), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'purple'))
-          casillas_especiales[(i, j)] = {'color': ('white', 'purple'), 'texto' : 'P x3', 'modificador' : 13 if posicion_invertida in multiplicador_nivel_medio else 12}
+          casillas_especiales[(i, j)] = {'color': ('white', 'purple'), 'texto' : 'P x3' if posicion in multiplicador_nivel_facil else 'P x2', 'modificador' : 23 if posicion_invertida in multiplicador_nivel_medio else 22}
       elif (nivel == 'dificil'):
         if ((posicion in malas_nivel_dificil) or (posicion_invertida in malas_nivel_dificil)):
           tablero_juego[i][j] = sg.Button('F ' + str(mala_actual), size = (3, 1), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'black'))
@@ -248,7 +253,7 @@ def colocar_posiciones_especiales(tablero_juego, nivel, casillas_especiales, FIL
           mala_actual = mala_actual - 1 if mala_actual > -3 else -1
         elif (posicion in multiplicador_nivel_dificil or posicion_invertida in multiplicador_nivel_dificil):
           tablero_juego[i][j] = sg.Button('P x3' if posicion in multiplicador_nivel_dificil else 'P x2', size = (3, 1), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'purple'))
-          casillas_especiales[(i, j)] = {'color': ('white', 'purple'), 'texto' : 'P x3', 'modificador' : 13 if posicion in multiplicador_nivel_dificil else 12}
+          casillas_especiales[(i, j)] = {'color': ('white', 'purple'), 'texto' : 'P x3' if posicion in multiplicador_nivel_facil else 'P x2', 'modificador' : 23 if posicion in multiplicador_nivel_dificil else 22}
           
   tablero_juego[centro[0]][centro[1]] = sg.Button('Inicio', size = (3, 1), key = (centro[0], centro[1]), pad = (0.5, 0.5), button_color = ('black', 'yellow'))
   casillas_especiales[(centro[0], centro[1])] = {'color' : ('black', 'yellow'), 'texto' : 'Inicio', 'modificador' : 1}          
@@ -259,7 +264,7 @@ def repartir_fichas(bolsa_de_fichas, letras):
   Los jugadores reciben más vocales que consonantes para que 
   tengan mayor posibilidad de formar palabras.
   '''
-  abecedario = list('AAAABCDEEEEFGHIIIIJKLMNOOOOPQRSTUUUUVWXYZ')    # las vocales se repiten para que sea más probable que "random.choice" elija una vocal
+  abecedario = list('AAABCDEEEFGHIIIJKLMNOOOPQRSTUUUVWXYZ')    # las vocales se repiten para que sea más probable que "random.choice" elija una vocal
   for i in range(7):
     letra = random.choice(abecedario)
     while (bolsa_de_fichas[letra]['cantidad_fichas'] <= 0):         
@@ -275,12 +280,17 @@ def contar_puntos_jugador(posiciones_ocupadas, casillas_especiales, bolsa_de_fic
   multiplicador = 0
   puntos = 0
   for posicion in posiciones_ocupadas:
-    puntos += bolsa_de_fichas[letras_jugador[posiciones_ocupadas[posicion]]]['puntaje_ficha']
+    temp = bolsa_de_fichas[letras_jugador[posiciones_ocupadas[posicion]]]['puntaje_ficha']
     if (posicion in casillas_especiales):
       if (casillas_especiales[posicion]['modificador'] < 10):
-        puntos += casillas_especiales[posicion]['modificador']
+        puntos += temp + casillas_especiales[posicion]['modificador']
+      elif (casillas_especiales[posicion]['modificador'] < 20):
+        puntos += temp * (casillas_especiales[posicion]['modificador'] % 10)
       else:
         multiplicador += (casillas_especiales[posicion]['modificador'] % 10)
+        puntos += temp
+    else:
+      puntos += temp
   if (puntos < 0):
     return 0
   else:
@@ -325,7 +335,7 @@ def cambiar_fichas(jugador, letras_jugador, bolsa_de_fichas, contador, window):
                            [sg.Button('Aceptar', disabled = True), sg.Button('Salir')]]
   ventana = sg.Window('Cambiar fichas', layout_cambiar_fichas)
 
-  abecedario = list('AAAAABCDEEEEEFGHIIIIIJKLMNOOOOOPQRSTUUUUUVWXYZ')
+  abecedario = list('AAABCDEEEFGHIIIJKLMNOOOPQRSTUUUVWXYZ')
 
   seleccionadas = {}
 
@@ -439,13 +449,14 @@ def jugar(configuracion, partida):
     #print('NIVEL', nivel, 'FILAS', FILAS)
     centro = (int(FILAS / 2), int(FILAS / 2))
     abecedario = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
-    palabras_validas = configuracion['palabras validas'] if partida == None else partida['palabras validas']
+    palabras_validas = configuracion['palabras validas'] if partida == None else partida['palabras validas']    
     contador = configuracion['tiempo'] * 60 if partida == None else partida['contador'] # contador en segundos
     bolsa_de_fichas = {letra : {'cantidad_fichas' : int(configuracion['fichas'][letra]['cantidad_fichas']), 'puntaje_ficha' : int(configuracion['fichas'][letra]['puntaje'])} for letra in abecedario} if partida == None else partida['bolsa de fichas'] 
-
+    # bolsa_de_fichas = {letra : {'cantidad_fichas' : 1, 'puntaje_ficha' : 1}}
+    
     #print('Fichas totales:', fichas_totales(bolsa_de_fichas))
     if (partida == None):
-        letras_jugador = []
+        letras_jugador = []   # Letras del atril
         letras_pc = []
         repartir_fichas(bolsa_de_fichas, letras_jugador)
         repartir_fichas(bolsa_de_fichas, letras_pc)
@@ -453,10 +464,12 @@ def jugar(configuracion, partida):
         letras_jugador = partida['letras jugador']
         letras_pc = partida['letras computadora']
     #print('Fichas totales:', fichas_totales(bolsa_de_fichas))
+    
+    abecedario = list('AAABCDEEEFGHIIIJKLMNOOOPQRSTUUUVWXYZ')
 
     tablero_juego = [[sg.Button('', size = (3, 1), key = (i, j), pad = (0.5, 0.5), button_color = ('white', 'green')) for j in range(COLUMNAS)] for i in range(FILAS)]
 
-    casillas_especiales = {}
+    casillas_especiales = {} # {(i, j) : {'color' : ('white', 'blue'), 'texto' : 'F +2', 'modificador' : 2}} 
     colocar_posiciones_especiales(tablero_juego, nivel, casillas_especiales, FILAS, COLUMNAS, centro)
 
     fichas_jugador = [sg.Button(letras_jugador[i], size = (3, 1), key = i, pad = (0.5, 0.5), button_color = ('white', 'green')) for i in range(7)]
@@ -475,11 +488,11 @@ def jugar(configuracion, partida):
     letra_seleccionada = False              
     orientacion = [True, False] # Si define la orientación, orientacion[0] = True. Si la orientación es vertical, orientacion[1] = False, si es horizontal orientacion[1] = True.
     primer_posicion = ultima_posicion = ()
-    posiciones_ocupadas = OrderedDict() if partida == None else partida['posiciones ocupadas']
+    posiciones_ocupadas = OrderedDict() if partida == None else partida['posiciones ocupadas']  # {(i, j) : posicion del atril de la ficha colocada} se resetea por cada jugada
     primer_jugada = True if partida == None else partida['primer jugada']
     turno_jugador = random.randint(0, 100) % 2 == 0 if partida == None else partida['turno'] # si el número aleatorio es par, comienza el jugador
-    posiciones_bloqueadas = [] if partida == None else partida['posiciones bloqueadas']
-    fichas_usadas_pc = [] if partida == None else partida['fichas usadas pc']
+    posiciones_bloqueadas = [] if partida == None else partida['posiciones bloqueadas']     # [posicion1, posicion2]
+    fichas_usadas_pc = [] if partida == None else partida['fichas usadas pc']               # [posicion_atril, ..]
     comenzar = False
     letra = '' 
 
@@ -503,8 +516,8 @@ def jugar(configuracion, partida):
     if (partida != None):
         restaurar_tablero(window, partida['posiciones'])
 
-    posiciones = {} if partida == None else partida['posiciones']
-    partida = None
+    posiciones = {} if partida == None else partida['posiciones']     # {(i, j) : letra}  posiciones ocupadas del tablero
+    partida = None    
 
     while True:
       event = window.Read(timeout = 1000)[0] # milisegundos
