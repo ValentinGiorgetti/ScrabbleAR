@@ -1,6 +1,6 @@
 # ScrabbleAR - Seminario de Lenguajes (Python)
 
-#### Trabajo realizado por: Garea Antonella (17614/5), Giorgetti Valentín (17133/2). Número del grupo: 31.
+#### Trabajo realizado por: Garea Antonella (17614/5) y Giorgetti Valentín (17133/2). Número del grupo: 31.
 
 ##### Consideraciones a tener en cuenta:
 
@@ -20,7 +20,7 @@
 
 *~* Casillas especiales: 
   
-  - Las casillas rotuladas "F +3" y "F +2" suman 3 o 2 puntos respectivamente, a la ficha colocada en esa posición.
+  - Las casillas rotuladas "F x3" y "F x2" multiplican por 3 o por 2 respectivamente, el puntaje de la ficha colocada en esa posición.
   - Las casillas rotuladas "F -3", "F -2" y "F -1" restan 3, 2 o 1 punto respectivamente, a la ficha colocada en esa posición.
   - Las casillas rotuladas "P x3" y "P x2" multiplican por 2 o por 3 respectivamente, el puntaje de la palabra formada.
   - Los multiplicadores pueden acumularse, es decir, si la palabra ocupa una casilla "P x3" y una "P x2", se multiplicará por 5 el puntaje de la palabra formada.
