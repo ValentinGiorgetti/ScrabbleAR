@@ -1,7 +1,7 @@
 from functools import reduce
 import random, PySimpleGUI as sg
 from pattern.es import parse, verbs, spelling, lexicon
-import time, datetime
+import datetime
 from itertools import permutations
 
 def posicion_valida(event, posiciones_ocupadas, orientacion, posiciones_bloqueadas):
@@ -166,11 +166,10 @@ def jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fic
       while (x in fichas_usadas_pc):
         x = random.randint(8, 14)
       window.Element(x).Update(button_color = ('white', 'red'))
-      window.Element(posicion).Update(letra, button_color = ('white', 'red'))
+      window.Element(posicion).Update(letra, button_color = ('white', 'red')
       window.Read(timeout = 1000)
       contador -= 1
       window.Element('tiempo').Update(datetime.timedelta(seconds = contador))
-      time.sleep(1)
       fichas_usadas_pc += [x]
       letras_pc.remove(letra)
       if (quedan):
