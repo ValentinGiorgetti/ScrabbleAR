@@ -139,10 +139,10 @@ def jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fic
     print(palabra, es_palabra(nivel, palabras_validas, palabra))
     if (primer_jugada):
       for letra in palabra:
+        posiciones_usadas += [(i, j)]
         sumar_casilla(window, bolsa_de_fichas, casillas_especiales, (i, j), letra, puntos_jugada, multiplicador, posiciones_bloqueadas, posiciones) 
         j += 1 if orientacion else 0
         i += 1 if not orientacion else 0
-        posiciones_usadas += [(i, j)]
     else:
       posicion_valida = False
       while (not posicion_valida):
@@ -155,10 +155,10 @@ def jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fic
             posicion_valida = False
             break
       for letra in palabra:
+        posiciones_usadas += [(i, j)]
         sumar_casilla(window, bolsa_de_fichas, casillas_especiales, (i, j), letra, puntos_jugada, multiplicador, posiciones_bloqueadas, posiciones) 
         j += 1 if orientacion else 0
         i += 1 if not orientacion else 0
-        posiciones_usadas += [(i, j)]
     fichas_usadas_pc.clear()
     quedan = quedan_fichas(bolsa_de_fichas, len(palabra))
     for letra, posicion in zip(palabra, posiciones_usadas):
