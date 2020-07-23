@@ -67,7 +67,7 @@ def top_puntajes():
         [sg.Text('')],
         [sg.Button('Top general', key = 'general'), sg.Button('Top nivel fácil', key = 'fácil'), sg.Button('Top nivel medio', key = 'medio'), sg.Button('Top nivel difícil', key = 'difícil')],
         [sg.Text('')],
-        [sg.Table(tabla['general'], **param, key = 'tabla')],
+        [sg.Table(tabla['general'], **param, key = 'tabla', hide_vertical_scroll = True)],
         [sg.Text('')],
         [sg.Button("Volver")],
     ]
@@ -169,11 +169,13 @@ def configuracion():
         
     columna_configuracion_actual = sg.Column(layout_configuracion_actual, **parametros_columna)
     
-    window = sg.Window("Configuración", [[columna_configuracion, columna_configuracion_actual]], element_justification = 'center', auto_size_text=True, auto_size_buttons=True)
+    window = sg.Window("Configuración", [[columna_configuracion, columna_configuracion_actual]], element_justification = 'center', auto_size_text=True, auto_size_buttons=True, finalize = True)
+    
+    window[configuracion_seleccionada['nivel'].capitalize()].update(button_color = colores[configuracion_seleccionada['nivel'].capitalize()])
     
     parametros_popup = {"title" : "Atención", "non_blocking" : True, "auto_close_duration" : 5, "auto_close" : True}
     
-    ultimo_presionado = ''
+    ultimo_presionado = configuracion_seleccionada['nivel'].capitalize()
 
     while True:
         event, values = window.Read()
@@ -258,7 +260,7 @@ def actualizar_top(jugador, computadora, nivel):
         
         print('antes', top)
 
-        jugador = [("Jugador", jugador.get_puntaje(), fehca)] if jugador.get_puntaje() > 0 else []
+        jugador = [("Jugador", jugador.get_puntaje(), fecha)] if jugador.get_puntaje() > 0 else []
         computadora = [("Computadora", computadora.get_puntaje(), fecha)] if computadora.get_puntaje() > 0 else []
         
         temp = top['general'] + jugador + computadora
