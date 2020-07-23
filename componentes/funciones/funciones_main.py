@@ -1,5 +1,7 @@
 import pickle, json, random, PySimpleGUI as sg
 from os.path import join
+from datetime import datetime
+from playsound import playsound as reproducir
 
 def reglas():
     """
@@ -13,31 +15,38 @@ def reglas():
     texto2 = "Palabras válidas: adjetivos y verbos.\nTamaño del tablero: 17 x 17."
     texto3 = "Palabras válidas: adjetivos o verbos, se selecciona en forma aleatoria.\nTamaño del tablero: 15 x 15."
     ultimo_presionado = ""
+    colores = {'Fácil' : ("white", "green"), 'Medio' : ("white", "orange"), 'Difícil' : ('white', 'red')}
 
     layout = [
-        [sg.Text("Reglas del juego", size=(60, 1), justification="center", font=("Consolas", 11),)],
-        [
-            sg.Text("                          "),
-            sg.Button("Facil", button_color=("white", "blue")),
-            sg.Button("Medio", button_color=("white", "blue")),
-            sg.Button("Dificil", button_color=("white", "blue")),
-        ],
-        [sg.Multiline("Seleccione un nivel", key="nivel", disabled=True)],
-        [sg.Button("Volver", button_color=("white", "blue"))],
+        [sg.Text("Reglas del juego", size=(60, 1), font=("Consolas", 11), justification = 'center')],
+        [sg.Text('')],
+        [sg.Button("Fácil"), sg.Button("Medio"), sg.Button("Difícil")],
+        [sg.Text('')],
+        [sg.Multiline("Seleccione un nivel", key="nivel", disabled=True, size = (60, 3))],
+        [sg.Text('')],
+        [sg.Button("Volver")],
     ]
-    window = sg.Window("Reglas", layout)
+    window = sg.Window("Reglas", layout, element_justification = 'center', auto_size_text=True, auto_size_buttons=True)
 
     while True:
         event = window.Read()[0]
+        reproducir(join("componentes", "sonidos", "boton.mp3"))
         if event in (None, "Volver"):
             break
         if ultimo_presionado != "":
-            window.Element(ultimo_presionado).Update(button_color=("white", "blue"))
-        window.Element(event).Update(button_color=("white", "red"))
+            window.Element(ultimo_presionado).Update(button_color=sg.DEFAULT_BUTTON_COLOR)
+        window.Element(event).Update(button_color=colores[event])
         ultimo_presionado = event
         window.Element("nivel").Update(texto1 if event == "Fácil" else (texto2 if event == "Medio" else texto3))
     window.Close()
-
+    
+def generar_tabla(top):
+  tabla = [[i, "", "", ""] for i in range(1, 11)]
+  for i in range(len(top)):
+    tabla[i][1] = top[i][0]
+    tabla[i][2] = top[i][1]
+    tabla[i][3] = top[i][2]
+  return tabla
 
 def top_puntajes():
     """
@@ -48,22 +57,29 @@ def top_puntajes():
 
     with open(join("componentes", "informacion_guardada", "top_puntajes"), "rb") as f:
         top = pickle.load(f)
-
-    temp = list(jugador[0] + " " + str(jugador[1].get_puntaje()) + " puntos" for jugador in top)
-    strs = ""
-    for i in temp:
-        strs += i + "\n"
-    # print(strs)
+    print('en top', top)
+        
+    param = {"headings" : ['Posición', 'Usuario', 'Puntaje', 'Fecha'], "justification" : 'center'}
+    tabla = {i : generar_tabla(top[i]) for i in ['general', 'fácil', 'medio', 'difícil']}
 
     layout = [
-        [sg.Text("Top 10 de los mejores puntajes")],
-        [sg.Multiline(strs, disabled=True)],
+        [sg.Text("Top 10 de los mejores puntajes", size = (40,1), justification = 'center')],
+        [sg.Text('')],
+        [sg.Button('Top general', key = 'general'), sg.Button('Top nivel fácil', key = 'fácil'), sg.Button('Top nivel medio', key = 'medio'), sg.Button('Top nivel difícil', key = 'difícil')],
+        [sg.Text('')],
+        [sg.Table(tabla['general'], **param, key = 'tabla')],
+        [sg.Text('')],
         [sg.Button("Volver")],
     ]
 
-    window = sg.Window("Top puntajes", layout)
-
-    window.Read()
+    window = sg.Window("Top puntajes", layout, element_justification = 'center', auto_size_text=True, auto_size_buttons=True)
+    
+    while True:
+      event, values = window.Read()
+      reproducir(join("componentes", "sonidos", "boton.mp3"))
+      if event in (None, 'Volver'):
+        break
+      window['tabla'].Update(values = tabla[event], visible = True)
     window.Close()
     
 
@@ -73,20 +89,7 @@ def informacion_letras(letras):
     fichas, de acuerdo a la configuración actual.
     """
     
-    if len(letras) == 0:
-        return "Letras modificadas"
-    texto = "Letra   Puntos   Cantidad de fichas\n\n"
-    for letra in letras:
-        texto += (
-            "   "
-            + str(letra)
-            + "        "
-            + str(letras[letra]["puntaje"])
-            + "                  "
-            + str(letras[letra]["cantidad_fichas"])
-            + "\n"
-        )
-    return texto
+    return [[letra, letras[letra]['puntaje'], letras[letra]['cantidad_fichas']] for letra in letras]
 
 
 def configuracion():
@@ -101,36 +104,43 @@ def configuracion():
     en un archivo json y se retorna el diccionario con la configuración seleccionada a la ventana "menú".
     """
 
-    with open(join("componentes", "informacion_guardada", "ultima_configuracion.json")) as f:
+    with open(join("componentes", "informacion_guardada", "ultima_configuracion.json"), encoding = 'UTF-8') as f:
         configuracion_seleccionada = json.load(f)
 
-    with open(join("componentes", "informacion_guardada", "configuracion_predeterminada.json")) as f:
+    with open(join("componentes", "informacion_guardada", "configuracion_predeterminada.json"), encoding = 'UTF-8') as f:
         configuracion_predeterminada = json.load(f)
+        
+    titulos = {'font' : ("Consolas", 11), 'background_color' : '#1d3557', 'size' : (55, 1), 'justification' : 'center'}
+    
+    colores = {'Fácil' : ("white", "green"), 'Medio' : ("white", "orange"), 'Difícil' : ('white', 'red')}
 
-    layout = [
-        [sg.Text("Nivel de la partida", size=(80, 1), justification="center", font=("Consolas", 11),)],
+    layout_configuracion = [
+        [sg.Text("Nivel de la partida", **titulos)],
         [sg.Text("")],
         [
-            sg.Text("                                       "),
-            sg.Button("Facil", button_color=("white", "green")),
-            sg.Text("               "),
-            sg.Button("Medio", button_color=("white", "orange")),
-            sg.Text("            "),
-            sg.Button("Dificil", button_color=("white", "red")),
+            sg.Button("Fácil"),
+            sg.Button("Medio"),
+            sg.Button("Difícil"),
+        ],
+        [sg.Text("")],
+        [sg.Text("Tiempo de la partida", **titulos)],
+        [sg.Text("")],
+        [
+            sg.Input(" ", size=(4, 2), key="tiempo"),
+            sg.Text("minutos"),
+            sg.Button("Confirmar", key="confirmar_tiempo"),
         ],
         [sg.Text("")],
         [
             sg.Text(
-                "Configuración de las fichas\npara todos los niveles",
-                size=(80, 2),
-                justification="center",
-                font=("Consolas", 11),
+                "Configuración de las fichas para todos los niveles",
+                **titulos
             )
         ],
         [sg.Text("")],
         [
             sg.Text("Letra"),
-            sg.Spin(values=list("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), initial_value="A", enable_events=True, key="letra",),
+            sg.Input("", size=(4, 2), key="letra",),
             sg.Text("Puntaje"),
             sg.Input(" ", size=(4, 2), key="puntaje"),
             sg.Text("Cantidad de fichas"),
@@ -138,38 +148,36 @@ def configuracion():
             sg.Button("Confirmar", key="confirmar_letra"),
         ],
         [sg.Text("")],
-        [sg.Text("Tiempo de la partida", size=(80, 1), justification="center", font=("Consolas", 11),)],
-        [sg.Text("")],
-        [
-            sg.Text("         "),
-            sg.Text("Minutos"),
-            sg.Input(" ", size=(4, 2), key="tiempo"),
-            sg.Text("           "),
-            sg.Button("Confirmar", key="confirmar_tiempo"),
-        ],
-        [sg.Text("")],
-        [sg.Text("Configuracion actual", size=(80, 1), justification="center", font=("Consolas", 11),)],
-        [sg.Text("Nivel"), sg.Text(str(configuracion_seleccionada["nivel"]) + "   ", key="nivel_seleccionado",),],
-        [
-            sg.Text("Tiempo"),
-            sg.Text(str(configuracion_seleccionada["tiempo"]) + " minutos     ", key="tiempo_seleccionado",),
-        ],
-        [sg.Text("Letras")],
-        [
-            sg.Multiline(
-                informacion_letras(configuracion_seleccionada["fichas"]),
-                key="letras_modificadas",
-                disabled=True,
-                size=(25, 10),
-            )
-        ],
-        [sg.Text("")],
-        [sg.Button("Aceptar"), sg.Button("Restablecer\nconfiguración", size=(10, 3), key="restablecer"),],
+        [sg.Button("Restablecer configuración", key="restablecer")],
     ]
-    window = sg.Window("Configuración", layout)
+    
+    parametros_columna = {'justification' : 'left', 'element_justification' : 'center'}
+    
+    columna_configuracion = sg.Column(layout_configuracion, **parametros_columna)
+    
+    layout_configuracion_actual = [[sg.Text("Configuración actual", **titulos)],
+        [sg.Text("")],
+        [sg.Text("Nivel:", ), sg.Text(str(configuracion_seleccionada["nivel"] + '    '), key="nivel_seleccionado"),],
+        [
+            sg.Text("Tiempo:", ),
+            sg.Text(str(configuracion_seleccionada["tiempo"]) + " minutos", key="tiempo_seleccionado", ),
+        ],
+        [sg.Text("")],
+        [sg.Table(informacion_letras(configuracion_seleccionada["fichas"]), ['Letra', "Puntaje", "Cantidad fichas"], justification = 'center', key = "letras_modificadas")],
+        [sg.Text("")],
+        [sg.Button("Aceptar")]]
+        
+    columna_configuracion_actual = sg.Column(layout_configuracion_actual, **parametros_columna)
+    
+    window = sg.Window("Configuración", [[columna_configuracion, columna_configuracion_actual]], element_justification = 'center', auto_size_text=True, auto_size_buttons=True)
+    
+    parametros_popup = {"title" : "Atención", "non_blocking" : True, "auto_close_duration" : 5, "auto_close" : True}
+    
+    ultimo_presionado = ''
 
     while True:
         event, values = window.Read()
+        reproducir(join("componentes", "sonidos", "boton.mp3"))
         if event in (None, "Aceptar"):
             break
         if event == "restablecer":
@@ -179,80 +187,86 @@ def configuracion():
             window.Element("nivel_seleccionado").Update(configuracion_seleccionada["nivel"])
         if event == "confirmar_tiempo":
             if values["tiempo"] == " ":
-                sg.Popup(
-                    "El campo está vacío", title="Atención", non_blocking=True, auto_close_duration=5, auto_close=True,
-                )
+                sg.Popup("El campo está vacío", **parametros_popup)
             else:
                 try:
-                    configuracion_seleccionada["tiempo"] = int(values["tiempo"])
+                    tiempo = int(values["tiempo"])
                 except (ValueError):
-                    sg.Popup(
-                        "No se ingresó un número válido",
-                        title="Atención",
-                        non_blocking=True,
-                        auto_close_duration=5,
-                        auto_close=True,
-                    )
+                    sg.Popup("No se ingresó un número válido", **parametros_popup)
                 else:
-                    window.Element("tiempo_seleccionado").Update(
-                        str(configuracion_seleccionada["tiempo"]) + " minutos"
-                        if configuracion_seleccionada["tiempo"] != " "
-                        else " "
-                    )
+                    if tiempo >= 1:
+                      configuracion_seleccionada["tiempo"] = tiempo
+                    else:
+                      sg.Popup("Ingrese una cantidad de minutos válida", **parametros_popup)
+                    window.Element("tiempo_seleccionado").Update(str(configuracion_seleccionada["tiempo"]) + " minutos")
         if event == "confirmar_letra":
-            if " " in (values["letra"], values["puntaje"], values["fichas"]):
-                sg.Popup(
-                    "Todos los campos deben estar completos",
-                    title="Atención",
-                    non_blocking=True,
-                    auto_close_duration=5,
-                    auto_close=True,
-                )
+            letra = values["letra"].upper()
+            puntaje = values["puntaje"]
+            cantidad_fichas = values["fichas"]
+            if not letra.isalpha():
+              sg.Popup("Ingrese una letra válida", **parametros_popup)
+            elif (puntaje == " " and cantidad_fichas == " "):
+              sg.Popup("Los campos están vacíos", **parametros_popup)
             else:
                 try:
-                    configuracion_seleccionada["fichas"][values["letra"]] = {
-                        "puntaje": int(values["puntaje"]),
-                        "cantidad_fichas": int(values["fichas"]),
-                    }
+                    puntaje = int(puntaje) if puntaje != " " else puntaje
+                    cantidad_fichas = int(cantidad_fichas) if cantidad_fichas != " " else cantidad_fichas
                 except (ValueError):
-                    sg.Popup(
-                        "Los datos ingresados deben ser válidos",
-                        title="Atención",
-                        non_blocking=True,
-                        auto_close_duration=5,
-                        auto_close=True,
-                    )
+                    sg.Popup("Los datos ingresados deben ser válidos", **parametros_popup)
                 else:
-                    window.Element("letras_modificadas").Update(
-                        informacion_letras(configuracion_seleccionada["fichas"])
-                    )
-        if event in ("Facil", "Medio", "Dificil"):
+                    if puntaje != " ":
+                      if puntaje >= 1:
+                        configuracion_seleccionada["fichas"][letra]["puntaje"] = puntaje
+                      else:
+                        sg.Popup("El puntaje debe ser mayor o igual a 1", **parametros_popup)
+                    if cantidad_fichas != " ":
+                      if cantidad_fichas >= 1:
+                        configuracion_seleccionada["fichas"][letra]["cantidad_fichas"] = int(cantidad_fichas)
+                      else:
+                        sg.Popup("La cantidad de fichas debe ser mayor o igual a 1", **parametros_popup)
+                    window.Element("letras_modificadas").Update(informacion_letras(configuracion_seleccionada["fichas"]))
+        if event in ("Fácil", "Medio", "Difícil"):
+            window[event].Update(button_color = colores[event])
+            if ultimo_presionado != "":
+              window.Element(ultimo_presionado).Update(button_color=sg.DEFAULT_BUTTON_COLOR)
+            ultimo_presionado = event
             configuracion_seleccionada["nivel"] = event.lower()
             window.Element("nivel_seleccionado").Update(configuracion_seleccionada["nivel"])
 
     window.Close()
 
-    if configuracion_seleccionada["nivel"] == "dificil":
+    if configuracion_seleccionada["nivel"] == "difícil":
         configuracion_seleccionada["palabras validas"] = random.choice(["adjetivos", "verbos"])
     else:
         configuracion_seleccionada["palabras validas"] = "-"
 
-    with open(join("componentes", "informacion_guardada", "ultima_configuracion.json"), "w") as f:
+    with open(join("componentes", "informacion_guardada", "ultima_configuracion.json"), "w", encoding = 'UTF-8') as f:
         json.dump(configuracion_seleccionada, f, indent=2)
 
     return configuracion_seleccionada
 
 
-def actualizar_top(top, jugador, computadora):
+def actualizar_top(jugador, computadora, nivel):
     """
     Función usada para actualizar el top de los 10 mejores puntajes.
     """
+    
+    fecha = datetime.now().strftime('%d / %m / %Y')
 
-    top += [("Jugador", jugador)] if jugador.get_puntaje() > 0 else []
-    top += [("Computadora", computadora)] if computadora.get_puntaje() > 0 else []
+    with open(join("componentes", "informacion_guardada", "top_puntajes"), "rb") as f:
+        top = pickle.load(f)
+        
+        print('antes', top)
 
-    top = sorted(top, key=lambda x: x[1].get_puntaje(), reverse=True)
-    top = top[:10]
-
+        jugador = [("Jugador", jugador.get_puntaje(), fehca)] if jugador.get_puntaje() > 0 else []
+        computadora = [("Computadora", computadora.get_puntaje(), fecha)] if computadora.get_puntaje() > 0 else []
+        
+        temp = top['general'] + jugador + computadora
+        top['general'] = sorted(temp, key=lambda x: x[1], reverse=True)[:10]
+        
+        temp = top[nivel] + jugador + computadora
+        top[nivel] = sorted(temp, key=lambda x: x[1], reverse=True)[:10]
+        
+        print('despues', top)
     with open(join("componentes", "informacion_guardada", "top_puntajes"), "wb") as f:
         pickle.dump(top, f)
