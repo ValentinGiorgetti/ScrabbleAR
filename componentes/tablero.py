@@ -7,6 +7,7 @@ import sys, datetime
 from playsound import playsound as reproducir
 from os.path import join
 
+
 def jugar(configuracion, partida):
     """
     Esta es la función "principal", donde se crea el tablero de juego y se desarrolla la lógica más importante del mismo.
@@ -104,6 +105,10 @@ def jugar(configuracion, partida):
     fichas_usadas_pc = [] if partida ==  None else partida["fichas usadas pc"]  # [posicion_atril, ..]
     comenzar = False
     letra = ""
+    
+    informacion_jugador = ['Jugador', jugador.get_puntaje(), jugador.get_cambios_restantes()] 
+    informacion_pc = ['Computadora', computadora.get_puntaje(), computadora.get_cambios_restantes()]
+    tabla = [informacion_jugador, informacion_pc] if jugador.get_puntaje() >= computadora.get_puntaje() else [informacion_pc, informacion_jugador]
 
     columna2 = [
         [sg.Text("Tiempo restante"), sg.Text(datetime.timedelta(seconds = contador), key = "tiempo"),],
@@ -118,17 +123,9 @@ def jugar(configuracion, partida):
                 )
             )
         ],
-        [sg.Text("Puntajes")],
-        [sg.Text("Jugador:"), sg.Text(str(jugador.get_puntaje()) + "     ", key = "puntaje_jugador"),],
-        [sg.Text("Computadora:"), sg.Text(str(computadora.get_puntaje()) + "      ", key = "puntaje_computadora"),],
-        [sg.Text("Turno actual:"), sg.Text("jugador" if turno_jugador else "computadora", key = "turno"),],
-        [sg.Text("Palabra actual:"), sg.Text("                 ", key = "palabra_actual"),],
-        [
-            sg.Text("Cambios restantes jugador:"),
-            sg.Text(jugador.get_cambios_restantes(), key = "cambios_jugador"),
-            sg.Text("Cambios restantes pc:"),
-            sg.Text(computadora.get_cambios_restantes(), key = "cambios_pc"),
-        ],
+        [sg.Table(tabla, ["", "Puntaje", "Cambios restantes"], key = 'tabla', justification = 'center', num_rows = 2, hide_vertical_scroll = True)],
+        [sg.Text("Turno:"), sg.Text("jugador" if turno_jugador else "computadora", key = "turno"),],
+        [sg.Text("Palabra formada:"), sg.Text("                 ", key = "palabra_formada"),],
         [sg.Text("Cantidad de fichas en la bolsa:"), sg.Text(fichas_totales(bolsa_de_fichas), key = "cantidad_fichas"),],
         [sg.Text("")],
         [
@@ -184,7 +181,7 @@ def jugar(configuracion, partida):
             partida_pospuesta = True
             break
         elif event ==  "Terminar":
-            finalizar_partida(jugador, letras_jugador, computadora, letras_pc, bolsa_de_fichas, window)
+            finalizar_partida(jugador, letras_jugador, computadora, letras_pc, bolsa_de_fichas, window, tabla, informacion_jugador, informacion_pc)
             comenzar = False
         window.Element("turno").Update("jugador" if turno_jugador else "computadora")
         if not turno_jugador and comenzar:
@@ -203,11 +200,13 @@ def jugar(configuracion, partida):
                 posiciones,
                 nivel,
                 palabra_valida,
-                contador,
+                contador, informacion_pc, tabla
             )
             if jugada >= 0:
                 computadora.actualizar_puntaje(jugada)
-                window.Element("puntaje_computadora").Update(computadora.get_puntaje())
+                informacion_pc[1] = computadora.get_puntaje()
+                tabla = [informacion_jugador, informacion_pc] if jugador.get_puntaje() >= computadora.get_puntaje() else [informacion_pc, informacion_jugador]
+                window["tabla"].Update(tabla)
             else:
                 computadora.actualizar_cambios_restantes()
             turno_jugador = True
@@ -227,7 +226,8 @@ def jugar(configuracion, partida):
                     cambio, contador = cambiar_fichas(jugador, letras_jugador, bolsa_de_fichas, contador, window)
                     if cambio:
                         jugador.actualizar_cambios_restantes()
-                        window.Element("cambios_jugador").Update(jugador.get_cambios_restantes())
+                        informacion_jugador[2] = jugador.get_cambios_restantes()
+                        window["tabla"].Update(tabla)
                         letra_seleccionada = False
                         orientacion = [True, False]
                         primer_posicion = ultima_posicion = ()
@@ -294,7 +294,9 @@ def jugar(configuracion, partida):
                     else:
                         for i in range(4):
                             jugador.actualizar_cambios_restantes()
-                    window.Element("puntaje_jugador").Update(jugador.get_puntaje())
+                    informacion_jugador[1] = jugador.get_puntaje()
+                    tabla = [informacion_jugador, informacion_pc] if jugador.get_puntaje() >= computadora.get_puntaje() else [informacion_pc, informacion_jugador]
+                    window["tabla"].Update(tabla)
                 # else:
                 # print('palabra incorrecta')
             elif event in range(7):
@@ -348,11 +350,11 @@ def jugar(configuracion, partida):
                             )
         if comenzar:
             if contador ==  0 or computadora.get_cambios_restantes() < 0 or jugador.get_cambios_restantes() < 0:
-                finalizar_partida(jugador, letras_jugador, computadora, letras_pc, bolsa_de_fichas, window)
+                finalizar_partida(jugador, letras_jugador, computadora, letras_pc, bolsa_de_fichas, window, tabla, informacion_jugador, informacion_pc)
                 comenzar = False
             window.Element("tiempo").Update(datetime.timedelta(seconds = contador))
             contador -=  1
-            window.Element("palabra_actual").Update(palabra_formada(letras_jugador, posiciones_ocupadas))
+            window.Element("palabra_formada").Update(palabra_formada(letras_jugador, posiciones_ocupadas))
             window.Element("cantidad_fichas").Update(fichas_totales(bolsa_de_fichas))
             fichas = "".join([letra * bolsa_de_fichas[letra]["cantidad_fichas"] for letra in bolsa_de_fichas])
 
