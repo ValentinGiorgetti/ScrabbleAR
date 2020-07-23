@@ -4,7 +4,7 @@
 
 ##### Consideraciones a tener en cuenta:
 
-*~* Versión de PySimpleGUI usada: 3.39.0
+*~* Versión de PySimpleGUI usada: 4.26.0
 
 *~* Versión de Pattern usada: 2.6
 
