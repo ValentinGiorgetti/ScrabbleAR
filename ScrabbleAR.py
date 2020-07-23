@@ -45,7 +45,7 @@ def main():
     window_confirmar = sg.Window("Partida nueva", layout_confirmar, element_justification = 'center', auto_size_text=True, auto_size_buttons=True, finalize = True)
     window_confirmar.Hide()
 
-    with open(join("componentes", "informacion_guardada", "ultima_configuracion.json")) as f:
+    with open(join("componentes", "informacion_guardada", "ultima_configuracion.json"), encoding = 'UTF-8') as f:
         configuracion_seleccionada = json.load(f)
         
     partida_pospuesta = False
