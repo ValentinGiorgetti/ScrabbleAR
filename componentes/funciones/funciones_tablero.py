@@ -102,7 +102,7 @@ def sumar_casilla(window, bolsa_de_fichas, casillas_especiales, posicion, letra,
     puntos_jugada[0] += temp
 
 
-def jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fichas_usadas_pc, posiciones_bloqueadas, bolsa_de_fichas, computadora, window, FILAS, COLUMNAS, posiciones, nivel, palabras_validas, contador):
+def jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fichas_usadas_pc, posiciones_bloqueadas, bolsa_de_fichas, computadora, window, FILAS, COLUMNAS, posiciones, nivel, palabras_validas, contador, informacion_pc, tabla):
   '''
   Función que permite que la computadora pueda colocar en una orientación y posición random del tablero, la palabra de
   mayor longitud que pueda formar. De esta forma puede ganar puntos y competir contra el jugador.
@@ -206,7 +206,8 @@ def jugar_computadora(letras_pc, primer_jugada, centro, casillas_especiales, fic
           window.Element(i).Update(button_color = ('white', 'green'), disabled = True)
         repartir_fichas(bolsa_de_fichas, letras_pc)
         sg.Popup('Se repartieron nuevas fichas a la computadora', title = 'Atención', non_blocking = True, auto_close_duration = 5, auto_close = True)
-        window.Element('cambios_pc').Update(computadora.get_cambios_restantes())
+        informacion_pc[2] = computadora.get_cambios_restantes()
+        window["tabla"].Update(tabla)
         return 0, contador, primer_jugada   
       else:
         return -1, contador, primer_jugada
@@ -324,7 +325,7 @@ def fichas_totales(bolsa_de_fichas):
   return total  
 
 
-def finalizar_partida(jugador, letras_jugador, computadora, letras_pc, bolsa_de_fichas, window):
+def finalizar_partida(jugador, letras_jugador, computadora, letras_pc, bolsa_de_fichas, window, tabla, informacion_jugador, informacion_pc):
   '''
   Función que muestra el mensaje de fin de la partida, detallando los puntos
   de la computadora y del jugador.
@@ -339,8 +340,10 @@ def finalizar_partida(jugador, letras_jugador, computadora, letras_pc, bolsa_de_
   if computadora.get_puntaje() < 0:
     computadora.set_puntaje(0)
     
-  window['puntaje_jugador'].Update(jugador.get_puntaje())
-  window['puntaje_computadora'].Update(computadora.get_puntaje())
+  informacion_pc[1] = computadora.get_puntaje()
+  informacion_jugador[1] = jugador.get_puntaje()
+  tabla = [informacion_jugador, informacion_pc] if jugador.get_puntaje() >= computadora.get_puntaje() else [informacion_pc, informacion_jugador]  
+  window['tabla'].Update(tabla)
 
   for i, letra in zip(range(8, 15), letras_pc):
       window.Element(i).Update(letra, disabled = False)
