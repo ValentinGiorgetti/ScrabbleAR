@@ -42,7 +42,7 @@ def palabra_formada(letras, posiciones_ocupadas):
   return reduce(lambda anterior, posicion: anterior + letras[posicion], posiciones_ocupadas.values(), '')
 
 
-def es_palabra(nivel, palabra_validas, palabra):
+def es_palabra(nivel, palabras_validas, palabra):
   '''
   Función que retorna true en caso de que la palabra sea válida para el nivel correspondiente
   '''
