@@ -1,4 +1,4 @@
-import pickle, json, random, PySimpleGUI as sg
+import pickle, json, random, PySimpleGUI asimport pickle, json, random, PySimpleGUI as sg
 from os.path import join
 from datetime import datetime
 from playsound import playsound as reproducir
@@ -10,10 +10,13 @@ def reglas():
     """
 
     texto1 = (
-        "Palabras válidas: cualquier palabra que la librería Pattern considere válida.\nTamaño del tablero: 19 x 19."
+        "Palabras válidas: cualquier palabra que la librería Pattern considere válida. Tamaño del tablero: 19 x 19."
+        " El mismo contine casillas 72 con premios y 16 con descuento"
     )
-    texto2 = "Palabras válidas: adjetivos y verbos.\nTamaño del tablero: 17 x 17."
-    texto3 = "Palabras válidas: adjetivos o verbos, se selecciona en forma aleatoria.\nTamaño del tablero: 15 x 15."
+    texto2 = "Palabras válidas: adjetivos y verbos. Tamaño del tablero: 17 x 17. El mismo contiene 64 casillas con "\
+             "premios y 20 con descuento"
+    texto3 = "Palabras válidas: adjetivos o verbos, se selecciona en forma aleatoria.Tamaño del tablero: 15 x 15." \
+             "El mismo contiene 40 casillas con premios y 36 con descuento"
     ultimo_presionado = ""
     colores = {'Fácil' : ("white", "green"), 'Medio' : ("white", "orange"), 'Difícil' : ('white', 'red')}
 
