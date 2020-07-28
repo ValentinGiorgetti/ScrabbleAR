@@ -1,11 +1,11 @@
 {
   "nivel": "fácil",
-  "palabra valida": "-",
+  "palabras_validas": "-",
   "tiempo": 60, 
   "fichas": {
     "A": {
       "puntaje": 1,
-      "cantidad_fichas": 10
+      "cantidad_fichas": 15
     },
     "B": {
       "puntaje": 1,
@@ -21,7 +21,7 @@
     },
     "E": {
       "puntaje": 1,
-      "cantidad_fichas": 10
+      "cantidad_fichas": 15
     },
     "F": {
       "puntaje": 1,
@@ -37,7 +37,7 @@
     },
     "I": {
       "puntaje": 1,
-      "cantidad_fichas": 10
+      "cantidad_fichas": 15
     },
     "J": {
       "puntaje": 1,
@@ -59,9 +59,13 @@
       "puntaje": 1,
       "cantidad_fichas": 10
     },
-    "O": {
+    "Ñ": {
       "puntaje": 1,
       "cantidad_fichas": 10
+    },
+    "O": {
+      "puntaje": 1,
+      "cantidad_fichas": 15
     },
     "P": {
       "puntaje": 1,
@@ -85,7 +89,7 @@
     },
     "U": {
       "puntaje": 1,
-      "cantidad_fichas": 10
+      "cantidad_fichas": 15
     },
     "V": {
       "puntaje": 1,
