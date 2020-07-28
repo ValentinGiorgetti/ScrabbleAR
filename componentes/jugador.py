@@ -4,24 +4,46 @@ class Jugador:
     y los cambios restantes del mismo.
     """
 
-    def __init__(self):
+    def __init__(self, nombre, color_ficha):
         self._puntaje = 0
         self._cambios_restantes = 3
+        self._fichas = []
+        self._nombre = nombre
+        self._color = color_ficha
 
-    def get_puntaje(self):
+    @property
+    def puntaje(self):
         return self._puntaje
 
-    def set_puntaje(self, puntaje):
+    @puntaje.setter
+    def puntaje(self, puntaje):
         self._puntaje = puntaje
-
-    def actualizar_puntaje(self, puntos):
-        self._puntaje += puntos
-
-    def get_cambios_restantes(self):
+        if self._puntaje < 0:
+            self._puntaje = 0
+        
+    @property
+    def cambios_restantes(self):
         return self._cambios_restantes
     
-    def set_cambios_restantes_(self, cambios):
+    @cambios_restantes.setter
+    def cambios_restantes(self, cambios):
         self._cambios_restantes = cambios
-
-    def actualizar_cambios_restantes(self):
-        self._cambios_restantes -= 1
+        
+    @property
+    def fichas(self):
+        return self._fichas
+        
+    @fichas.setter
+    def fichas(self, fichas):
+        self._fichas = fichas
+        
+    @property
+    def nombre(self):
+        return self._nombre
+        
+    @property
+    def color(self):
+        return self._color
+        
+    def informacion(self):
+        return [self._nombre, self._puntaje, self._cambios_restantes]
