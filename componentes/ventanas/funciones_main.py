@@ -3,6 +3,7 @@ from componentes.ventanas.tablero.main import main as jugar
 from componentes.ventanas.parametros import parametros_ventana
 from componentes.ventanas.top_puntajes.funciones import actualizar_top
 from os.path import join
+import random
 import pickle
 import PySimpleGUI as sg
 
