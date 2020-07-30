@@ -181,35 +181,39 @@ def contar_jugada(window, palabra, ubicacion_mas_larga, tablero, casillas_especi
     window["tabla"].Update(tabla)
     
     return posiciones_ocupadas_pc, puntos_jugada
+    
         
 def ubicar_palabra(window, palabra, tablero, parametros, posiciones_ocupadas_pc):
 
     bolsa_de_fichas = tablero['bolsa_de_fichas']
     computadora = tablero['computadora']
     fichas = actualizar_fichas_totales(bolsa_de_fichas)
-    fichas_usadas_pc = [] # fichas de su atril marcadas en rojo
+    posiciones_atril = {}
+    nuevas_fichas = []
+    for i in range(8, 14):
+      letra = computadora.fichas[i-8]
+      posiciones_atril[letra] = posiciones_atril[letra] + [i] if letra in posiciones_atril else [i]
+    print(posiciones_atril)
     quedan = quedan_fichas(bolsa_de_fichas, len(palabra))
     for letra, posicion in zip(palabra, posiciones_ocupadas_pc):
-      x = random.randint(8, 14)
-      while (x in fichas_usadas_pc):
-        x = random.randint(8, 14)
+      x = posiciones_atril[letra][0]
+      posiciones_atril[letra].remove(x)
       window[x].Update(button_color = ('white', 'red'))
       window[posicion].Update(letra, button_color = computadora.color)
       window.Read(timeout = 1000)
       tablero['contador'] -= 1
       window['tiempo'].Update(datetime.timedelta(seconds = tablero['contador']))
-      fichas_usadas_pc += [x]
-      computadora.fichas.remove(letra)
       if (quedan):
         letra_nueva = random.choice(fichas)
         while (bolsa_de_fichas[letra_nueva]['cantidad_fichas'] <= 0):
           letra_nueva = random.choice(fichas)
-        computadora.fichas += [letra_nueva]
+        nuevas_fichas += [letra_nueva]
         bolsa_de_fichas[letra_nueva]['cantidad_fichas'] -= 1
         fichas = actualizar_fichas_totales(bolsa_de_fichas)
     if (quedan):
       for i in range(8, 15):
         window[i].Update(button_color = ('white', 'green'))
+      computadora.fichas = nuevas_fichas
     else:
       parametros['fin_juego'] = True
       
@@ -242,8 +246,10 @@ def repartir_nuevas_fichas(tablero, parametros, window):
         window["tabla"].Update(tabla) 
       else:
         parametros['fin_juego'] = True
+        parametros['historial'] += '\n\n - Fin de la partida. La computadora no pudo formar ninguna palabra y no dispone de cambios suficientes.'
+        window['historial'].Update(parametros['historial'])
     else:
-      parametros['historial'] += '\n\n - La computadora no pudo formar ninguna palabra y no hay fichas suficientes para repartir'
+      parametros['historial'] += '\n\n - Fin de la partida. La computadora no pudo formar ninguna palabra y no hay fichas suficientes para repartir.'
       window['historial'].Update(parametros['historial'])
       parametros['fin_juego'] = True
 
@@ -271,6 +277,9 @@ def jugar_computadora(window, parametros, tablero):
     posiciones_ocupadas_pc, puntos_jugada = contar_jugada(window, palabra, ubicacion_mas_larga, tablero, parametros['casillas_especiales'])
     ubicar_palabra(window, palabra, tablero, parametros, posiciones_ocupadas_pc)
     finalizar_jugada(window, parametros, tablero, palabra, puntos_jugada)
+    if (parametros['fin_juego']):
+        parametros['historial'] += '\n\n - Fin de la partida. No hay fichas suficientes para repartir.'
+        window['historial'].Update(parametros['historial'])
   else:
     repartir_nuevas_fichas(tablero, parametros, window)
     
@@ -420,17 +429,14 @@ def finalizar_partida(window, tablero):
   for i, letra in zip(range(8, 15), computadora.fichas):
       window[i].Update(letra, disabled = False)
 
-  aux = ''
-  if (computadora.cambios_restantes < 0):
-    aux = 'La computadora'
-  mensaje = '¡Fin de la partida!\n' + (f'{aux} no puede formar ninguna palabra y no dispone de más cambios \n' if aux else '\n')
+  mensaje = ''
   if (jugador.puntaje > computadora.puntaje):
-    mensaje += f'Ganó el jugador con {jugador.puntaje} puntos'
+    mensaje = f'Ganó el jugador con {jugador.puntaje} puntos'
   elif (jugador.puntaje < computadora.puntaje):
-    mensaje += f'Ganó la computadora con {computadora.puntaje} puntos'
+    mensaje = f'Ganó la computadora con {computadora.puntaje} puntos'
   else: 
-    mensaje += 'Hubo un empate'
-  sg.Popup(mensaje, title = 'Atención')
+    mensaje = 'Hubo un empate'
+  sg.Popup(mensaje, title = 'Fin de la partida')
 
   for key in ('Iniciar', 'Posponer', 'Pausa', 'Terminar', 'confirmar', 'cambiar', 'pasar'):
     window[key].Update(disabled = True)
@@ -602,6 +608,8 @@ def confirmar_palabra(window, parametros, tablero):
             window['turno'].Update('computadora')
         else:
             parametros['fin_juego'] = True
+            parametros['historial'] += '\n\n - Fin de la partida. No quedan suficientes fichas para repartir.'
+            window['historial'].Update(parametros['historial'])
         tabla = sorted([tablero['jugador'].informacion(), tablero['computadora'].informacion()], key = lambda x : x[1], reverse = True)
         window["tabla"].Update(tabla)
 
