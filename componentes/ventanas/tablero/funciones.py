@@ -189,13 +189,13 @@ def ubicar_palabra(window, palabra, tablero, parametros, posiciones_ocupadas_pc)
     computadora = tablero['computadora']
     fichas = actualizar_fichas_totales(bolsa_de_fichas)
     posiciones_atril = {}
-    nuevas_fichas = []
+    nuevas_fichas = computadora.fichas[:]
     for i in range(8, 15):
       letra = computadora.fichas[i-8]
       posiciones_atril[letra] = posiciones_atril[letra] + [i] if letra in posiciones_atril else [i]
-    print(posiciones_atril)
     quedan = quedan_fichas(bolsa_de_fichas, len(palabra))
     for letra, posicion in zip(palabra, posiciones_ocupadas_pc):
+      nuevas_fichas.remove(letra)
       x = posiciones_atril[letra][0]
       posiciones_atril[letra].remove(x)
       window[x].Update(button_color = ('white', 'red'))
