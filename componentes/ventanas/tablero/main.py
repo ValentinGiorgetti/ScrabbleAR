@@ -29,6 +29,9 @@ def main(configuracion, partida_anterior = None):
                    "historial" : string que indica lo ocurrido durante la partida (palabras formadas, puntos, etc.),
                    "fichas_totales" : string que contiene todas las fichas de la bolsa ('AAABBBCC...')
                    "fin_juego" : booleano usado para controlar el fin de la partida
+                   "tiempo_inicio": float que almacena el momento en el que se inicio la partida
+                   "tiempo_total": float que indica cantidad de segundos de la partida
+                   "tiempo_restante": float que indica cuantos segundos faltan para que termine la partida
                  }
                  
     "tablero" es un diccionario que contine información para actualizar diferentes widgets de la ventana:
@@ -40,7 +43,6 @@ def main(configuracion, partida_anterior = None):
                 "jugador" : referencia al jugador (instancia de la clase Jugador),
                 "computadora" : referencia a la computadora (instancia de la clase Jugador),
                 "turno" : string que indica el turno ('computadora' o 'jugador'),
-                "contador" : almacena la cantidad máxima de segundos de la partida,
                 "bolsa_de_fichas" : diccionario que almacena información sobre las fichas. Las claves son las letras y el valor es otro diccionario
                                     que almacena el puntaje y cantidad de fichas de la letra,
                 "primer_jugada" : booleano que indica si se realizó alguna jugada o no,
@@ -85,7 +87,7 @@ def main(configuracion, partida_anterior = None):
                 seleccionar_ficha(window, parametros, event)
               elif event:
                 colocar_ficha(window, parametros, tablero, event)
-            if not tablero['contador'] or parametros['fin_juego']:
+            if parametros['fin_juego']:
               finalizar_partida(window, tablero)
               comenzar = False
             actualizar_tablero(window, parametros, tablero)

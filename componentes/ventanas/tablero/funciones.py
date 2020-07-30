@@ -9,12 +9,19 @@ from componentes.jugador import Jugador
 from os.path import join
 from componentes.ventanas.general import *
 from playsound import playsound as reproducir
+import time
+import math
     
     
+def actualizar_tiempo(window, parametros):
+
+  parametros['tiempo_restante'] = parametros['tiempo_total'] - math.ceil(time.time() - parametros['tiempo_inicio'])
+  window['tiempo'].Update(datetime.timedelta(seconds = parametros['tiempo_restante']))
+
+
 def actualizar_tablero(window, parametros, tablero):
 
-    window["tiempo"].Update(datetime.timedelta(seconds = tablero['contador']))
-    tablero['contador'] -=  1
+    actualizar_tiempo(window, parametros)
     window["palabra_formada"].Update(palabra_formada(tablero['jugador'].fichas, parametros['jugada']))
     window["cantidad_fichas"].Update(fichas_totales(tablero['bolsa_de_fichas']))
 
@@ -201,8 +208,7 @@ def ubicar_palabra(window, palabra, tablero, parametros, posiciones_ocupadas_pc)
       window[x].Update(button_color = ('white', 'red'))
       window[posicion].Update(letra, button_color = computadora.color)
       window.Read(timeout = 1000)
-      tablero['contador'] -= 1
-      window['tiempo'].Update(datetime.timedelta(seconds = tablero['contador']))
+      actualizar_tiempo(window, parametros)
       if (quedan):
         letra_nueva = random.choice(fichas)
         while (bolsa_de_fichas[letra_nueva]['cantidad_fichas'] <= 0):
@@ -483,9 +489,9 @@ def cambiar_fichas(window, tablero, parametros):
 
   while True:
     event = leer_evento(ventana, 1000, 'pasar')[0]
-    tablero['contador'] -= 1
-    window['tiempo'].Update(datetime.timedelta(seconds = tablero['contador']))
-    if (not tablero['contador']):
+    actualizar_tiempo(window, parametros)
+    if (parametros['tiempo_restante'] <= 0):
+      parametros['fin_juego'] = True
       break
     elif (event == 'pasar'):
       continue
@@ -622,7 +628,6 @@ def inicializar_parametros(configuracion, partida_anterior):
       "jugador" : Jugador("Jugador", ('white', 'blue')),
       "computadora" : Jugador("Computadora", ('white', 'red')),
       "turno" : random.choice(('computadora', 'jugador')),
-      "contador" : configuracion['tiempo'] * 60,
       "bolsa_de_fichas" : configuracion['fichas'],
       "primer_jugada" : True,
       "nivel" : configuracion['nivel'],
@@ -644,6 +649,7 @@ def inicializar_parametros(configuracion, partida_anterior):
     "historial" : '                  Historial de la partida',
     "fichas_totales" : actualizar_fichas_totales(tablero['bolsa_de_fichas']),
     "fin_juego" : False,
+    "tiempo_total": configuracion['tiempo'] * 60
   }
   
   return tablero, parametros
@@ -689,7 +695,7 @@ def crear_ventana_tablero(tablero, parametros, partida_anterior):
     tabla = sorted([tablero['jugador'].informacion(), tablero['computadora'].informacion()], key = lambda x : x[1], reverse = True)
 
     columna2 = [
-        [sg.Text("Tiempo restante"), sg.Text(datetime.timedelta(seconds = tablero['contador']), key = "tiempo"),],
+        [sg.Text("Tiempo restante"), sg.Text('--:--:--    ', key = "tiempo"),],
         [sg.Text("Nivel: " + tablero['nivel'])],
         [sg.Text("Palabras válidas: " + tablero['palabras_validas'])],
         [sg.Table(tabla, ["", "Puntaje", "Cambios restantes"], key = 'tabla', justification = 'center', num_rows = 2, hide_vertical_scroll = True)],
@@ -718,6 +724,7 @@ def crear_ventana_tablero(tablero, parametros, partida_anterior):
         
 def iniciar_partida(window, parametros, partida_anterior):
 
+    parametros['tiempo_inicio'] = time.time()
     parametros['historial'] += '\n\n - El jugador ' + ('reanudó' if partida_anterior else 'inició') + ' la partida.'
     window['historial'].Update(parametros['historial'])
     window["Iniciar"].Update(disabled = True)
