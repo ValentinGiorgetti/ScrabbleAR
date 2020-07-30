@@ -2,13 +2,11 @@ from componentes.ventanas.funciones_main import *
 from componentes.ventanas.configuracion.funciones import leer_ultima_configuracion
 from componentes.ventanas.reglas.main import main as reglas
 from componentes.ventanas.top_puntajes.main import main as top_puntajes
-import PySimpleGUI as sg
-from os.path import join
-from playsound import playsound as reproducir
+from componentes.ventanas.general import leer_evento
 
 def main():
     """
-    Función principal que muestra una ventana_principal con opciones para acceder al menú, reanundar una partida o iniciar una partida nueva.
+    Función principal que muestra una ventana con opciones para acceder al menú, reanundar una partida o iniciar una partida nueva.
 
     La opción de reanudar una partida sólo estará habilitada en caso de que exista una partida guardada. En caso de que exista una 
     partida guardada y el usuario quiera iniciar una nueva, se mostrará una ventana_principal para confirmar la opción, ya que si se inicia una
@@ -29,8 +27,7 @@ def main():
     ventana_principal = crear_ventana_main(partida_guardada)
 
     while True:
-        event = ventana_principal.Read()[0]
-        reproducir(join("componentes", "sonidos", "boton.mp3"))
+        event = leer_evento(ventana_principal)[0]
         if event in (None, "Salir"):
             break
         ventana_principal.Hide()
