@@ -1,9 +1,6 @@
-import random, PySimpleGUI as sg
-from componentes.jugador import Jugador
 from componentes.ventanas.tablero.funciones import *
-import datetime
-from playsound import playsound as reproducir
-from os.path import join
+from componentes.ventanas.general import leer_evento
+
 
 def main(configuracion, partida_anterior = None):
     """
@@ -61,11 +58,7 @@ def main(configuracion, partida_anterior = None):
     comenzar = partida_guardada = None
 
     while True:
-        event = window.Read(timeout = 1000, timeout_key = '')[0]  # milisegundos
-  #      if (event):
-  #        reproducir(join("componentes", "sonidos", "boton.mp3"))
-  #      else:
-  #        continue
+        event = leer_evento(window, 1000)[0]
         if event in (None, 'Salir'):
             break
         elif event ==  "Iniciar":
@@ -95,10 +88,7 @@ def main(configuracion, partida_anterior = None):
             if not tablero['contador'] or parametros['fin_juego']:
               finalizar_partida(window, tablero)
               comenzar = False
-            window["tiempo"].Update(datetime.timedelta(seconds = tablero['contador']))
-            tablero['contador'] -=  1
-            window["palabra_formada"].Update(palabra_formada(tablero['jugador'].fichas, parametros['jugada']))
-            window["cantidad_fichas"].Update(fichas_totales(tablero['bolsa_de_fichas']))
+            actualizar_tablero(window, parametros, tablero)
 
     window.Close()
     return partida_guardada, tablero['jugador'], tablero['computadora']

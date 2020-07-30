@@ -1,5 +1,5 @@
 import json, random, PySimpleGUI as sg
-from componentes.ventanas.parametros import titulos, parametros_columna, parametros_ventana, parametros_popup
+from componentes.ventanas.general import titulos, parametros_columna, parametros_ventana, parametros_popup
 from os.path import join
 
 def crear_ventana_configuracion(colores, ultimo_presionado, tabla, configuracion_seleccionada):
@@ -32,9 +32,9 @@ def crear_ventana_configuracion(colores, ultimo_presionado, tabla, configuracion
             sg.Text("Letra"),
             sg.Input("", size=(4, 2), key="letra",),
             sg.Text("Puntaje"),
-            sg.Input(" ", size=(4, 2), key="puntaje"),
+            sg.Input("", size=(4, 2), key="puntaje"),
             sg.Text("Cantidad de fichas"),
-            sg.Input(" ", size=(4, 2), key="fichas"),
+            sg.Input("", size=(4, 2), key="fichas"),
             sg.Button("Confirmar", key="confirmar_letra"),
         ],
         [sg.Text("")],
@@ -131,21 +131,21 @@ def confirmar_letra(values, configuracion_seleccionada, window):
     cantidad_fichas = values["fichas"]
     if len(letra) > 1 or not letra.isalpha():
       sg.Popup("Ingrese una letra válida", **parametros_popup)
-    elif (puntaje == " " and cantidad_fichas == " "):
+    elif (not puntaje and not cantidad_fichas):
       sg.Popup("Los campos están vacíos", **parametros_popup)
     else:
         try:
-            puntaje = int(puntaje) if puntaje != " " else puntaje
-            cantidad_fichas = int(cantidad_fichas) if cantidad_fichas != " " else cantidad_fichas
+            puntaje = int(puntaje) if puntaje else puntaje
+            cantidad_fichas = int(cantidad_fichas) if cantidad_fichas else cantidad_fichas
         except (ValueError):
             sg.Popup("Los datos ingresados deben ser válidos", **parametros_popup)
         else:
-            if puntaje != " ":
+            if puntaje:
               if puntaje >= 1:
                 configuracion_seleccionada["fichas"][letra]["puntaje"] = puntaje
               else:
                 sg.Popup("El puntaje debe ser mayor o igual a 1", **parametros_popup)
-            if cantidad_fichas != " ":
+            if cantidad_fichas:
               if cantidad_fichas >= 1:
                 configuracion_seleccionada["fichas"][letra]["cantidad_fichas"] = int(cantidad_fichas)
               else:
@@ -166,7 +166,8 @@ def seleccionar_dificultad(configuracion_seleccionada, ultimo_presionado, event,
     
 def establecer_palabras_validas(configuracion_seleccionada):
 
-    if configuracion_seleccionada["nivel"] == "difícil":
-        configuracion_seleccionada["palabras_validas"] = random.choice(["adjetivos", "verbos"])
-    else:
-        configuracion_seleccionada["palabras_validas"] = "-"
+    nivel = configuracion_seleccionada["nivel"]
+    palabras_validas = {'fácil' : 'adjetivos, sustantivos y verbos',
+                        'medio' : 'adjetivos y verbos',
+                         'difícil' : random.choice(["adjetivos", "verbos"])}
+    configuracion_seleccionada["palabras_validas"] = palabras_validas[nivel]

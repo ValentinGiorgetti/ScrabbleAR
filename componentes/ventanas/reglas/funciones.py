@@ -1,7 +1,6 @@
 import PySimpleGUI as sg
-from componentes.ventanas.parametros import parametros_ventana
+from componentes.ventanas.general import parametros_ventana
     
-  
 
 def crear_ventana_reglas():
 

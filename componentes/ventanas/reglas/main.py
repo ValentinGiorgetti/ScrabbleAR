@@ -1,7 +1,5 @@
-import PySimpleGUI as sg
-from playsound import playsound as reproducir
-from os.path import join
 from componentes.ventanas.reglas.funciones import *
+from componentes.ventanas.general import leer_evento
 
 def main():
     """
@@ -19,8 +17,7 @@ def main():
     window = crear_ventana_reglas()
 
     while True:
-        event = window.Read()[0]
-        reproducir(join("componentes", "sonidos", "boton.mp3"))
+        event = leer_evento(window)[0]
         if event in (None, "Volver"):
             break
         else:

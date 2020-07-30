@@ -1,7 +1,7 @@
 {
-  "nivel": "fácil",
-  "palabras_validas": "-",
-  "tiempo": 60, 
+  "nivel": "f\u00e1cil",
+  "palabras_validas": "adjetivos, sustantivos y verbos",
+  "tiempo": 60,
   "fichas": {
     "A": {
       "puntaje": 1,
@@ -59,7 +59,7 @@
       "puntaje": 1,
       "cantidad_fichas": 10
     },
-    "Ñ": {
+    "\u00d1": {
       "puntaje": 1,
       "cantidad_fichas": 10
     },

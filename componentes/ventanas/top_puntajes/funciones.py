@@ -1,7 +1,7 @@
 import pickle, PySimpleGUI as sg
 from datetime import datetime
 from componentes.jugador import Jugador
-from componentes.ventanas.parametros import parametros_ventana
+from componentes.ventanas.general import parametros_ventana
 from os.path import join
 
 def crear_ventana_tops(tabla):
@@ -13,7 +13,7 @@ def crear_ventana_tops(tabla):
         [sg.Text('')],
         [sg.Button('General', key = 'general', button_color = ('white', 'blue'), size = tamanio), sg.Button('Nivel fácil', key = 'fácil', size = tamanio), sg.Button('Nivel medio', key = 'medio', size = tamanio), sg.Button('Nivel difícil', key = 'difícil', size = tamanio)],
         [sg.Text('')],
-        [sg.Table(tabla, headings = ['Posición', 'Usuario', 'Puntaje', 'Fecha'], justification = 'center', key = 'top', hide_vertical_scroll = True)],
+        [sg.Table(tabla, headings = ['Posición', 'Usuario', 'Puntaje', 'Fecha', 'Nivel'], justification = 'center', key = 'top', hide_vertical_scroll = True)],
         [sg.Text('')],
         [sg.Button('Resetear', key = 'resetear', disabled = tabla[0][1] == '', size = tamanio), sg.Button("Volver")],
     ]
@@ -37,11 +37,12 @@ def guardar_top(top):
         
 def generar_tabla(top):
 
-  tabla = [[i, "", "", ""] for i in range(1, 11)]
+  tabla = [[i, "", "", "", ""] for i in range(1, 11)]
   for i in range(len(top)):
     tabla[i][1] = top[i][0]
     tabla[i][2] = top[i][1]
     tabla[i][3] = top[i][2]
+    tabla[i][4] = top[i][3]
   return tabla
         
         
@@ -83,8 +84,8 @@ def actualizar_top(jugador, computadora, nivel):
 
     top = leer_top()
 
-    jugador = [("Jugador", jugador.puntaje, fecha)] if jugador.puntaje > 0 else []
-    computadora = [("Computadora", computadora.puntaje, fecha)] if computadora.puntaje > 0 else []
+    jugador = [("Jugador", jugador.puntaje, fecha, nivel.capitalize())] if jugador.puntaje > 0 else []
+    computadora = [("Computadora", computadora.puntaje, fecha, nivel.capitalize())] if computadora.puntaje > 0 else []
     
     temp = top['general'] + jugador + computadora
     top['general'] = sorted(temp, key=lambda x: x[1], reverse=True)[:10]

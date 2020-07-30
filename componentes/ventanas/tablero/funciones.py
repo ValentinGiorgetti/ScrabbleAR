@@ -7,7 +7,17 @@ from collections import OrderedDict
 from itertools import permutations
 from componentes.jugador import Jugador
 from os.path import join
-from componentes.ventanas.parametros import parametros_popup, parametros_columna
+from componentes.ventanas.general import *
+from playsound import playsound as reproducir
+    
+    
+def actualizar_tablero(window, parametros, tablero):
+
+    window["tiempo"].Update(datetime.timedelta(seconds = tablero['contador']))
+    tablero['contador'] -=  1
+    window["palabra_formada"].Update(palabra_formada(tablero['jugador'].fichas, parametros['jugada']))
+    window["cantidad_fichas"].Update(fichas_totales(tablero['bolsa_de_fichas']))
+
 
 def posicion_valida(posicion, posiciones_ocupadas, posiciones_bloqueadas, orientacion):
   '''
@@ -15,6 +25,7 @@ def posicion_valida(posicion, posiciones_ocupadas, posiciones_bloqueadas, orient
   está respetando la orientación elegida y si no está tratando de colocar la ficha en una
   posición previamente ocupada.
   '''
+  
   misma_orientacion = False
   if (not posicion in posiciones_bloqueadas):
     if (not posiciones_ocupadas or posicion in posiciones_ocupadas):
@@ -225,7 +236,7 @@ def repartir_nuevas_fichas(tablero, parametros, window):
         for i in range(8, 15):
           window[i].Update(button_color = ('white', 'green'))
         repartir_fichas(bolsa_de_fichas, computadora.fichas)
-        parametros['historial'] += '\n\n - La computadora no pudo formar ninguna palabra, se le repartieron nuevas fichas'
+        parametros['historial'] += '\n\n - La computadora no pudo formar ninguna palabra, se le repartieron nuevas fichas.'
         window['historial'].Update(parametros['historial'])
         tabla = sorted([tablero['jugador'].informacion(), tablero['computadora'].informacion()], key = lambda x : x[1], reverse = True)
         window["tabla"].Update(tabla) 
@@ -434,7 +445,7 @@ def ventana_cambio_fichas(letras_jugador):
                            [sg.Button(letras_jugador[i], size= (3, 1), key = i, pad = (0.5, 0.5), button_color = ('white', 'green')) for i in range(7)],
                            [sg.Text('')],
                            [sg.Button('Aceptar'), sg.Button('Salir')]]
-    return sg.Window('Cambiar fichas', layout_cambiar_fichas)
+    return sg.Window('Cambiar fichas', layout_cambiar_fichas, **parametros_ventana)
     
     
 def reiniciar_parametros(parametros):
@@ -465,12 +476,12 @@ def cambiar_fichas(window, tablero, parametros):
   seleccionadas = {}
 
   while True:
-    event = ventana.Read(timeout = 1000, timeout_key = 'esperar')[0]
+    event = leer_evento(ventana, 1000, 'pasar')[0]
     tablero['contador'] -= 1
     window['tiempo'].Update(datetime.timedelta(seconds = tablero['contador']))
     if (not tablero['contador']):
       break
-    elif (event == 'esperar'):
+    elif (event == 'pasar'):
       continue
     elif (event in ('Salir', None)):
       break
@@ -672,19 +683,10 @@ def crear_ventana_tablero(tablero, parametros, partida_anterior):
     columna2 = [
         [sg.Text("Tiempo restante"), sg.Text(datetime.timedelta(seconds = tablero['contador']), key = "tiempo"),],
         [sg.Text("Nivel: " + tablero['nivel'])],
-        [
-            sg.Text(
-                "Palabras válidas: "
-                + (
-                    "adjetivos, sustantivos y verbos"
-                    if tablero['nivel'] ==  "fácil"
-                    else ("adjetivos y verbos" if tablero['nivel'] ==  "medio" else tablero['palabras_validas'])
-                )
-            )
-        ],
+        [sg.Text("Palabras válidas: " + tablero['palabras_validas'])],
         [sg.Table(tabla, ["", "Puntaje", "Cambios restantes"], key = 'tabla', justification = 'center', num_rows = 2, hide_vertical_scroll = True)],
         [sg.Text("Turno:"), sg.Text(tablero['turno'], key = 'turno')],
-        [sg.Text("Palabra formada:"), sg.Text("                 ", key = "palabra_formada"),],
+        [sg.Text("Palabra formada:"), sg.Text("", key = "palabra_formada"),],
         [sg.Text("Cantidad de fichas en la bolsa:"), sg.Text(fichas_totales(tablero['bolsa_de_fichas']), key = "cantidad_fichas"),],
         [sg.Text("")],
         [sg.Multiline(parametros['historial'], size = (37, 10), key = 'historial', disabled = True, autoscroll = True)],
@@ -697,7 +699,7 @@ def crear_ventana_tablero(tablero, parametros, partida_anterior):
 
     layout = [[sg.Column(columna1, **parametros_columna), sg.Column(columna2, **parametros_columna)]]
 
-    window = sg.Window("Tablero", layout, element_justification = 'center', auto_size_text=True, auto_size_buttons=True, finalize = True, use_default_focus = False, text_justification = 'center', disable_close = True)
+    window = sg.Window("Tablero", layout, **parametros_ventana)
     
     parametros['casillas_especiales'] = colocar_posiciones_especiales(window, tablero) # {(i, j) : {'color' : ('white', 'blue'), 'texto' : 'F +2', 'modificador' : 2}}
 
@@ -716,7 +718,7 @@ def iniciar_partida(window, parametros, partida_anterior):
     
 def pausar(window, comenzar):
 
-   window["Pausa"].Update(button_color = ("white", "red") if (not comenzar) else sg.DEFAULT_BUTTON_COLOR)
+   window["Pausa"].Update(button_color = ("white", "red") if comenzar else sg.DEFAULT_BUTTON_COLOR)
    
    return not comenzar
    
@@ -767,8 +769,7 @@ def colocar_ficha(window, parametros, tablero, event):
             if len(parametros['jugada']) <=  1:
                 parametros['orientacion'] = ''
                 if not parametros['jugada']:
-                    parametros['primer_posicion'] = ()
-                    parametros['ultima_posicion'] = ()
+                    parametros['primer_posicion'] = parametros['ultima_posicion'] = ()
             if event == parametros['primer_posicion']:
                 parametros['primer_posicion'] = (
                     (event[0] + 1, event[1]) if parametros['orientacion'] == 'vertical' else (event[0], event[1] + 1)

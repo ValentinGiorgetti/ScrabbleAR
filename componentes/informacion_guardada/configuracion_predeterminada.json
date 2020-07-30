@@ -1,6 +1,6 @@
 {
   "nivel": "fácil",
-  "palabras_validas": "-",
+  "palabras_validas": "adjetivos, sustantivos y verbos",
   "tiempo": 60, 
   "fichas": {
     "A": {
