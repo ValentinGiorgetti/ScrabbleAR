@@ -190,7 +190,7 @@ def ubicar_palabra(window, palabra, tablero, parametros, posiciones_ocupadas_pc)
     fichas = actualizar_fichas_totales(bolsa_de_fichas)
     posiciones_atril = {}
     nuevas_fichas = []
-    for i in range(8, 14):
+    for i in range(8, 15):
       letra = computadora.fichas[i-8]
       posiciones_atril[letra] = posiciones_atril[letra] + [i] if letra in posiciones_atril else [i]
     print(posiciones_atril)
