@@ -16,7 +16,9 @@ import math
 def actualizar_tiempo(window, parametros):
 
   parametros['tiempo_restante'] = parametros['tiempo_total'] - math.ceil(time.time() - parametros['tiempo_inicio'])
+  parametros['fin_juego'] = parametros['tiempo_restante'] <= 0
   window['tiempo'].Update(datetime.timedelta(seconds = parametros['tiempo_restante']))
+  window.Refresh()
 
 
 def actualizar_tablero(window, parametros, tablero):
@@ -207,7 +209,7 @@ def ubicar_palabra(window, palabra, tablero, parametros, posiciones_ocupadas_pc)
       posiciones_atril[letra].remove(x)
       window[x].Update(button_color = ('white', 'red'))
       window[posicion].Update(letra, button_color = computadora.color)
-      window.Read(timeout = 1000)
+      time.sleep(1)
       actualizar_tiempo(window, parametros)
       if (quedan):
         letra_nueva = random.choice(fichas)
@@ -490,8 +492,7 @@ def cambiar_fichas(window, tablero, parametros):
   while True:
     event = leer_evento(ventana, 1000, 'pasar')[0]
     actualizar_tiempo(window, parametros)
-    if (parametros['tiempo_restante'] <= 0):
-      parametros['fin_juego'] = True
+    if (parametros['fin_juego']):
       break
     elif (event == 'pasar'):
       continue
