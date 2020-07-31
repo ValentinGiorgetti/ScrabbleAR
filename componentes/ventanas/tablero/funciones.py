@@ -83,7 +83,7 @@ def es_palabra(nivel, palabras_validas, palabra):
     tipo = analisis(palabra)
     return tipo.find('JJ') != -1 or tipo.find('VB') != -1
   elif (nivel == 'difícil'):
-    tipo = 'JJ' if palabras_validas == 'adjetivos' else 'VB'
+    tipo = 'JJ' if palabras_validas == 'Adjetivos' else 'VB'
     return analisis(palabra).find(tipo) != -1
       
 
@@ -703,17 +703,27 @@ def crear_ventana_tablero(tablero, parametros, partida_anterior):
     columna1 = layout_columna1
     
     tabla = sorted([tablero['jugador'].informacion(), tablero['computadora'].informacion()], key = lambda x : x[1], reverse = True)
+    
+    titulo = {'font' : ("Consolas", 12), 'background_color' : '#1d3557', 'size' : (40, 1)}
+    fuente = ("Helvetica", 11)
+    nivel = tablero['nivel']
 
     columna2 = [
-        [sg.Text("Tiempo restante"), sg.Text(datetime.timedelta(seconds = tablero['contador']), key = "tiempo"),],
-        [sg.Text("Nivel: " + tablero['nivel'])],
-        [sg.Text("Palabras válidas: " + tablero['palabras_validas'])],
+        [sg.Text("Tiempo restante", **titulo)], 
+        [sg.Text(datetime.timedelta(seconds = tablero['contador']), key = "tiempo", font = fuente)],
+        [sg.Text("Nivel", **titulo)],
+        [sg.Text(nivel.capitalize(), font = fuente)],
+        [sg.Text("Palabras válidas", **titulo)],
+        [sg.Text(tablero['palabras_validas'], font = fuente)],
+        [sg.Text("Cantidad de fichas en la bolsa", **titulo)], 
+        [sg.Text(fichas_totales(tablero['bolsa_de_fichas']), font = fuente, key = "cantidad_fichas")],
+        [sg.Text("Turno", **titulo)],
+        [sg.Text(tablero['turno'], key = 'turno', font = fuente)],
+        [sg.Text('')],
         [sg.Table(tabla, ["", "Puntaje", "Cambios restantes"], key = 'tabla', justification = 'center', num_rows = 2, hide_vertical_scroll = True)],
-        [sg.Text("Turno:"), sg.Text(tablero['turno'], key = 'turno')],
-        [sg.Text("Palabra formada:"), sg.Text("", key = "palabra_formada"),],
-        [sg.Text("Cantidad de fichas en la bolsa:"), sg.Text(fichas_totales(tablero['bolsa_de_fichas']), key = "cantidad_fichas"),],
-        [sg.Text("")],
+        [sg.Text('')],
         [sg.Multiline(parametros['historial'], size = (37, 10), key = 'historial', disabled = True, autoscroll = True)],
+        [sg.Text('')],
         [
             sg.Button("Confirmar palabra", key = "confirmar"),
             sg.Button("Cambiar fichas", key = "cambiar"),
@@ -721,7 +731,7 @@ def crear_ventana_tablero(tablero, parametros, partida_anterior):
         ],
     ]
 
-    layout = [[sg.Column(columna1, **parametros_columna), sg.Column(columna2, **parametros_columna)]]
+    layout = [[sg.Column(columna1, **parametros_columna), sg.Column(columna2, pad = ((20, 0), (0, 0)), **parametros_columna)]]
 
     window = sg.Window("Tablero", layout, **parametros_ventana)
     
