@@ -1,7 +1,7 @@
 from functools import reduce
 import random, PySimpleGUI as sg
 from pattern.es import parse, verbs, spelling, lexicon
-import datetime
+import datetime, time
 from random import randint
 from collections import OrderedDict
 from itertools import permutations
@@ -9,23 +9,22 @@ from componentes.jugador import Jugador
 from os.path import join
 from componentes.ventanas.general import *
 from playsound import playsound as reproducir
-import time
-import math
     
     
-def actualizar_tiempo(window, parametros):
-
-  parametros['tiempo_restante'] = parametros['tiempo_total'] - math.ceil(time.time() - parametros['tiempo_inicio'])
-  parametros['fin_juego'] = parametros['tiempo_restante'] <= 0
-  window['tiempo'].Update(datetime.timedelta(seconds = parametros['tiempo_restante']))
-  window.Refresh()
-
-
 def actualizar_tablero(window, parametros, tablero):
 
-    actualizar_tiempo(window, parametros)
     window["palabra_formada"].Update(palabra_formada(tablero['jugador'].fichas, parametros['jugada']))
     window["cantidad_fichas"].Update(fichas_totales(tablero['bolsa_de_fichas']))
+    
+    
+def actualizar_tiempo(window, contador, tiempo):
+
+    temp = round(contador - tiempo)
+    contador = 0 if temp <= 0 else temp
+    window['tiempo'].Update(datetime.timedelta(seconds = contador))
+    window.Refresh()
+    
+    return contador == 0, contador
 
 
 def posicion_valida(posicion, posiciones_ocupadas, posiciones_bloqueadas, orientacion):
@@ -131,8 +130,9 @@ def sumar_casilla(casillas_especiales, posicion, letra, puntos_jugada, multiplic
   return multiplicador, puntos_jugada
     
 
-def buscar_ubicacion_mas_larga(tablero):
+def buscar_ubicacion_mas_larga(tablero, window):
 
+  fin_juego = False
   tamanio = tablero['tamanio']
   centro = tablero['centro']
   orientacion = random.choice(('v', 'h'))
@@ -144,7 +144,8 @@ def buscar_ubicacion_mas_larga(tablero):
     ubicacion_mas_larga = []
     encontre = False
     cant = 0
-    while (not encontre):
+    while (not encontre and not fin_juego):
+      tiempo_inicio = time.time()
       i = random.randint(0, tamanio - 1)
       j = random.randint(0, tamanio - 3)
       cant += 1
@@ -159,22 +160,26 @@ def buscar_ubicacion_mas_larga(tablero):
         ubicacion_mas_larga = temp
       if cant > 100 or len(ubicacion_mas_larga) == 7:
         encontre = True
+      fin_juego, tablero['contador'] = actualizar_tiempo(window, tablero['contador'], time.time() - tiempo_inicio)
         
-  return ubicacion_mas_larga
+  return fin_juego, ubicacion_mas_larga
   
 
-def buscar_palabra(longitud, tablero):
+def buscar_palabra(longitud, tablero, window):
 
   encontrada = ''
+  fin_juego = False
   for i in range(longitud, 1, -1):
     permutaciones = set("".join(permutacion) for permutacion in permutations(tablero['computadora'].fichas, i))
+    tiempo_inicio = time.time()
     for permutacion in permutaciones:
-      if es_palabra(tablero['nivel'], tablero['palabras_validas'], permutacion):
+      if es_palabra(tablero['nivel'], tablero['palabras_validas'], permutacion) and not fin_juego:
         encontrada = permutacion
         break
-    if (encontrada):
+    fin_juego, tablero['contador'] = actualizar_tiempo(window, tablero['contador'], time.time() - tiempo_inicio)
+    if (encontrada or fin_juego):
       break
-  return encontrada
+  return fin_juego, encontrada
   
 
 def contar_jugada(window, palabra, ubicacion_mas_larga, tablero, casillas_especiales):
@@ -210,7 +215,9 @@ def ubicar_palabra(window, palabra, tablero, parametros, posiciones_ocupadas_pc)
       window[x].Update(button_color = ('white', 'red'))
       window[posicion].Update(letra, button_color = computadora.color)
       time.sleep(1)
-      actualizar_tiempo(window, parametros)
+      parametros['fin_juego'], tablero['contador'] = actualizar_tiempo(window, tablero['contador'], 1)
+      if (parametros['fin_juego']):
+        break
       if (quedan):
         letra_nueva = random.choice(fichas)
         while (bolsa_de_fichas[letra_nueva]['cantidad_fichas'] <= 0):
@@ -218,7 +225,7 @@ def ubicar_palabra(window, palabra, tablero, parametros, posiciones_ocupadas_pc)
         nuevas_fichas += [letra_nueva]
         bolsa_de_fichas[letra_nueva]['cantidad_fichas'] -= 1
         fichas = actualizar_fichas_totales(bolsa_de_fichas)
-    if (quedan):
+    if (quedan and not parametros['fin_juego']):
       for i in range(8, 15):
         window[i].Update(button_color = ('white', 'green'))
       computadora.fichas = nuevas_fichas
@@ -279,9 +286,10 @@ def jugar_computadora(window, parametros, tablero):
   Finalmente se retornan los puntos ganados en la jugada.
   '''
   
-  ubicacion_mas_larga = buscar_ubicacion_mas_larga(tablero)
-  palabra = buscar_palabra(len(ubicacion_mas_larga), tablero)
-  if (palabra):
+  parametros['fin_juego'], ubicacion_mas_larga = buscar_ubicacion_mas_larga(tablero, window)
+  if not parametros['fin_juego']:
+    parametros['fin_juego'], palabra = buscar_palabra(len(ubicacion_mas_larga), tablero, window)
+  if (palabra and not parametros['fin_juego']):
     posiciones_ocupadas_pc, puntos_jugada = contar_jugada(window, palabra, ubicacion_mas_larga, tablero, parametros['casillas_especiales'])
     ubicar_palabra(window, palabra, tablero, parametros, posiciones_ocupadas_pc)
     finalizar_jugada(window, parametros, tablero, palabra, puntos_jugada)
@@ -436,6 +444,9 @@ def finalizar_partida(window, tablero):
 
   for i, letra in zip(range(8, 15), computadora.fichas):
       window[i].Update(letra, disabled = False)
+      
+  for key in ('Iniciar', 'Posponer', 'Pausa', 'Terminar', 'confirmar', 'cambiar', 'pasar'):
+    window[key].Update(button_color = sg.DEFAULT_BUTTON_COLOR, disabled = True)
 
   mensaje = ''
   if (jugador.puntaje > computadora.puntaje):
@@ -445,9 +456,7 @@ def finalizar_partida(window, tablero):
   else: 
     mensaje = 'Hubo un empate'
   sg.Popup(mensaje, title = 'Fin de la partida')
-
-  for key in ('Iniciar', 'Posponer', 'Pausa', 'Terminar', 'confirmar', 'cambiar', 'pasar'):
-    window[key].Update(disabled = True)
+  
   window['Salir'].Update(visible = True)
 
 
@@ -490,8 +499,8 @@ def cambiar_fichas(window, tablero, parametros):
   seleccionadas = {}
 
   while True:
-    event = leer_evento(ventana, 1000, 'pasar')[0]
-    actualizar_tiempo(window, parametros)
+    event, values, tiempo = leer_evento(ventana, 1000, 'pasar')
+    parametros['fin_juego'], tablero['contador'] = actualizar_tiempo(window, tablero['contador'], tiempo)
     if (parametros['fin_juego']):
       break
     elif (event == 'pasar'):
@@ -629,6 +638,7 @@ def inicializar_parametros(configuracion, partida_anterior):
       "jugador" : Jugador("Jugador", ('white', 'blue')),
       "computadora" : Jugador("Computadora", ('white', 'red')),
       "turno" : random.choice(('computadora', 'jugador')),
+      "contador" : configuracion['tiempo'] * 60,
       "bolsa_de_fichas" : configuracion['fichas'],
       "primer_jugada" : True,
       "nivel" : configuracion['nivel'],
@@ -650,7 +660,6 @@ def inicializar_parametros(configuracion, partida_anterior):
     "historial" : '                  Historial de la partida',
     "fichas_totales" : actualizar_fichas_totales(tablero['bolsa_de_fichas']),
     "fin_juego" : False,
-    "tiempo_total": configuracion['tiempo'] * 60
   }
   
   return tablero, parametros
@@ -696,7 +705,7 @@ def crear_ventana_tablero(tablero, parametros, partida_anterior):
     tabla = sorted([tablero['jugador'].informacion(), tablero['computadora'].informacion()], key = lambda x : x[1], reverse = True)
 
     columna2 = [
-        [sg.Text("Tiempo restante"), sg.Text('--:--:--    ', key = "tiempo"),],
+        [sg.Text("Tiempo restante"), sg.Text(datetime.timedelta(seconds = tablero['contador']), key = "tiempo"),],
         [sg.Text("Nivel: " + tablero['nivel'])],
         [sg.Text("Palabras válidas: " + tablero['palabras_validas'])],
         [sg.Table(tabla, ["", "Puntaje", "Cambios restantes"], key = 'tabla', justification = 'center', num_rows = 2, hide_vertical_scroll = True)],
@@ -725,7 +734,6 @@ def crear_ventana_tablero(tablero, parametros, partida_anterior):
         
 def iniciar_partida(window, parametros, partida_anterior):
 
-    parametros['tiempo_inicio'] = time.time()
     parametros['historial'] += '\n\n - El jugador ' + ('reanudó' if partida_anterior else 'inició') + ' la partida.'
     window['historial'].Update(parametros['historial'])
     window["Iniciar"].Update(disabled = True)

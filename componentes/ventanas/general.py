@@ -1,5 +1,11 @@
+"""
+Módulo que contiene variables usadas por las ventanas y una función para
+leer eventos.
+"""
+
 from os.path import join
 from playsound import playsound as reproducir
+import time
 
 titulos = {'font' : ("Consolas", 11), 
            'background_color' : '#1d3557', 
@@ -23,9 +29,15 @@ parametros_popup = {"title" : "Atención",
                     "auto_close" : True}
                     
 def leer_evento(window, tiempo = None, key = ''):
-
+    """
+    Función usada para leer un evento. 
+    
+    Retorna el evento, valores y el tiempo transcurrido.
+    """
+    
+    inicio = time.time()
     event, values = window.Read(timeout = tiempo, timeout_key = key)  
-    if (event):
+    if (event != key):
         reproducir(join("componentes", "sonidos", "boton.mp3"))
         
-    return event, values
+    return event, values, round(time.time() - inicio)
