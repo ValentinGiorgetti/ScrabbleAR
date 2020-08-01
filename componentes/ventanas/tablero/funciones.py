@@ -13,6 +13,7 @@ from itertools import permutations
 from componentes.jugador import Jugador
 from os.path import join
 from componentes.ventanas.general import *
+from playsound import playsound as reproducir
     
     
 def actualizar_tiempo(window, contador, tiempo):
@@ -655,6 +656,9 @@ def confirmar_palabra(window, parametros, tablero):
             window['historial'].Update(parametros['historial'])
         tabla = sorted([tablero['jugador'].informacion(), tablero['computadora'].informacion()], key = lambda x : x[1], reverse = True)
         window["tabla"].Update(tabla)
+        reproducir(join("componentes", "sonidos", "palabra-correcta.mp3"))
+    else:
+      reproducir(join("componentes", "sonidos", "palabra-incorrecta.mp3"))
         
 
 def inicializar_parametros(configuracion, partida_anterior):
