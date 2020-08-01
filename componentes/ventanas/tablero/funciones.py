@@ -1,3 +1,8 @@
+"""
+Módulo con las funciones usadas por la ventana del tablero.
+"""
+
+
 from functools import reduce
 import random, PySimpleGUI as sg
 from pattern.es import parse, verbs, spelling, lexicon
@@ -8,16 +13,12 @@ from itertools import permutations
 from componentes.jugador import Jugador
 from os.path import join
 from componentes.ventanas.general import *
-from playsound import playsound as reproducir
-    
-    
-def actualizar_tablero(window, parametros, tablero):
-
-    window["palabra_formada"].Update(palabra_formada(tablero['jugador'].fichas, parametros['jugada']))
-    window["cantidad_fichas"].Update(fichas_totales(tablero['bolsa_de_fichas']))
     
     
 def actualizar_tiempo(window, contador, tiempo):
+    """
+    Función usada para actualizar el contador de la partida.
+    """
 
     temp = round(contador - tiempo)
     contador = 0 if temp <= 0 else temp
@@ -28,11 +29,11 @@ def actualizar_tiempo(window, contador, tiempo):
 
 
 def posicion_valida(posicion, posiciones_ocupadas, posiciones_bloqueadas, orientacion):
-  '''
-  Función que verifica si el usuario puede añadir una ficha al tablero o no, chequeando si
-  está respetando la orientación elegida y si no está tratando de colocar la ficha en una
-  posición previamente ocupada.
-  '''
+  """
+  Función que verifica si el usuario puede colocar una ficha en una posicion determinada del tablero. 
+  
+  Se comprueba que se respete la orientación elegida y que la casilla no esté ocupada.
+  """
   
   misma_orientacion = False
   if (not posicion in posiciones_bloqueadas):
@@ -51,7 +52,14 @@ def posicion_valida(posicion, posiciones_ocupadas, posiciones_bloqueadas, orient
     if misma_orientacion:
       return orientacion, True
     else:
-      sg.Popup('Solo se pueden agregar letras en forma horizontal, de izquierda a derecha' if orientacion == 'horizontal' else ('Solo se pueden agregar letras en forma vertical, de arriba hacia abajo' if orientacion == 'vertical' else 'Las letras sólo se pueden agregar de izquierda a derecha o de abajo hacia arriba'), **parametros_popup)
+      mensaje = ''
+      if orientacion == 'horizontal':
+        mensaje = 'Solo se pueden agregar letras en forma horizontal, de izquierda a derecha'
+      elif orientacion == 'vertical':
+        mensaje = 'Solo se pueden agregar letras en forma vertical, de arriba hacia abajo'
+      else:
+        mensaje = 'Las letras sólo se pueden agregar de izquierda a derecha o de abajo hacia arriba'
+      sg.Popup(mensaje, **parametros_popup)
       return orientacion, False
   else:
     sg.Popup('La casilla está ocupada', **parametros_popup)
@@ -59,18 +67,17 @@ def posicion_valida(posicion, posiciones_ocupadas, posiciones_bloqueadas, orient
 
 
 def palabra_formada(letras, posiciones_ocupadas):
-  '''
-  Función que se usa para actualizar el texto mostrado en el tablero de juego que indica la palabra que
-  está formando el jugador.
-  '''
+  """
+  Función que retorna un string con la palabra formada por el jugador.
+  """
 
   return reduce(lambda anterior, posicion: anterior + letras[posicion], posiciones_ocupadas.values(), '')
 
 
 def es_palabra(nivel, palabras_validas, palabra):
-  '''
-  Función que retorna true en caso de que la palabra sea válida para el nivel correspondiente
-  '''
+  """
+  Función que verifica que la palabra sea válida correspondiente al nivel de la partida.
+  """
 
   palabra = palabra.lower()
   if not (palabra in verbs or (palabra in spelling and palabra in lexicon)):
@@ -88,10 +95,10 @@ def es_palabra(nivel, palabras_validas, palabra):
       
 
 def verificar_palabra(parametros, tablero):
-  '''
-  Función que verifica si la palabra ingresada por el usuario es válida, chequeando si la casilla de inicio está
-  ocupada en caso de que sea la primer jugada de la partida, y chequeando que la palábra sea válida para el nivel
-  '''
+  """"
+  Función que verifica si la casilla de inicio está ocupada en caso de que sea la primer
+  jugada de la partida, y que la palabra sea válida para el nivel.
+  """
   
   if (tablero['primer_jugada'] and not tablero['centro'] in parametros['jugada']):
     sg.Popup('La casilla de inicio de juego no está ocupada', **parametros_popup)
@@ -100,7 +107,8 @@ def verificar_palabra(parametros, tablero):
     sg.Popup('Palabra inválida', **parametros_popup)
     return False
   else:
-    if (es_palabra(tablero['nivel'], tablero['palabras_validas'], palabra_formada(tablero['jugador'].fichas, parametros['jugada']))):
+    palabra = palabra_formada(tablero['jugador'].fichas, parametros['jugada'])
+    if (es_palabra(tablero['nivel'], tablero['palabras_validas'], palabra)):
       return True
     else:
       sg.Popup('Palabra inválida', **parametros_popup)
@@ -108,11 +116,11 @@ def verificar_palabra(parametros, tablero):
 
 
 def sumar_casilla(casillas_especiales, posicion, letra, puntos_jugada, multiplicador, tablero):
-  '''
+  """
   Función que actualiza la cantidad de puntos de la jugada de la computadora, obtenidos al pasar por 
   una casilla, sumando el puntaje de la ficha. Si la casilla es especial, también se suma el modificador 
   correspondiente o se acumula el multiplicador de la palabra.
-  '''
+  """
   
   tablero['posiciones_ocupadas'][posicion] = letra
   temp = tablero['bolsa_de_fichas'][letra]['puntaje']
@@ -131,6 +139,9 @@ def sumar_casilla(casillas_especiales, posicion, letra, puntos_jugada, multiplic
     
 
 def buscar_ubicacion_mas_larga(tablero, window):
+  """
+  Función que retorna la ubicación más larga donde se pueda colocar una palabra.
+  """
 
   fin_juego = False
   tamanio = tablero['tamanio']
@@ -166,6 +177,9 @@ def buscar_ubicacion_mas_larga(tablero, window):
   
 
 def buscar_palabra(longitud, tablero, window):
+  """
+  Función para buscar una palabra válida a partir de las fichas de la computadora.
+  """
 
   encontrada = ''
   fin_juego = False
@@ -183,6 +197,9 @@ def buscar_palabra(longitud, tablero, window):
   
 
 def contar_jugada(window, palabra, ubicacion_mas_larga, tablero, casillas_especiales):
+    """
+    Función para contar los puntos que obtuvo la computadora a partir de la palabra formada.
+    """
 
     posiciones_ocupadas_pc = []
     multiplicador = puntos_jugada = 0
@@ -198,6 +215,9 @@ def contar_jugada(window, palabra, ubicacion_mas_larga, tablero, casillas_especi
     
         
 def ubicar_palabra(window, palabra, tablero, parametros, posiciones_ocupadas_pc):
+    """
+    Función que coloca en el tablero la palabra encontrada por la computadora.
+    """
 
     bolsa_de_fichas = tablero['bolsa_de_fichas']
     computadora = tablero['computadora']
@@ -234,6 +254,9 @@ def ubicar_palabra(window, palabra, tablero, parametros, posiciones_ocupadas_pc)
       
       
 def finalizar_jugada(window, parametros, tablero, palabra, puntos_jugada):
+    """
+    Función que brinda información sobre la palabra formada y los puntos obtenidos por la computadora.
+    """
 
     tipo = parse(palabra, chunks = False).split('/')[1] 
     tipo_palabra = 'sustantivo' if tipo.find('NN') != -1 else ('verbo' if tipo.find('VB') != -1 else 'adjetivo')
@@ -243,6 +266,9 @@ def finalizar_jugada(window, parametros, tablero, palabra, puntos_jugada):
     
 
 def repartir_nuevas_fichas(tablero, parametros, window):
+    """
+    Función usada para repartir nuevas fichas a la computadora.
+    """
 
     bolsa_de_fichas = tablero['bolsa_de_fichas']
     computadora = tablero['computadora']
@@ -271,20 +297,9 @@ def repartir_nuevas_fichas(tablero, parametros, window):
 
 
 def jugar_computadora(window, parametros, tablero):
-  '''
-  Función que permite que la computadora pueda colocar en una orientación y posición random del tablero, la palabra de
-  mayor longitud que pueda formar. De esta forma puede ganar puntos y competir contra el jugador.
-
-  Lo primero que se hace es calcular todas las permutaciones que se pueden formar con las fichas que dispone la computadora.
-  Luego se itera sobre todas esas permutaciones, desde la palabra de mayor longitud a la de menor longitud, hasta encontrar 
-  una palabra válida para el nivel.
-  Si no se encontró ningúna palabra válida, entonces se reparten nuevas fichas a la computadora y se actualizan los cambios
-  disponibles. Si no dispone de cambios suficientes, al retornar de la función terminará la partida.
-  Si se encontró una palabra válida, se elige una orientación al azar para ubicar la palabra. Si es la primer jugada, la palabra
-  se ubica comenzando desde la casilla de inicio. Si no es la primer jugada, se elige una posición de inicio al azar, hasta encontrar
-  una donde la palabra no ocupe alguna posición ocupada anteriormente.
-  Finalmente se retornan los puntos ganados en la jugada.
-  '''
+  """
+  Función que permite que la computadora pueda colocar una palabra en el tablero y sumar puntos.
+  """
   
   parametros['fin_juego'], ubicacion_mas_larga = buscar_ubicacion_mas_larga(tablero, window)
   if not parametros['fin_juego']:
@@ -304,9 +319,9 @@ def jugar_computadora(window, parametros, tablero):
     
     
 def colocar_posiciones_especiales(window, tablero):
-  '''
-  Función que coloca todas las casillas especiales correspondiente al nivel de la partida.
-  '''
+  """
+  Función que coloca todas las casillas especiales en el tablero.
+  """
   
   malas_nivel_facil =[(4, 8), (5, 9), (4, 10), (3, 9), (8, 14), (9, 13), (10, 14), (9, 15)]
   #malas_nivel_facil =[(1, 7), (1, 11), (2, 8),(2, 10), (3, 9), (17, 7), (11, 17), (8, 16), (10, 16), (9, 15)]
@@ -367,11 +382,9 @@ def colocar_posiciones_especiales(window, tablero):
 
 
 def repartir_fichas(bolsa_de_fichas, letras):
-  '''
+  """
   Función que reparte 7 fichas de la bolsa en forma aleatoria.
-  Los jugadores reciben más vocales que consonantes para que 
-  tengan mayor posibilidad de formar palabras.
-  '''
+  """
   
   letras.clear()
   fichas = actualizar_fichas_totales(bolsa_de_fichas)
@@ -416,9 +429,9 @@ def contar_puntos_jugador(parametros, tablero):
 
     
 def fichas_totales(bolsa_de_fichas):
-  '''
+  """
   Función que retorna la cantidad total de fichas que quedan en la bolsa.
-  '''
+  """
 
   total = 0
   for letra in bolsa_de_fichas:
@@ -427,10 +440,12 @@ def fichas_totales(bolsa_de_fichas):
 
 
 def finalizar_partida(window, tablero):
-  '''
-  Función que muestra el mensaje de fin de la partida, detallando los puntos
-  de la computadora y del jugador.
-  '''
+  """
+  Función que muestra el mensaje de fin de la partida.
+  
+  Se informa el ganador o si hubo un empate.
+  """
+  
   jugador = tablero['jugador']
   computadora = tablero['computadora']
   bolsa_de_fichas = tablero['bolsa_de_fichas']
@@ -461,17 +476,22 @@ def finalizar_partida(window, tablero):
 
 
 def ventana_cambio_fichas(letras_jugador):
+    """
+    Función usada para crear la ventana de cambio de fichas.
+    """
 
-    layout_cambiar_fichas = [[sg.Button('Cambiar todas', key = 'todas')],
-                           [sg.Text('')],
-                           [sg.Text('Seleccione las fichas que quiere intercambiar')],
-                           [sg.Button(letras_jugador[i], size= (3, 1), key = i, pad = (0.5, 0.5), button_color = ('white', 'green')) for i in range(7)],
-                           [sg.Text('')],
-                           [sg.Button('Aceptar'), sg.Button('Salir')]]
+    layout_cambiar_fichas = [[sg.Text('Seleccione las fichas que quiere intercambiar')],
+                             [sg.Text('')],
+                             [sg.Button(letras_jugador[i], size= (3, 1), key = i, pad = (0.5, 0.5), button_color = ('white', 'green')) for i in range(7)],
+                             [sg.Text('')],
+                             [sg.Button('Aceptar'), sg.Button('Cambiar todas', key = 'todas'), sg.Button('Cancelar')]]
     return sg.Window('Cambiar fichas', layout_cambiar_fichas, **parametros_ventana)
     
     
 def reiniciar_parametros(parametros):
+    """
+    Función usada para reiniciar algunos parámetros de la partida.
+    """
 
     parametros["letra_seleccionada"] = False
     parametros["orientacion"] = parametros["primer_posicion"] = parametros["ultima_posicion"] = ''
@@ -479,10 +499,9 @@ def reiniciar_parametros(parametros):
 
 
 def cambiar_fichas(window, tablero, parametros):
-  '''
-  Esta función muestra una ventana para que el jugador pueda cambiar algunas o todas sus fichas.
-  En caso de haber hecho algún cambio, actualiza las fichas del atril.
-  '''
+  """
+  Función que muestra una ventana donde el jugador puede cambiar algunas o todas sus fichas.
+  """
 
   jugador = tablero['jugador']
   letras_jugador = jugador.fichas
@@ -505,7 +524,7 @@ def cambiar_fichas(window, tablero, parametros):
       break
     elif (event == 'pasar'):
       continue
-    elif (event in ('Salir', None)):
+    elif (event in ('Cancelar', None)):
       break
     elif (event == 'todas'):
       if (quedan_fichas(bolsa_de_fichas)):
@@ -548,7 +567,7 @@ def cambiar_fichas(window, tablero, parametros):
         seleccionadas[event] = letras_jugador[event]
   ventana.Close()
   
-  if not event in (None, 'Salir'):  
+  if not event in (None, 'Cancelar'):  
     jugador.cambios_restantes -= 1
     tabla = sorted([tablero['jugador'].informacion(), tablero['computadora'].informacion()], key = lambda x : x[1], reverse = True)
     window["tabla"].Update(tabla)
@@ -557,21 +576,21 @@ def cambiar_fichas(window, tablero, parametros):
         window["cambiar"].Update(disabled = True, button_color = ("white", "red"))
     tablero['turno'] = 'computadora'
     window['turno'].Update('computadora')
+    
 
 def restaurar_tablero(window, posiciones):
-    '''
-    Función que restaura las posiciones ocupadas del tablero, en caso de haber
-    reanudado una partida anterior.
-    '''
+    """
+    Función que restaura el tablero al estado de la partida anterior.
+    """
 
     for posicion in posiciones:
         window[posicion].Update(posiciones[posicion], button_color = ('white', 'red')) # button_text, button_color
 
 
 def quedan_fichas(bolsa_de_fichas, cantidad_fichas = 7):
-    '''
-    Función que chequea si hay suficientes fichas en la bolsa para repartir.
-    '''
+    """
+    Función que verifica si hay suficientes fichas en la bolsa para repartir.
+    """
 
     contador = 0
     for letra in bolsa_de_fichas:
@@ -580,7 +599,11 @@ def quedan_fichas(bolsa_de_fichas, cantidad_fichas = 7):
             return True
     return False
     
+    
 def pasar(window, parametros, tablero):
+    """
+    Función usada para pasar el turno a la computadora
+    """
 
     if parametros['jugada']:
         sg.Popup("Primero debe levantar sus fichas")
@@ -588,10 +611,14 @@ def pasar(window, parametros, tablero):
         if parametros['letra_seleccionada']:
             window[parametros['letra']].Update(button_color = ("white", "green"))
             parametros['letra_seleccionada'] = False
-        tablero['turno'] = 'computadora'
-        window['turno'].Update('computadora')
+        tablero['turno'] = 'Computadora'
+        window['turno'].Update('Computadora')
+        
             
 def confirmar_palabra(window, parametros, tablero):
+    """
+    Función usada para confirmar la palabra ingresada por el jugador.
+    """
     
     fichas = actualizar_fichas_totales(tablero['bolsa_de_fichas'])
     letras_jugador = tablero['jugador'].fichas
@@ -628,8 +655,12 @@ def confirmar_palabra(window, parametros, tablero):
             window['historial'].Update(parametros['historial'])
         tabla = sorted([tablero['jugador'].informacion(), tablero['computadora'].informacion()], key = lambda x : x[1], reverse = True)
         window["tabla"].Update(tabla)
+        
 
 def inicializar_parametros(configuracion, partida_anterior):
+  """
+  Función que inicializa los parámetros de la partida.
+  """
 
   if not partida_anterior:
     tablero = {
@@ -663,12 +694,20 @@ def inicializar_parametros(configuracion, partida_anterior):
   }
   
   return tablero, parametros
+  
         
 def actualizar_fichas_totales(bolsa_de_fichas):
+    """
+    Función que retorna un string con todas las fichas de la bolsa.
+    """
     
     return "".join([letra * bolsa_de_fichas[letra]["cantidad_fichas"] for letra in bolsa_de_fichas])
     
+    
 def crear_ventana_tablero(tablero, parametros, partida_anterior):
+    """
+    Función usada para crear la ventana del tablero.
+    """
 
     tablero_juego = [
         [
@@ -741,22 +780,35 @@ def crear_ventana_tablero(tablero, parametros, partida_anterior):
         restaurar_tablero(window, tablero["posiciones_ocupadas"])
         
     return window
+    
         
 def iniciar_partida(window, parametros, partida_anterior):
+    """
+    Función que inicia la partida.
+    """
 
     parametros['historial'] += '\n\n - El jugador ' + ('reanudó' if partida_anterior else 'inició') + ' la partida.'
     window['historial'].Update(parametros['historial'])
     window["Iniciar"].Update(disabled = True)
     window["Pausa"].Update(disabled = False)
+    
     return True
     
+    
 def pausar(window, comenzar):
-
-   window["Pausa"].Update(button_color = ("white", "red") if comenzar else sg.DEFAULT_BUTTON_COLOR)
+    """
+    Función usada para pausar la partida.
+    """
+    
+    window["Pausa"].Update(button_color = ("white", "red") if comenzar else sg.DEFAULT_BUTTON_COLOR)
    
-   return not comenzar
+    return not comenzar
+   
    
 def posponer(tablero, jugada):
+    """
+    Función usada para posponer la partida.
+    """
 
     if (not jugada):
         sg.Popup("Se guardaron los datos de la partida", title = "Atención")
@@ -765,7 +817,11 @@ def posponer(tablero, jugada):
       sg.Popup("Primero debe levantar sus fichas", title = "Atención")
       return False, None
       
+      
 def seleccionar_ficha(window, parametros, event):
+    """
+    Función usada para que el usuario seleccione una ficha.
+    """
 
     if parametros['letra_seleccionada']:
         window[parametros['letra']].Update(button_color = ("white", "green"))
@@ -773,7 +829,11 @@ def seleccionar_ficha(window, parametros, event):
     parametros['letra'] = event
     parametros['letra_seleccionada'] = True
     
+    
 def colocar_ficha(window, parametros, tablero, event):
+    """
+    Función usada para que el usuario coloque la ficha seleccionada en el tablero.
+    """
 
     if parametros['letra_seleccionada']:
         parametros['orientacion'], es_valida = posicion_valida(event, parametros['jugada'], tablero['posiciones_ocupadas'], parametros['orientacion'])
