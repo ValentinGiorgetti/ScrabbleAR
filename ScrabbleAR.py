@@ -1,23 +1,21 @@
+"""
+Módulo principal del programa.
+"""
+
+
 from componentes.ventanas.funciones_main import *
 from componentes.ventanas.configuracion.funciones import leer_ultima_configuracion
 from componentes.ventanas.reglas.main import main as reglas
 from componentes.ventanas.top_puntajes.main import main as top_puntajes
 from componentes.ventanas.general import leer_evento
 
+
 def main():
     """
-    Función principal que muestra una ventana con opciones para acceder al menú, reanundar una partida o iniciar una partida nueva.
-
-    La opción de reanudar una partida sólo estará habilitada en caso de que exista una partida guardada. En caso de que exista una 
-    partida guardada y el usuario quiera iniciar una nueva, se mostrará una ventana_principal para confirmar la opción, ya que si se inicia una
-    nueva partida, la partida guardada se elimina.
-
-    La configuración de la partida será la última seleccionada.
-
-    Una vez que la partida termina, se actualiza el top de puntajes y se guarda la información de la partida. En caso de que el usuario
-    no haya pospuesto la partida, se guardará None en el archivo "partida_guardada", lo cuál indica que no hay partida guardada.
+    Función que muestra la ventana principal del programa.
     
-    (falta implementar manejo de excepciones para el caso en que se haya borrado algún archivo)
+    Muestra un menú con opciones para acceder a la ventana de configuración, reglas, top de
+    puntajes, reanundar o iniciar una partida nueva.
     """
     
     partida_guardada = leer_partida_guardada()
