@@ -1,3 +1,8 @@
+"""
+Módulo donde se define la clase Jugador.
+"""
+
+
 class Jugador:
     """
     Clase Jugador con métodos para obtener y actualizar el puntaje
