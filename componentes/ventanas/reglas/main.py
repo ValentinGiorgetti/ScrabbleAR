@@ -1,10 +1,18 @@
+"""
+Módulo principal de la ventana de reglas.
+"""
+
+
 from componentes.ventanas.reglas.funciones import *
 from componentes.ventanas.general import leer_evento
 
+
 def main():
     """
-    Función que muestra una ventana con información sobre cada nivel: tipo de palabras válidas
-    y tamaño del tablero.
+    Función que muestra la ventana de reglas
+    
+    Informa el tipo de palabras válidas y tamaño del tablero de acuerdo
+    al nivel seleccionado.
     """
 
     textos = {'Fácil' : "Palabras válidas: cualquier palabra que la librería Pattern considere válida.\nTamaño del tablero: 19 x 19.",

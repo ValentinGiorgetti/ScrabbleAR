@@ -1,11 +1,17 @@
+"""
+Módulo principal de la ventana de top de puntajes.
+"""
+
+
 from componentes.ventanas.top_puntajes.funciones import *
 from componentes.ventanas.general import leer_evento
 
+
 def main():
     """
-    Función que muestra una ventana con el top 10 de los mejores puntajes.
-    Abre un archivo binario que contiene una lista de tuplas ('Computadora / Jugador', Objeto jugador) ordenada
-    por puntaje en forma descendente. Lo que hace es mostrar esa información en la ventana.
+    Función que muestra la ventana de top de puntajes.
+    
+    El usuario puede ver el top de todos los niveles y un top general (todos los niveles).
     """
     
     colores = {'general' : ('white', 'blue'), 'fácil' : ("white", "green"), 'medio' : ("white", "orange"), 'difícil' : ('white', 'red')}
@@ -19,7 +25,7 @@ def main():
     window = crear_ventana_tops(tabla['general'])
     
     while True:
-      event, values = leer_evento(window)
+      event = leer_evento(window)[0]
       if event in (None, 'Volver'):
         break
       elif event == 'resetear':

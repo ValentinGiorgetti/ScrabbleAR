@@ -1,9 +1,18 @@
+"""
+Módulo que contiene las funciones usadas por la ventana de configuración.
+"""
+
+
 import json, random, PySimpleGUI as sg
 from componentes.ventanas.general import titulos, parametros_columna, parametros_ventana, parametros_popup
 from os.path import join
 
-def crear_ventana_configuracion(colores, ultimo_presionado, tabla, configuracion_seleccionada):
 
+def crear_ventana_configuracion(colores, ultimo_presionado, tabla, configuracion_seleccionada):
+    """
+    Función usada para crear la ventana de configuración.
+    """
+    
     layout_configuracion = [
         [sg.Text("Nivel de la partida", **titulos)],
         [sg.Text("")],
@@ -45,7 +54,7 @@ def crear_ventana_configuracion(colores, ultimo_presionado, tabla, configuracion
     
     layout_configuracion_actual = [[sg.Text("Configuración actual", **titulos)],
         [sg.Text("")],
-        [sg.Text("Nivel:", ), sg.Text(str(configuracion_seleccionada["nivel"] + '    '), key="nivel_seleccionado"),],
+        [sg.Text("Nivel:", ), sg.Text(str(configuracion_seleccionada["nivel"]), key="nivel_seleccionado"),],
         [
             sg.Text("Tiempo:", ),
             sg.Text(str(configuracion_seleccionada["tiempo"]) + " minutos", key="tiempo_seleccionado", ),
@@ -65,28 +74,62 @@ def crear_ventana_configuracion(colores, ultimo_presionado, tabla, configuracion
     
     
 def leer_ultima_configuracion():
+    """
+    Función que lee y retorna la última configuración seleccionada por el usuario.
+    
+    Abre un archivo json que contiene un diccionario con la configuración. Inicialmente 
+    coincide con la configuración por defecto. En caso de que el archivo no exista se
+    retorna la configuración por defecto.
+    """
 
-    with open(join("componentes", "informacion_guardada", "ultima_configuracion.json"), encoding = 'UTF-8') as f:
-        configuracion_seleccionada = json.load(f)
+    try:
+        with open(join("componentes", "informacion_guardada", "ultima_configuracion.json"), encoding = 'UTF-8') as f:
+            configuracion_seleccionada = json.load(f)
+    except FileNotFoundError:
+        sg.Popup('No se encontró el archivo con la última configuración seleccionada, se cargó la configuración por defecto.', title = 'Atención')
+        configuracion_seleccionada = leer_configuracion_predeterminada()
     
     return configuracion_seleccionada
     
     
 def guardar_ultima_configuracion(configuracion):
+    """
+    Función usada para guardar la configuración seleccionada.
+    
+    Guarda el diccionario con la configuración en formato json.
+    """
     
     with open(join("componentes", "informacion_guardada", "ultima_configuracion.json"), 'w', encoding = 'UTF-8') as f:
         json.dump(configuracion, f, indent=2)
         
     
 def leer_configuracion_predeterminada():
-
-    with open(join("componentes", "informacion_guardada", "configuracion_predeterminada.json"), encoding = 'UTF-8') as f:
-        configuracion_predeterminada = json.load(f)
+    """
+    Función que lee y retorna la configuración predeterminada.
+    
+    Abre un archivo json que contiene un diccionario con la configuración predeterminada.
+    """
+    
+    ruta = join("componentes", "informacion_guardada", "configuracion_predeterminada.json")
+    try:
+        with open(ruta, encoding = 'UTF-8') as f:
+            configuracion_predeterminada = json.load(f)
+    except FileNotFoundError:
+        configuracion_predeterminada = {"nivel": "fácil", "palabras_validas": "Adjetivos, sustantivos y verbos", "tiempo": 60}
+        configuracion_predeterminada['fichas'] = {i : {"puntaje" : 1, "cantidad_fichas" : 15 if i in 'AEIOU' else 10} for i in 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ'}
+        with open(ruta, 'w') as f:
+            json.dump(configuracion_predeterminada, f, indent = 2)
     
     return configuracion_predeterminada 
 
 
 def restablecer_configuracion(window, configuracion_predeterminada, ultimo_presionado, colores):
+    """
+    Función usada para restablecer la configuración.
+    
+    Actualiza la configuracion seleccionada y los widgets de la ventana con la configuración
+    predeterminada.
+    """
 
     configuracion_seleccionada = configuracion_predeterminada.copy()
     window["tiempo_seleccionado"].Update(str(configuracion_seleccionada["tiempo"]) + " minutos")
@@ -99,8 +142,13 @@ def restablecer_configuracion(window, configuracion_predeterminada, ultimo_presi
     
     
 def confirmar_tiempo(tiempo, configuracion_seleccionada, ventana_configuracion):
+    """
+    Función usada para confirmar el tiempo de la partida ingresado por el usuario.
+    
+    Verifica que el valor ingresado sea válido.
+    """
 
-    if tiempo == " ":
+    if not tiempo:
         sg.Popup("El campo está vacío", **parametros_popup)
     else:
         try:
@@ -115,16 +163,13 @@ def confirmar_tiempo(tiempo, configuracion_seleccionada, ventana_configuracion):
             ventana_configuracion["tiempo_seleccionado"].Update(str(configuracion_seleccionada["tiempo"]) + " minutos")
             
             
-def informacion_letras(letras):
-    """
-    Función que es usada para actualizar un widget de la ventana el cuál muestra la información de las 
-    fichas, de acuerdo a la configuración actual.
-    """
-    
-    return [[letra, letras[letra]['puntaje'], letras[letra]['cantidad_fichas']] for letra in letras]
-            
-            
 def confirmar_letra(values, configuracion_seleccionada, window):
+    """
+    Función usada para confirmar la configuración de una letra.
+    
+    Verifica que los valores ingresados sean válidos. El usuario debe ingresar una letra y
+    alguna configuración (puntaje y/o cantidad de fichas de la misma).
+    """
 
     letra = values["letra"].upper()
     puntaje = values["puntaje"]
@@ -154,6 +199,11 @@ def confirmar_letra(values, configuracion_seleccionada, window):
             
             
 def seleccionar_dificultad(configuracion_seleccionada, ultimo_presionado, event, color, window):
+    """
+    Función usada para seleccionar el nivel de dificultad de la partida.
+    
+    Actualiza los widgets de la ventana y la configuración seleccionada.
+    """
 
     window[event].Update(button_color = color)
     if not ultimo_presionado in ("", event):
@@ -163,11 +213,26 @@ def seleccionar_dificultad(configuracion_seleccionada, ultimo_presionado, event,
     return event
     
     
-    
 def establecer_palabras_validas(configuracion_seleccionada):
+    """
+    Función usada para establecer las palabras válidas para el nivel seleccionado.
+    """
 
     nivel = configuracion_seleccionada["nivel"]
-    palabras_validas = {'fácil' : 'adjetivos, sustantivos y verbos',
-                        'medio' : 'adjetivos y verbos',
-                         'difícil' : random.choice(["adjetivos", "verbos"])}
+    palabras_validas = {'fácil' : 'Adjetivos, sustantivos y verbos',
+                        'medio' : 'Adjetivos y verbos',
+                         'difícil' : random.choice(["Adjetivos", "Verbos"])}
     configuracion_seleccionada["palabras_validas"] = palabras_validas[nivel]
+    
+    
+def informacion_letras(letras):
+    """
+    Función que retorna una lista con la información de las letras.
+
+    Esta función es usada para actualizar la tabla que muestra la información de las fichas.
+    La misma es actualizada a partir de la configuración seleccionada.
+    
+    Retorna una lista con las letras, el puntaje y la cantidad de fichas de las mismas.
+    """
+    
+    return [[letra, letras[letra]['puntaje'], letras[letra]['cantidad_fichas']] for letra in letras]

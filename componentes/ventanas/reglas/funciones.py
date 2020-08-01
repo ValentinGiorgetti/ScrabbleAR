@@ -1,8 +1,16 @@
+"""
+Módulo que contiene las funciones usadas por la ventana de reglas.
+"""
+
+
 import PySimpleGUI as sg
 from componentes.ventanas.general import parametros_ventana
     
 
 def crear_ventana_reglas():
+    """
+    Función usada para crear la ventana de reglas.
+    """
 
     layout = [
         [sg.Text("Reglas del juego", size=(60, 1), justification = 'center', background_color = '#1d3557')],
@@ -13,10 +21,17 @@ def crear_ventana_reglas():
         [sg.Text('')],
         [sg.Button("Volver", size=(7, 1))],
     ]
+    
     return sg.Window("Reglas", layout, **parametros_ventana)
     
     
 def mostrar_texto(ventana_reglas, event, color, texto, ultimo_presionado):
+    """
+    Función usada para mostrar las reglas de un nivel.
+    
+    Actualiza los widgets de la ventana y muestra el texto correspondiente
+    al nivel seleccionado.
+    """
 
     if ultimo_presionado != "":
         ventana_reglas[ultimo_presionado].Update(button_color=sg.DEFAULT_BUTTON_COLOR)
@@ -25,5 +40,3 @@ def mostrar_texto(ventana_reglas, event, color, texto, ultimo_presionado):
     ventana_reglas["nivel"].Update(texto)
     
     return ultimo_presionado
-    
-

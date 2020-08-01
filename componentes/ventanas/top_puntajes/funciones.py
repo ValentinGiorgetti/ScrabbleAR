@@ -1,10 +1,19 @@
+"""
+Módulo que contiene las funciones usadas por la ventana de top de puntajes.
+"""
+
+
 import pickle, PySimpleGUI as sg
 from datetime import datetime
 from componentes.jugador import Jugador
 from componentes.ventanas.general import parametros_ventana
 from os.path import join
 
+
 def crear_ventana_tops(tabla):
+    """
+    Función usada para crear la ventana del top de puntajes.
+    """
 
     tamanio = (13, 1)
 
@@ -22,31 +31,62 @@ def crear_ventana_tops(tabla):
     
 
 def leer_top():
-
-    with open(join("componentes", "informacion_guardada", "top_puntajes"), "rb") as f:
-        top = pickle.load(f)
-        
+    """
+    Función usada para leer el top de puntajes desde un archivo binario.
+    """
+    
+    try:
+        with open(join("componentes", "informacion_guardada", "top_puntajes"), "rb") as f:
+            top = pickle.load(f)
+    except FileNotFoundError:
+        sg.Popup('No se encontró el archivo con el top de puntajes, se reseteó el top de los niveles.', title = 'Atención')
+        top = {i : [] for i in ['general', 'fácil', 'medio', 'difícil']}
+        guardar_top(top)
+            
     return top
     
     
 def guardar_top(top):
+    """
+    Función usada para guardar el top de puntajes en un archivo binario.
+    """
 
     with open(join("componentes", "informacion_guardada", "top_puntajes"), "wb") as f:
         pickle.dump(top, f)
         
         
 def generar_tabla(top):
+    """
+    Función que genera la tabla para mostrar el top de puntajes.
+    
+    Primero genera una tabla vacía y luego la completa con los valores del top.
+    """
 
-  tabla = [[i, "", "", "", ""] for i in range(1, 11)]
-  for i in range(len(top)):
-    tabla[i][1] = top[i][0]
-    tabla[i][2] = top[i][1]
-    tabla[i][3] = top[i][2]
-    tabla[i][4] = top[i][3]
-  return tabla
+    tabla = [[i, "", "", "", ""] for i in range(1, 11)]
+    for i in range(len(top)):
+      tabla[i] = [i + 1] + top[i]
+      
+    return tabla
+    
+    
+def cargar_tabla():
+    """
+    Función que genera las 4 tablas del top.
+    """
+
+    top = leer_top()
+    tabla = {i : generar_tabla(top[i]) for i in ['general', 'fácil', 'medio', 'difícil']}
+    
+    return tabla
         
         
 def resetear(top, tabla, nivel, ventana_tops):
+    """
+    Función usada para resetear un top.
+    
+    Muestra un mensaje para que el usuario confirme la operación, luego actualiza
+    el top y los widgets de la ventana.
+    """
 
     aux = f'del nivel {nivel}' if nivel != 'general' else 'general'
     ok = sg.Popup('¿Está seguro de que quiere resetear el top ' + aux + '?', custom_text = ('Si', 'No'))
@@ -56,23 +96,19 @@ def resetear(top, tabla, nivel, ventana_tops):
         ventana_tops['top'].Update(values = tabla[nivel])
         ventana_tops['resetear'].Update(disabled = True)
         guardar_top(top)
-        
-        
-def cargar_tabla():
-
-    top = leer_top()
-    tabla = {i : generar_tabla(top[i]) for i in ['general', 'fácil', 'medio', 'difícil']}
-    return tabla
     
   
 def mostrar_top(ultimo_presionado, event, color, top, ventana_tops):
+    """
+    Función usada para mostrar el top de puntajes de un nivel determinado.
+    """
 
-  ventana_tops[ultimo_presionado].Update(button_color = sg.DEFAULT_BUTTON_COLOR)
-  ventana_tops[event].Update(button_color = color)
-  ventana_tops['top'].Update(values = top)
-  ventana_tops['resetear'].Update(disabled = top[0][1] == '')
-  
-  return event
+    ventana_tops[ultimo_presionado].Update(button_color = sg.DEFAULT_BUTTON_COLOR)
+    ventana_tops[event].Update(button_color = color)
+    ventana_tops['top'].Update(values = top)
+    ventana_tops['resetear'].Update(disabled = not top[0][1])
+
+    return event
   
 
 def actualizar_top(jugador, computadora, nivel):
@@ -84,8 +120,8 @@ def actualizar_top(jugador, computadora, nivel):
 
     top = leer_top()
 
-    jugador = [("Jugador", jugador.puntaje, fecha, nivel.capitalize())] if jugador.puntaje > 0 else []
-    computadora = [("Computadora", computadora.puntaje, fecha, nivel.capitalize())] if computadora.puntaje > 0 else []
+    jugador = [["Jugador", jugador.puntaje, fecha, nivel.capitalize()]] if jugador.puntaje > 0 else []
+    computadora = [["Computadora", computadora.puntaje, fecha, nivel.capitalize()]] if computadora.puntaje > 0 else []
     
     temp = top['general'] + jugador + computadora
     top['general'] = sorted(temp, key=lambda x: x[1], reverse=True)[:10]

@@ -1,16 +1,22 @@
+"""
+Módulo principal de la ventana de configuración.
+"""
+
 from componentes.ventanas.configuracion.funciones import *
 from componentes.ventanas.general import leer_evento
 
+
 def main():
     """
-    Función que muestra una ventana donde el usuario puede modificar diferentes parámetros de la partida,
-    tales como el nivel, el tiempo, el puntaje y cantidad de fichas de cada letra. La configuración 
-    consiste en un diccionario donde se van almacenando la configuración seleccionada.
+    Función que muestra una ventana donde el usuario puede modificar diferentes parámetros de la partida.
+    
+    El usuario puede configurar el nivel y tiempo de la partida, asi como también el puntaje y cantidad de 
+    fichas de cada letra para todos los niveles. 
 
-    Siempre muestra la última configuración seleccionada, la cuál inicialmente coincide con la configuración 
-    por defecto (la configuración por defecto se obtiene de un archivo json). El usuario tiene la posibilidad 
-    de reestablecer las configuraciones a valores por defecto. Finalmente, se guarda la configuración seleccionada 
-    en un archivo json y se retorna el diccionario con la configuración seleccionada a la ventana "menú".
+    Siempre se muestra la última configuración seleccionada, la cuál inicialmente coincide con la configuración 
+    por defecto. El usuario tiene la posibilidad de reestablecer las configuraciones a valores por defecto. 
+    
+    Retorna un diccionario con la configuración seleccionada a la ventana principal.
     """
 
     configuracion_seleccionada = leer_ultima_configuracion()
@@ -23,7 +29,7 @@ def main():
     window = crear_ventana_configuracion(colores, ultimo_presionado, informacion_letras(configuracion_seleccionada["fichas"]), configuracion_seleccionada)
 
     while True:
-        event, values = leer_evento(window)
+        event, values, tiempo = leer_evento(window)
         if event in (None, "Aceptar"):
             break
         elif event == "restablecer":
