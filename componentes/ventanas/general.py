@@ -1,11 +1,12 @@
 """
-Módulo que contiene variables usadas por las ventanas y una función para
-leer eventos.
+Módulo que contiene parámetros usados para la creación de ventanas y una función para leer eventos.
 """
+
 
 from os.path import join
 from playsound import playsound as reproducir
 import time
+
 
 titulos = {'font' : ("Consolas", 11), 
            'background_color' : '#1d3557', 
@@ -28,11 +29,13 @@ parametros_popup = {"title" : "Atención",
                     "auto_close_duration" : 5, 
                     "auto_close" : True}
                     
+                    
 def leer_evento(window, tiempo = None, key = ''):
     """
     Función usada para leer un evento. 
     
-    Retorna el evento, valores y el tiempo transcurrido.
+    Retorna el evento, valores y el tiempo transcurrido hasta que
+    se leyó el evento.
     """
     
     inicio = time.time()
