@@ -93,7 +93,7 @@ def main(configuracion, partida_anterior = None):
             if parametros['fin_juego']:
               finalizar_partida(window, tablero)
               comenzar = False
-            actualizar_tablero(window, parametros, tablero)
+            window["cantidad_fichas"].Update(fichas_totales(tablero['bolsa_de_fichas']))
 
     window.Close()
     return partida_guardada, tablero['jugador'], tablero['computadora']
