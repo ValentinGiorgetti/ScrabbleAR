@@ -16,6 +16,10 @@ from componentes.ventanas.general import *
 from playsound import playsound as reproducir
     
     
+def reproducir_sonido_palabra(es_correcta):
+  reproducir(join("componentes", "sonidos", "palabra_correcta.mp3" if es_correcta else "palabra_incorrecta.mp3"))
+  
+
 def actualizar_tiempo(window, contador, tiempo):
     """
     Función usada para actualizar el contador de la partida.
@@ -305,7 +309,8 @@ def jugar_computadora(window, parametros, tablero):
   parametros['fin_juego'], ubicacion_mas_larga = buscar_ubicacion_mas_larga(tablero, window)
   if not parametros['fin_juego']:
     parametros['fin_juego'], palabra = buscar_palabra(len(ubicacion_mas_larga), tablero, window)
-  if (palabra and not parametros['fin_juego']):
+  es_correcta = palabra and not parametros['fin_juego']
+  if es_correcta:
     posiciones_ocupadas_pc, puntos_jugada = contar_jugada(window, palabra, ubicacion_mas_larga, tablero, parametros['casillas_especiales'])
     ubicar_palabra(window, palabra, tablero, parametros, posiciones_ocupadas_pc)
     finalizar_jugada(window, parametros, tablero, palabra, puntos_jugada)
@@ -314,6 +319,7 @@ def jugar_computadora(window, parametros, tablero):
         window['historial'].Update(parametros['historial'])
   else:
     repartir_nuevas_fichas(tablero, parametros, window)
+  reproducir_sonido_palabra(es_correcta)
     
   tablero['turno'] = "jugador"
   window["turno"].Update("jugador")
@@ -626,7 +632,8 @@ def confirmar_palabra(window, parametros, tablero):
     if parametros['letra_seleccionada']:
         window[parametros['letra']].Update(button_color = ("white", "green"))
         parametros['letra_seleccionada'] = False
-    if verificar_palabra(parametros, tablero):
+    es_correcta = verificar_palabra(parametros, tablero)
+    if es_correcta:
         tablero['primer_jugada'] = False
         puntos_jugada = contar_puntos_jugador(parametros, tablero)
         palabra = palabra_formada(letras_jugador, parametros['jugada'])
@@ -656,9 +663,7 @@ def confirmar_palabra(window, parametros, tablero):
             window['historial'].Update(parametros['historial'])
         tabla = sorted([tablero['jugador'].informacion(), tablero['computadora'].informacion()], key = lambda x : x[1], reverse = True)
         window["tabla"].Update(tabla)
-        reproducir(join("componentes", "sonidos", "palabra-correcta.mp3"))
-    else:
-      reproducir(join("componentes", "sonidos", "palabra-incorrecta.mp3"))
+    reproducir_sonido_palabra(es_correcta)
         
 
 def inicializar_parametros(configuracion, partida_anterior):
