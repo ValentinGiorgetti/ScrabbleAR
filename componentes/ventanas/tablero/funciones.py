@@ -23,7 +23,7 @@ def actualizar_tiempo(window, contador, tiempo):
 
     temp = round(contador - tiempo)
     contador = 0 if temp <= 0 else temp
-    window['tiempo'].Update(datetime.timedelta(seconds = contador))
+    window['tiempo'].Update(datetime.timedelta(seconds = contador), text_color='red' if temp < 60 else 'white')
     window.Refresh()
     
     return contador == 0, contador
