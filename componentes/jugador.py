@@ -9,11 +9,11 @@ class Jugador:
     y los cambios restantes del mismo.
     """
 
-    def __init__(self, nombre, color_ficha):
+    def __init__(self, nick, color_ficha):
         self._puntaje = 0
         self._cambios_restantes = 3
         self._fichas = []
-        self._nombre = nombre
+        self._nick = nick
         self._color = color_ficha
 
     @property
@@ -43,12 +43,12 @@ class Jugador:
         self._fichas = fichas
         
     @property
-    def nombre(self):
-        return self._nombre
+    def nick(self):
+        return self._nick
         
     @property
     def color(self):
         return self._color
         
     def informacion(self):
-        return [self._nombre, self._puntaje, self._cambios_restantes]
+        return [self._nick, self._puntaje, self._cambios_restantes]

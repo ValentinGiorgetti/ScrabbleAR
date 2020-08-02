@@ -472,9 +472,9 @@ def finalizar_partida(window, tablero):
 
   mensaje = ''
   if (jugador.puntaje > computadora.puntaje):
-    mensaje = f'Ganó el jugador con {jugador.puntaje} puntos'
+    mensaje = f'Ganó "{jugador.nick}" con {jugador.puntaje} puntos'
   elif (jugador.puntaje < computadora.puntaje):
-    mensaje = f'Ganó la computadora con {computadora.puntaje} puntos'
+    mensaje = f'Ganó "{computadora.nick}" con {computadora.puntaje} puntos'
   else: 
     mensaje = 'Hubo un empate'
   sg.Popup(mensaje, title = 'Fin de la partida')
@@ -675,7 +675,7 @@ def inicializar_parametros(configuracion, partida_anterior):
     tablero = {
       "posiciones_ocupadas" : {},
       "palabras_usadas" : [],
-      "jugador" : Jugador("Jugador", ('white', 'blue')),
+      "jugador" : Jugador(configuracion["nick"], ('white', 'blue')),
       "computadora" : Jugador("Computadora", ('white', 'red')),
       "turno" : random.choice(('computadora', 'jugador')),
       "contador" : configuracion['tiempo'] * 60,

@@ -47,12 +47,19 @@ def crear_ventana_configuracion(colores, ultimo_presionado, tabla, configuracion
             sg.Button("Confirmar", key="confirmar_letra"),
         ],
         [sg.Text("")],
+        [sg.Text("Nick del jugador", **titulos)],
+        [
+            sg.Input("", key="nick"),
+            sg.Button("Confirmar", key="confirmar_nick")
+        ],
+        [sg.Text("")],
         [sg.Button("Restablecer configuración", key="restablecer")],
     ]
     
     columna_configuracion = sg.Column(layout_configuracion, **parametros_columna)
     
-    layout_configuracion_actual = [[sg.Text("Configuración actual", **titulos)],
+    layout_configuracion_actual = [
+        [sg.Text("Configuración actual", **titulos)],
         [sg.Text("")],
         [sg.Text("Nivel:", ), sg.Text(str(configuracion_seleccionada["nivel"]), key="nivel_seleccionado"),],
         [
@@ -62,7 +69,10 @@ def crear_ventana_configuracion(colores, ultimo_presionado, tabla, configuracion
         [sg.Text("")],
         [sg.Table(tabla, ['Letra', "Puntaje", "Cantidad fichas"], justification = 'center', key = "letras_modificadas")],
         [sg.Text("")],
-        [sg.Button("Aceptar")]]
+        [sg.Text("Nick: "), sg.Text(configuracion_seleccionada["nick"], key="nick_seleccionado", size=(20,None))],
+        [sg.Text("")],
+        [sg.Button("Aceptar")]
+    ]
         
     columna_configuracion_actual = sg.Column(layout_configuracion_actual, **parametros_columna)
     
@@ -138,6 +148,7 @@ def restablecer_configuracion(window, configuracion_predeterminada, ultimo_presi
     window[ultimo_presionado].Update(button_color = sg.DEFAULT_BUTTON_COLOR)
     nivel = configuracion_seleccionada['nivel'].capitalize()
     window[nivel].Update(button_color = colores[nivel])
+    window["nick_seleccionado"].Update(configuracion_seleccionada["nick"])
     return nivel, configuracion_seleccionada    
     
     
@@ -198,6 +209,12 @@ def confirmar_letra(values, configuracion_seleccionada, window):
             window["letras_modificadas"].Update(informacion_letras(configuracion_seleccionada["fichas"]))
             
             
+def confirmar_nick(values, configuracion_seleccionada, window):
+    nick = values["nick"]
+    configuracion_seleccionada["nick"] = nick
+    window["nick_seleccionado"].Update(nick)
+
+
 def seleccionar_dificultad(configuracion_seleccionada, ultimo_presionado, event, color, window):
     """
     Función usada para seleccionar el nivel de dificultad de la partida.

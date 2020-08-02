@@ -120,8 +120,8 @@ def actualizar_top(jugador, computadora, nivel):
 
     top = leer_top()
 
-    jugador = [["Jugador", jugador.puntaje, fecha, nivel.capitalize()]] if jugador.puntaje > 0 else []
-    computadora = [["Computadora", computadora.puntaje, fecha, nivel.capitalize()]] if computadora.puntaje > 0 else []
+    jugador = [[jugador.nick, jugador.puntaje, fecha, nivel.capitalize()]] if jugador.puntaje > 0 else []
+    computadora = [[computadora.nick, computadora.puntaje, fecha, nivel.capitalize()]] if computadora.puntaje > 0 else []
     
     temp = top['general'] + jugador + computadora
     top['general'] = sorted(temp, key=lambda x: x[1], reverse=True)[:10]
