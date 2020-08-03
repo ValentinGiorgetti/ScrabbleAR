@@ -14,8 +14,6 @@ def main():
     El usuario puede ver el top de todos los niveles y un top general (todos los niveles).
     """
     
-    colores = {'general' : ('white', 'blue'), 'fácil' : ("white", "green"), 'medio' : ("white", "orange"), 'difícil' : ('white', 'red')}
-    
     ultimo_presionado = 'general'
     
     top = leer_top()
@@ -31,5 +29,5 @@ def main():
       elif event == 'resetear':
         resetear(top, tabla, ultimo_presionado, window)
       else:
-        ultimo_presionado = mostrar_top(ultimo_presionado, event, colores[event], tabla[event], window)
+        ultimo_presionado = mostrar_top(ultimo_presionado, event, tabla[event], window)
     window.Close()

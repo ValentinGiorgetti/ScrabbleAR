@@ -2,7 +2,11 @@
 Módulo principal de la ventana del tablero de juego.
 """
 
+
 from componentes.ventanas.tablero.funciones import *
+from componentes.ventanas.tablero.cambio_fichas.main import main as cambiar_fichas
+from componentes.ventanas.tablero.logica_computadora import jugar_computadora
+from componentes.ventanas.tablero.logica_jugador import *
 from componentes.ventanas.general import leer_evento
 
 
@@ -77,22 +81,21 @@ def main(configuracion, partida_anterior = None):
             finalizar_partida(window, tablero)
         elif comenzar:
             parametros['fin_juego'], tablero['contador'] = actualizar_tiempo(window, tablero['contador'], tiempo)
-            if tablero['turno'] == 'computadora':
+            if tablero['turno'] == 'Computadora':
               jugar_computadora(window, parametros, tablero)
-            elif tablero['turno'] == 'jugador':
-              if event ==  "cambiar":
+            elif tablero['turno'] == 'Jugador':
+              if event == "cambiar":
                 cambiar_fichas(window, tablero, parametros)
-              elif event ==  "pasar":
+              elif event == "Pasar":
                 pasar(window, parametros, tablero)
-              elif event ==  "confirmar":
+              elif event == "confirmar":
                 confirmar_palabra(window, parametros, tablero)
               elif event in range(7):
                 seleccionar_ficha(window, parametros, event)
               elif event:
                 colocar_ficha(window, parametros, tablero, event)
             if parametros['fin_juego']:
-              finalizar_partida(window, tablero)
-              comenzar = False
+              comenzar = finalizar_partida(window, tablero)
             window["cantidad_fichas"].Update(fichas_totales(tablero['bolsa_de_fichas']))
 
     window.Close()

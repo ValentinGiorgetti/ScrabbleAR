@@ -98,13 +98,14 @@ def resetear(top, tabla, nivel, ventana_tops):
         guardar_top(top)
     
   
-def mostrar_top(ultimo_presionado, event, color, top, ventana_tops):
+def mostrar_top(ultimo_presionado, event, top, ventana_tops):
     """
     Función usada para mostrar el top de puntajes de un nivel determinado.
     """
+    colores = {'general' : ('white', 'blue'), 'fácil' : ("white", "green"), 'medio' : ("white", "orange"), 'difícil' : ('white', 'red')}
 
     ventana_tops[ultimo_presionado].Update(button_color = sg.DEFAULT_BUTTON_COLOR)
-    ventana_tops[event].Update(button_color = color)
+    ventana_tops[event].Update(button_color = colores[event])
     ventana_tops['top'].Update(values = top)
     ventana_tops['resetear'].Update(disabled = not top[0][1])
 

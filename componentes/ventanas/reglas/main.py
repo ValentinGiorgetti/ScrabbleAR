@@ -9,7 +9,7 @@ from componentes.ventanas.general import leer_evento
 
 def main():
     """
-    Función que muestra la ventana de reglas
+    Función que muestra la ventana de reglas.
     
     Informa el tipo de palabras válidas y tamaño del tablero de acuerdo
     al nivel seleccionado.
