@@ -88,7 +88,7 @@ def comenzar_juego(configuracion_seleccionada, partida_guardada, ventana_princip
 
     opcion = 'Continuar'
     if partida_guardada:
-        opcion = sg.Popup('Se encontró una partida guardada, si inicia una nueva no podrá continuar con la anterior', custom_text = ('Continuar', 'Cancelar')) 
+        opcion = sg.Popup('Se encontró una partida guardada, si inicia una nueva no podrá continuar con la anterior', custom_text = ('Continuar', 'Cancelar'), title = 'Atención') 
     if opcion == "Continuar":
         ventana_principal.Hide()
         partida_guardada, jugador, computadora = jugar(configuracion_seleccionada, None)
