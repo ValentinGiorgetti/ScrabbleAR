@@ -5,7 +5,7 @@ Módulo principal de la ventana de cambio de fichas.
 
 import PySimpleGUI as sg
 from componentes.ventanas.general import leer_evento
-from componentes.ventanas.tablero.funciones import actualizar_fichas_totales, actualizar_tiempo
+from componentes.ventanas.tablero.logica.funciones import fichas_totales, actualizar_tiempo
 from componentes.ventanas.tablero.cambio_fichas.funciones import *
 
 
@@ -24,7 +24,7 @@ def main(window, tablero, parametros):
 
   ventana = crear_ventana_cambio_fichas(letras_jugador)
 
-  fichas = actualizar_fichas_totales(bolsa_de_fichas)
+  fichas = fichas_totales(bolsa_de_fichas)
 
   seleccionadas = {}
 

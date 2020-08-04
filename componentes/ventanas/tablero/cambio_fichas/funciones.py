@@ -5,7 +5,7 @@ Módulo que contiene las funciones usadas en la ventana de cambio de fichas.
 
 import random, PySimpleGUI as sg
 from componentes.ventanas.general import parametros_popup, parametros_ventana
-from componentes.ventanas.tablero.funciones import actualizar_fichas_totales, actualizar_tiempo, quedan_fichas, repartir_fichas, reiniciar_parametros, actualizar_tabla
+from componentes.ventanas.tablero.logica.funciones import *
 
 
 def crear_ventana_cambio_fichas(letras_jugador):
@@ -26,7 +26,7 @@ def cambiar_todas(window, bolsa_de_fichas, parametros, letras_jugador):
     Función para que el jugador cambie todas sus fichas.
     """
 
-    if (quedan_fichas(bolsa_de_fichas)):
+    if (len(fichas_totales(bolsa_de_fichas)) >= 7):
         for letra in letras_jugador:
             bolsa_de_fichas[letra]['cantidad_fichas'] += 1
         letras_jugador.clear()
@@ -46,17 +46,12 @@ def cambiar_seleccionadas(window, bolsa_de_fichas, seleccionadas, letras_jugador
     if (not seleccionadas):
         sg.Popup('Debe seleccionar alguna letra', **parametros_popup)
         return False
-    if (quedan_fichas(bolsa_de_fichas, len(seleccionadas))):
-        fichas = actualizar_fichas_totales(bolsa_de_fichas)
+    if len(fichas_totales(bolsa_de_fichas)) >= len(seleccionadas):
         for i in seleccionadas:
             bolsa_de_fichas[seleccionadas[i]]['cantidad_fichas'] += 1
-            letra = random.choice(fichas)
-            while (bolsa_de_fichas[letra]['cantidad_fichas'] <= 0):
-              letra = random.choice(fichas)
-            bolsa_de_fichas[letra]['cantidad_fichas'] -= 1
+            letra = letra_random(bolsa_de_fichas)
             window[i].Update(letra, button_color = ('white', 'green'))
             letras_jugador[i] = letra
-            fichas = actualizar_fichas_totales(bolsa_de_fichas)
         parametros['historial'] += '\n\n - Se cambiaron algunas fichas del jugador.'
         window['historial'].Update(parametros['historial'])
         return True

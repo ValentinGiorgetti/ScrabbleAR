@@ -5,10 +5,8 @@ Módulo que contiene funciones usadas por el jugador.
 
 import PySimpleGUI as sg
 from functools import reduce
-from pattern.es import parse
 from componentes.ventanas.general import parametros_popup
-from componentes.ventanas.tablero.funciones import reproducir_sonido_palabra, es_palabra, actualizar_fichas_totales, reiniciar_parametros, quedan_fichas
-from componentes.ventanas.tablero.funciones import *
+from componentes.ventanas.tablero.logica.funciones import *
 
 
 def posicion_valida(posicion, posiciones_ocupadas, posiciones_bloqueadas, orientacion):
@@ -78,67 +76,31 @@ def verificar_palabra(parametros, tablero):
       return False
 
 
-def contar_puntos_jugador(parametros, tablero):
-  '''
-  Función que retorna la cantidad de puntos de una jugada, teniendo en cuenta
-  las casillas especiales (modificadores)
-  '''
-  jugada = parametros['jugada']
-  bolsa_de_fichas = tablero['bolsa_de_fichas']
-  letras_jugador = tablero['jugador'].fichas
-  casillas_especiales = parametros['casillas_especiales']
-  for posicion in jugada:
-    tablero['posiciones_ocupadas'][posicion] = letras_jugador[jugada[posicion]]
-  multiplicador = 0
-  puntos = 0
-  for posicion in jugada:
-    temp = bolsa_de_fichas[letras_jugador[jugada[posicion]]]['puntaje']
-    if (posicion in casillas_especiales):
-      if (casillas_especiales[posicion]['modificador'] < 10):
-        puntos += temp + casillas_especiales[posicion]['modificador']
-      elif (casillas_especiales[posicion]['modificador'] < 20):
-        puntos += temp * (casillas_especiales[posicion]['modificador'] % 10)
-      else:
-        multiplicador += (casillas_especiales[posicion]['modificador'] % 10)
-        puntos += temp
-    else:
-      puntos += temp
-  if (puntos < 0):
-    return 0
-  else:
-    return puntos if multiplicador == 0 else puntos * multiplicador
-
-
 def confirmar_palabra(window, parametros, tablero):
     """
     Función usada para confirmar la palabra ingresada por el jugador.
     """
     
-    fichas = actualizar_fichas_totales(tablero['bolsa_de_fichas'])
+    jugada = parametros['jugada']
+    quedan_fichas = len(fichas_totales(tablero['bolsa_de_fichas'])) >= len(jugada)
     letras_jugador = tablero['jugador'].fichas
+    es_correcta = verificar_palabra(parametros, tablero)
     if parametros['letra_seleccionada']:
         window[parametros['letra']].Update(button_color = ("white", "green"))
         parametros['letra_seleccionada'] = False
-    es_correcta = verificar_palabra(parametros, tablero)
     if es_correcta:        
         tablero['primer_jugada'] = False
-        #puntos_jugada = contar_puntos_jugador(parametros, tablero)
-        jugada = parametros['jugada']
         palabra = palabra_formada(letras_jugador, jugada)
         puntos_jugada = contar_jugada(window, palabra, list(jugada.keys()), tablero, parametros['casillas_especiales'])[1]
         finalizar_jugada(window, parametros, tablero, palabra, puntos_jugada, tablero['jugador'], 'El jugador')
         reiniciar_parametros(parametros)
-        if quedan_fichas(tablero['bolsa_de_fichas'], len(jugada)):
+        if quedan_fichas:
             for posicion in jugada:
-                letra = random.choice(fichas)
-                while tablero['bolsa_de_fichas'][letra]["cantidad_fichas"] <=  0:
-                    letra = random.choice(fichas)
+                letra = letra_random(tablero['bolsa_de_fichas'])
                 letras_jugador[jugada[posicion]] = letra
                 window[jugada[posicion]].Update(
                     letra, disabled = False, button_color = ("white", "green")
                 )
-                tablero['bolsa_de_fichas'][letra]["cantidad_fichas"] -=  1
-                fichas = actualizar_fichas_totales(tablero['bolsa_de_fichas'])
             tablero['turno'] = 'Computadora'
             window['turno'].Update('Computadora')
         else:

@@ -2,11 +2,10 @@
 Módulo que contiene funciones usadas por la computadora.
 """
 
-import time, random
+import time, random, PySimpleGUI as sg
 from pattern.es import parse
 from itertools import permutations
-from componentes.ventanas.tablero.funciones import actualizar_tiempo, reproducir_sonido_palabra, es_palabra, actualizar_fichas_totales, quedan_fichas
-from componentes.ventanas.tablero.funciones import *
+from componentes.ventanas.tablero.logica.funciones import *
 
 
 def jugar_computadora(window, parametros, tablero):
@@ -25,9 +24,9 @@ def jugar_computadora(window, parametros, tablero):
     ubicar_palabra(window, palabra, tablero, parametros, posiciones_ocupadas_pc)
     reproducir_sonido_palabra(True)
     finalizar_jugada(window, parametros, tablero, palabra, puntos_jugada, tablero['computadora'], 'La computadora')
-    if (parametros['fin_juego']):
-        parametros['historial'] += '\n\n - Fin de la partida. No hay fichas suficientes para repartir.'
-        window['historial'].Update(parametros['historial'])
+    # if (parametros['fin_juego']):
+    #     parametros['historial'] += '\n\n - Fin de la partida. No hay fichas suficientes para repartir.'
+    #     window['historial'].Update(parametros['historial'])
   else:
     reproducir_sonido_palabra(False)
     repartir_nuevas_fichas(tablero, parametros, window)
@@ -106,13 +105,13 @@ def ubicar_palabra(window, palabra, tablero, parametros, posiciones_ocupadas_pc)
 
     bolsa_de_fichas = tablero['bolsa_de_fichas']
     computadora = tablero['computadora']
-    fichas = actualizar_fichas_totales(bolsa_de_fichas)
+    fichas = fichas_totales(bolsa_de_fichas)
     posiciones_atril = {}
     nuevas_fichas = computadora.fichas[:]
     for i in range(8, 15):
       letra = computadora.fichas[i-8]
       posiciones_atril[letra] = posiciones_atril[letra] + [i] if letra in posiciones_atril else [i]
-    quedan = quedan_fichas(bolsa_de_fichas, len(palabra))
+    quedan = len(fichas_totales(bolsa_de_fichas)) >= len(palabra)
     for letra, posicion in zip(palabra, posiciones_ocupadas_pc):
       nuevas_fichas.remove(letra)
       x = posiciones_atril[letra][0]
@@ -124,12 +123,7 @@ def ubicar_palabra(window, palabra, tablero, parametros, posiciones_ocupadas_pc)
       if (parametros['fin_juego']):
         break
       if (quedan):
-        letra_nueva = random.choice(fichas)
-        while (bolsa_de_fichas[letra_nueva]['cantidad_fichas'] <= 0):
-          letra_nueva = random.choice(fichas)
-        nuevas_fichas += [letra_nueva]
-        bolsa_de_fichas[letra_nueva]['cantidad_fichas'] -= 1
-        fichas = actualizar_fichas_totales(bolsa_de_fichas)
+        nuevas_fichas += [letra_random(bolsa_de_fichas)]
     if (quedan and not parametros['fin_juego']):
       for i in range(8, 15):
         window[i].Update(button_color = ('white', 'green'))
@@ -145,14 +139,14 @@ def repartir_nuevas_fichas(tablero, parametros, window):
 
     bolsa_de_fichas = tablero['bolsa_de_fichas']
     computadora = tablero['computadora']
-    if (quedan_fichas(bolsa_de_fichas)):
-      if (computadora.cambios_restantes > 0):
+    if len(fichas_totales(bolsa_de_fichas)) >= 7:
+      if (computadora.cambios_restantes):
         computadora.cambios_restantes -= 1
         for letra in computadora.fichas:
           bolsa_de_fichas[letra]['cantidad_fichas'] += 1
         computadora.fichas.clear()
-        for i in range(8, 15):
-          window[i].Update(button_color = ('white', 'green'))
+        for posicion_atril in range(8, 15):
+          window[posicion_atril].Update(button_color = ('white', 'green'))
         repartir_fichas(bolsa_de_fichas, computadora.fichas)
         parametros['historial'] += '\n\n - La computadora no pudo formar ninguna palabra, se le repartieron nuevas fichas.'
         window['historial'].Update(parametros['historial'])

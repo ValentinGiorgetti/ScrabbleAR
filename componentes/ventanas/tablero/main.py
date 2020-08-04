@@ -5,8 +5,8 @@ Módulo principal de la ventana del tablero de juego.
 
 from componentes.ventanas.tablero.funciones import *
 from componentes.ventanas.tablero.cambio_fichas.main import main as cambiar_fichas
-from componentes.ventanas.tablero.logica_computadora import jugar_computadora
-from componentes.ventanas.tablero.logica_jugador import *
+from componentes.ventanas.tablero.logica.logica_computadora import jugar_computadora
+from componentes.ventanas.tablero.logica.logica_jugador import *
 from componentes.ventanas.general import leer_evento
 
 
@@ -96,7 +96,7 @@ def main(configuracion, partida_anterior = None):
                 colocar_ficha(window, parametros, tablero, event)
             if parametros['fin_juego']:
               comenzar = finalizar_partida(window, tablero)
-            window["cantidad_fichas"].Update(fichas_totales(tablero['bolsa_de_fichas']))
+            window["cantidad_fichas"].Update(len(fichas_totales(tablero['bolsa_de_fichas'])))
 
     window.Close()
     return partida_guardada, tablero['jugador'], tablero['computadora']

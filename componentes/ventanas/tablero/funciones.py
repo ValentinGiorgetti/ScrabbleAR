@@ -3,13 +3,11 @@ Módulo con las funciones usadas por la ventana del tablero.
 """
 
 
-import random, PySimpleGUI as sg
-from pattern.es import parse, verbs, spelling, lexicon
-import datetime
+import random, datetime, PySimpleGUI as sg
 from collections import OrderedDict
 from componentes.jugador import Jugador
-from os.path import join
 from componentes.ventanas.general import *
+from componentes.ventanas.tablero.logica.funciones import fichas_totales, repartir_fichas
 
 
 def crear_ventana_tablero(tablero, parametros, partida_anterior):
@@ -63,7 +61,7 @@ def crear_ventana_tablero(tablero, parametros, partida_anterior):
         [sg.Text("Palabras válidas", **titulo)],
         [sg.Text(tablero['palabras_validas'], font = fuente)],
         [sg.Text("Cantidad de fichas en la bolsa", **titulo)], 
-        [sg.Text(fichas_totales(tablero['bolsa_de_fichas']), font = fuente, key = "cantidad_fichas")],
+        [sg.Text(len(fichas_totales(tablero['bolsa_de_fichas'])), font = fuente, key = "cantidad_fichas")],
         [sg.Text("Turno", **titulo)],
         [sg.Text(tablero['turno'], key = 'turno', font = fuente)],
         [sg.Text('')],
@@ -193,7 +191,6 @@ def inicializar_parametros(configuracion, partida_anterior):
     "jugada" : OrderedDict(),
     "letra" : '',
     "historial" : '                  Historial de la partida',
-    "fichas_totales" : actualizar_fichas_totales(tablero['bolsa_de_fichas']),
     "fin_juego" : False,
   }
   
@@ -254,22 +251,6 @@ def pasar(window, parametros, tablero):
         window['turno'].Update('Computadora')
 
 
-def repartir_fichas(bolsa_de_fichas, letras):
-  """
-  Función que reparte 7 fichas de la bolsa en forma aleatoria.
-  """
-  
-  letras.clear()
-  fichas = actualizar_fichas_totales(bolsa_de_fichas)
-  for i in range(7):
-    letra = random.choice(fichas)
-    while (bolsa_de_fichas[letra]['cantidad_fichas'] <= 0):
-      letra = random.choice(fichas)
-    letras += [letra]
-    bolsa_de_fichas[letra]['cantidad_fichas'] -= 1
-    fichas = actualizar_fichas_totales(bolsa_de_fichas)
-
-
 def seleccionar_ficha(window, parametros, event):
     """
     Función usada para que el usuario seleccione una ficha.
@@ -279,148 +260,7 @@ def seleccionar_ficha(window, parametros, event):
         window[parametros['letra']].Update(button_color = ("white", "green"))
     window[event].Update(button_color = ("white", "red"))
     parametros['letra'] = event
-    parametros['letra_seleccionada'] = True
-    
-    
-def actualizar_tiempo(window, contador, tiempo):
-    """
-    Función usada para actualizar el contador de la partida.
-    """
-
-    temp = round(contador - tiempo)
-    contador = 0 if temp <= 0 else temp
-    window['tiempo'].Update(datetime.timedelta(seconds = contador), text_color='red' if temp < 60 else 'white')
-    window.Refresh()
-    
-    return contador == 0, contador
-
-
-def es_palabra(nivel, palabras_validas, palabra):
-  """
-  Función que verifica que la palabra sea válida correspondiente al nivel de la partida.
-  """
-
-  palabra = palabra.lower()
-  if not (palabra in verbs or (palabra in spelling and palabra in lexicon)):
-    return False
-  analisis = lambda palabra : parse(palabra, chunks = False).split('/')[1]
-  if (nivel == 'fácil'):
-    tipo = analisis(palabra)
-    return tipo.find('NN') != -1 or tipo.find('VB') != -1 or tipo.find('JJ') != -1
-  elif (nivel == 'medio'):
-    tipo = analisis(palabra)
-    return tipo.find('JJ') != -1 or tipo.find('VB') != -1
-  elif (nivel == 'difícil'):
-    tipo = 'JJ' if palabras_validas == 'Adjetivos' else 'VB'
-    return analisis(palabra).find(tipo) != -1
-    
-    
-def fichas_totales(bolsa_de_fichas):
-  """
-  Función que retorna la cantidad total de fichas que quedan en la bolsa.
-  """
-
-  total = 0
-  for letra in bolsa_de_fichas:
-    total += bolsa_de_fichas[letra]['cantidad_fichas'] 
-  return total  
-
-
-def reproducir_sonido_palabra(es_correcta):	
-    """
-    Función que reproduce un sonido para el caso de que la palabra sea correcta o incorrecta.
-    """
-    
-    reproducir(join("componentes", "sonidos", "palabra_correcta.mp3" if es_correcta else "palabra_incorrecta.mp3"))
-
-
-def reiniciar_parametros(parametros):
-    """
-    Función usada para reiniciar algunos parámetros de la partida.
-    """
-
-    parametros["letra_seleccionada"] = False
-    parametros["orientacion"] = parametros["primer_posicion"] = parametros["ultima_posicion"] = ''
-    parametros["jugada"] = OrderedDict()
-
-
-def quedan_fichas(bolsa_de_fichas, cantidad_fichas = 7):
-    """
-    Función que verifica si hay suficientes fichas en la bolsa para repartir.
-    """
-
-    contador = 0
-    for letra in bolsa_de_fichas:
-        contador += bolsa_de_fichas[letra]['cantidad_fichas']
-        if (contador >= cantidad_fichas):
-            return True
-    return False
-    
-        
-def actualizar_fichas_totales(bolsa_de_fichas):
-    """
-    Función que retorna un string con todas las fichas de la bolsa.
-    """
-    
-    return "".join([letra * bolsa_de_fichas[letra]["cantidad_fichas"] for letra in bolsa_de_fichas])
-
-
-def actualizar_tabla(window, jugador, computadora):
-
-    tabla = sorted([jugador.informacion(), computadora.informacion()], key = lambda x : x[1], reverse = True)
-    window["tabla"].Update(tabla)
-
-
-def finalizar_jugada(window, parametros, tablero, palabra, puntos_jugada, jugador, texto):
-    """
-    Función que brinda información sobre la palabra formada y suma el puntaje de la jugada.
-    """
-
-    tipo = parse(palabra.lower(), chunks = False).split('/')[1] 
-    tipo_palabra = 'sustantivo' if tipo.find('NN') != -1 else ('verbo' if tipo.find('VB') != -1 else 'adjetivo')
-    parametros['historial'] += f'\n\n - {texto} formó la palabara "{palabra}" ({tipo_palabra}) y sumó {puntos_jugada} puntos.'
-    window['historial'].Update(parametros['historial'])
-    jugador.puntaje += puntos_jugada
-    tablero['primer_jugada'] = False
-    actualizar_tabla(window, tablero['jugador'], tablero['computadora'])
-
-
-def sumar_casilla(casillas_especiales, posicion, letra, puntos_jugada, multiplicador, tablero):
-  """
-  Función que actualiza la cantidad de puntos de la jugada, obtenidos al pasar por una casilla, 
-  sumando el puntaje de la ficha. Si la casilla es especial, también se suma el modificador 
-  correspondiente o se acumula el multiplicador de la palabra.
-  """
-  
-  tablero['posiciones_ocupadas'][posicion] = letra
-  temp = tablero['bolsa_de_fichas'][letra]['puntaje']
-  if (posicion in casillas_especiales):
-    if (casillas_especiales[posicion]['modificador'] < 10):
-      puntos_jugada += temp + casillas_especiales[posicion]['modificador']
-    elif (casillas_especiales[posicion]['modificador'] < 20):
-      puntos_jugada += temp * (casillas_especiales[posicion]['modificador'] % 10)
-    else:
-      puntos_jugada += temp
-      multiplicador += (casillas_especiales[posicion]['modificador'] % 10)   
-  else:
-    puntos_jugada += temp
-    
-  return multiplicador, puntos_jugada
-  
-
-def contar_jugada(window, palabra, posiciones_tablero, tablero, casillas_especiales):
-    """
-    Función para contar los puntos obtenidos al formar una palabra.
-    """
-
-    posiciones_ocupadas = []
-    multiplicador = puntos_jugada = 0
-    for letra, posicion in zip(palabra, posiciones_tablero):
-        multiplicador, puntos_jugada = sumar_casilla(casillas_especiales, posicion, letra, puntos_jugada, multiplicador, tablero) 
-        posiciones_ocupadas += [posicion]
-    puntos_jugada = 0 if puntos_jugada < 0 else (puntos_jugada if multiplicador == 0 else puntos_jugada * multiplicador)
-    
-    return posiciones_ocupadas, puntos_jugada
+    parametros['letra_seleccionada'] = True 
 
 
 def finalizar_partida(window, tablero):
@@ -447,7 +287,7 @@ def finalizar_partida(window, tablero):
   for key in ('Iniciar', 'Posponer', 'Pausa', 'Terminar', 'confirmar', 'cambiar', 'Pasar'):
     window[key].Update(button_color = sg.DEFAULT_BUTTON_COLOR, disabled = True)
 
-  aux = 'el jugador' if jugador.nick != 'Jugador' else "jugador.nick"
+  aux = 'el jugador' if jugador.nick != 'Jugador' else jugador.nick
   mensaje = ''
   if (jugador.puntaje > computadora.puntaje):
     mensaje = f'Ganó {aux} con {jugador.puntaje} puntos'
