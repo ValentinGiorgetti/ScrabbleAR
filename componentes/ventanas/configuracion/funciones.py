@@ -11,6 +11,15 @@ from os.path import join
 def crear_ventana_configuracion(colores, ultimo_presionado, tabla, configuracion_seleccionada):
     """
     Función usada para crear la ventana de configuración.
+
+    Parámetros:
+        - colores (dict): contiene los colores a utilizar para cada nivel de dificultad.
+        - ultimo_presionado (str): último nivel de dificultad presionado (Fácil, Medio, Difícil).
+        - tabla (list): contiene la información de las letras.
+        - configuracion_seleccionada (dict): contiene la configuración seleccionada.
+
+    Retorna:
+        - (sg.Window): la ventana de configuración creada.
     """
     
     layout_configuracion = [
@@ -87,8 +96,10 @@ def leer_ultima_configuracion():
     Función que lee y retorna la última configuración seleccionada por el usuario.
     
     Abre un archivo json que contiene un diccionario con la configuración. Inicialmente 
-    coincide con la configuración por defecto. En caso de que el archivo no exista se
-    retorna la configuración por defecto.
+    coincide con la configuración por defecto.
+
+    Retorna:
+        - (dict): la última configuración, o en caso de no existir, la configuración por defecto.
     """
 
     try:
@@ -106,6 +117,9 @@ def guardar_ultima_configuracion(configuracion):
     Función usada para guardar la configuración seleccionada.
     
     Guarda el diccionario con la configuración en formato json.
+
+    Parámetros:
+        - configuracion (dict): configuración a guardar.
     """
     
     with open(join("componentes", "informacion_guardada", "ultima_configuracion.json"), 'w', encoding = 'UTF-8') as f:
@@ -117,6 +131,9 @@ def leer_configuracion_predeterminada():
     Función que lee y retorna la configuración predeterminada.
     
     Abre un archivo json que contiene un diccionario con la configuración predeterminada.
+
+    Retorna:
+        - (dict): la configuración por defecto.
     """
     
     ruta = join("componentes", "informacion_guardada", "configuracion_predeterminada.json")
@@ -138,6 +155,16 @@ def restablecer_configuracion(window, configuracion_predeterminada, ultimo_presi
     
     Actualiza la configuracion seleccionada y los widgets de la ventana con la configuración
     predeterminada.
+
+    Parámetros:
+        - window (sg.Window): ventana de configuración a actualizar.
+        - configuracion_predeterminada (dict): configuración predeterminada.
+        - ultimo_presionado (str): último nivel de dificultad presionado (Fácil, Medio, Difícil).
+        - colores (dict): contiene los colores a utilizar para cada nivel de dificultad.
+
+    Retorna:
+        - (str): el nivel de dificultad nuevo (Fácil, Medio, Difícil).
+        - (dict): la nueva configuración seleccionada, que es igual a la predeterminada.
     """
 
     configuracion_seleccionada = configuracion_predeterminada.copy()
@@ -156,6 +183,11 @@ def confirmar_tiempo(tiempo, configuracion_seleccionada, ventana_configuracion):
     Función usada para confirmar el tiempo de la partida ingresado por el usuario.
     
     Verifica que el valor ingresado sea válido.
+
+    Parámetros:
+        - tiempo (str): contiene el tiempo a verificar.
+        - configuracion_seleccionada (dict): contiene la configuración seleccionada.
+        - ventana_configuracion (sg.Window): la ventana de configuración.
     """
 
     if not tiempo:
@@ -179,6 +211,11 @@ def confirmar_letra(values, configuracion_seleccionada, window):
     
     Verifica que los valores ingresados sean válidos. El usuario debe ingresar una letra y
     alguna configuración (puntaje y/o cantidad de fichas de la misma).
+
+    Parámetros:
+        - values (dict): contiene los valores de los widgets en el momento del evento.
+        - configuracion_seleccionada (dict): contiene la configuración seleccionada.
+        - window (sg.Window): la ventana de configuración.
     """
 
     letra = values["letra"].upper()
@@ -211,6 +248,11 @@ def confirmar_letra(values, configuracion_seleccionada, window):
 def confirmar_nick(values, configuracion_seleccionada, window):	
     """
     Función usada para confirmar el nick ingresado por el usuario.
+
+    Parámetros:
+        - values (dict): contiene los valores de los widgets en el momento del evento.
+        - configuracion_seleccionada (dict): contiene la configuración seleccionada.
+        - window (sg.Window): la ventana de configuración.
     """
     
     nick = values["nick"]
@@ -226,6 +268,16 @@ def seleccionar_dificultad(configuracion_seleccionada, ultimo_presionado, event,
     Función usada para seleccionar el nivel de dificultad de la partida.
     
     Actualiza los widgets de la ventana y la configuración seleccionada.
+
+    Parámetros:
+        - configuracion_seleccionada (dict): contiene la configuración seleccionada.
+        - ultimo_presionado (str): anterior nivel de dificultad presionado (Fácil, Medio, Difícil).
+        - event (str): nuevo nivel de dificultad presionado (Fácil, Medio, Difícil).
+        - color (tuple): colores del botón del nivel presionado.
+        - window (sg.Window): la ventana de configuración.
+
+    Retorna:
+        - (str): nuevo nivel de dificultad (Fácil, Medio, Difícil).
     """
 
     window[event].Update(button_color = color)
@@ -239,6 +291,9 @@ def seleccionar_dificultad(configuracion_seleccionada, ultimo_presionado, event,
 def establecer_palabras_validas(configuracion_seleccionada):
     """
     Función usada para establecer las palabras válidas para el nivel seleccionado.
+
+    Parámetros:
+        - configuracion_seleccionada (dict): contiene la configuración seleccionada.
     """
 
     nivel = configuracion_seleccionada["nivel"]
@@ -256,6 +311,12 @@ def informacion_letras(letras):
     La misma es actualizada a partir de la configuración seleccionada.
     
     Retorna una lista con las letras, el puntaje y la cantidad de fichas de las mismas.
+
+    Parámetros:
+        - letras (dict): contiene información de las fichas.
+
+    Retorna:
+        - (list): contiene la información de las fichas adaptadas para mostrar en un widget tipo 'sg.Table'.
     """
     
     return [[letra, letras[letra]['puntaje'], letras[letra]['cantidad_fichas']] for letra in letras]

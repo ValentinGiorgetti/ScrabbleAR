@@ -14,6 +14,12 @@ import pickle, random, PySimpleGUI as sg
 def crear_ventana_main(partida_guardada):
     """
     Función que crea la ventana principal.
+
+    Parámetros:
+        - partida_guardada (dict): diccionario con la información del tablero de la partida guardada.
+
+    Retorna:
+        - (sg.Window): ventana principal.
     """
     
     tamanio = (25, 1)
@@ -35,6 +41,9 @@ def crear_ventana_main(partida_guardada):
 def leer_partida_guardada():
     """
     Función que retorna la partida guardada.
+
+    Retorna:
+        - (dict): diccionario con la información del tablero de la partida guardada.
     """
 
     try:
@@ -54,6 +63,9 @@ def guardar_partida(partida_guardada):
     
     En caso de que la partida haya terminado se guardará None. Si la partida fue pospuesta, se
     guardará un diccionario con la información del tablero.
+
+    Parámetros:
+        - partida_guardada (dict): diccionario con la información del tablero de la partida a guardar.
     """
     
     with open(join("componentes", "informacion_guardada", "partida_guardada"), "wb") as f:
@@ -66,6 +78,9 @@ def cargar_configuracion():
     
     Abre la ventana de configuración y retorna un diccionario con la 
     configuracion seleccionada.
+
+    Retorna:
+        - (dict): diccionario con la configuración seleccionada.
     """
 
     configuracion_temporal = configuracion()
@@ -84,6 +99,14 @@ def comenzar_juego(configuracion_seleccionada, partida_guardada, ventana_princip
     
     Retorna None en caso de que la partida haya terminado o un diccionario con la información
     del tablero en caso de que la partida haya sido pospuesta.
+
+    Parámetros:
+        - configuracion_seleccionada (dict): diccionario con la configuración seleccionada.
+        - partida_guardada (dict): diccionario con la información del tablero de la partida guardada.
+        - ventana_principal (sg.Window): ventana principal.
+
+    Retorna:
+        - (dict): diccionario con la partida jugada.
     """
 
     opcion = 'Continuar'
@@ -103,6 +126,13 @@ def reanudar_juego(configuracion_seleccionada, partida_guardada):
     
     Retorna None en caso de que la partida haya terminado o un diccionario con la información
     del tablero en caso de que la partida haya sido pospuesta.
+
+    Parámetros:
+        - configuracion_seleccionada (dict): diccionario con la configuración seleccionada.
+        - partida_guardada (dict): diccionario con la información del tablero de la partida guardada.
+
+    Retorna:
+        - (dict): diccionario con la partida jugada.
     """
     partida_guardada, jugador, computadora = jugar(configuracion_seleccionada, partida_guardada)
     fin_partida(jugador, computadora, configuracion_seleccionada, partida_guardada)
@@ -118,6 +148,12 @@ def fin_partida(jugador, computadora, configuracion_seleccionada, partida_guarda
     tipo de palabra válida para la próxima partida, en caso de que el nivel sea difícil.
     Si la partida fue pospuesta se guardará la información del tablero, si la partida
     terminó se guardará None.
+
+    Parámetros:
+        - jugador (Jugador): instancia de Jugador que representa al usuario.
+        - computadora (Jugador): instancia de Jugador que representa a la computadora.
+        - configuracion_seleccionada (dict): diccionario con la configuración seleccionada.
+        - partida_guardada (dict): diccionario con la información del tablero de la partida.
     """
 
     if not partida_guardada:

@@ -10,6 +10,9 @@ from componentes.ventanas.general import parametros_ventana
 def crear_ventana_reglas():
     """
     Función usada para crear la ventana de reglas.
+
+    Retorna:
+        - (sg.Window): la ventana de reglas.
     """
 
     layout = [
@@ -31,6 +34,16 @@ def mostrar_texto(ventana_reglas, event, color, texto, ultimo_presionado):
     
     Actualiza los widgets de la ventana y muestra el texto correspondiente
     al nivel seleccionado.
+
+    Parámetros:
+        - ventana_reglas (sg.Window): ventana de reglas.
+        - event (str): botón de dificultad presionado.
+        - color (str): color de la dificultad seleccionada.
+        - texto (str): texto sobre la dificultad seleccionada.
+        - ultimo_presionado (str): el anterior botón de dificultad presionado.
+
+    Retorna:
+        - (str): parametro event (botón de dificultad presionado).
     """
 
     if ultimo_presionado != "":

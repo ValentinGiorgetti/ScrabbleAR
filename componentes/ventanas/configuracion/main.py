@@ -16,7 +16,8 @@ def main():
     Siempre se muestra la última configuración seleccionada, la cuál inicialmente coincide con la configuración 
     por defecto. El usuario tiene la posibilidad de reestablecer las configuraciones a valores por defecto. 
     
-    Retorna un diccionario con la configuración seleccionada a la ventana principal.
+    Retorna:
+        - (dict): contiene la configuración seleccionada para la ventana principal.
     """
 
     configuracion_seleccionada = leer_ultima_configuracion()

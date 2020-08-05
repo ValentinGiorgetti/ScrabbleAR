@@ -36,6 +36,16 @@ def leer_evento(window, tiempo = None, key = ''):
     
     Retorna el evento, valores y el tiempo transcurrido hasta que
     se leyó el evento.
+
+    Parámetros:
+        - window (sg.Window): ventana sobre la cuál se lee el evento.
+        - tiempo (None/int/float): máximo tiempo a esperar.
+        - key: evento a usar si se llega al timeout.
+
+    Retorna:
+        - el evento recibido.
+        - (dict): los valores de los widgets recibidos con el evento.
+        - (int): el tiempo que tardó en llegar el evento.
     """
     
     inicio = time.time()
