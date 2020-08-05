@@ -1,6 +1,7 @@
 # ScrabbleAR - Seminario de Lenguajes (Python)
 
-#### Trabajo realizado por: Garea Antonella (17614/5) y Giorgetti Valentín (17133/2). Número del grupo: 31.
+#### Trabajo realizado por: Garea Antonella (17614/5), Garofalo Pedro (17136/5) y Giorgetti Valentín (17133/2).
+#### Número del grupo: 31.
 
 ##### Consideraciones a tener en cuenta:
 
