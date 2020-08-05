@@ -14,6 +14,17 @@ def posicion_valida(posicion, posiciones_ocupadas, posiciones_bloqueadas, orient
   Función que verifica si el usuario puede colocar una ficha en una posicion determinada del tablero. 
   
   Se comprueba que se respete la orientación elegida y que la casilla no esté ocupada.
+
+  Parámetros:
+    - posicion (tuple): tupla que indica la posición a verificar.
+    - posiciones_ocupadas (OrderedDict): diccionario ordenado cuyas llaves son tuplas con la posición de la ficha
+      y sus llaves son la ficha.
+    - posiciones_bloqueadas (list): lista de posiciones bloqueadas.
+    - orientacion (str): string que indica la orientación de la jugada.
+
+  Retorna:
+    - (str): orientación de la jugada.
+    - (bool): indica si la posición es válida.
   """
   
   misma_orientacion = False
@@ -50,6 +61,14 @@ def posicion_valida(posicion, posiciones_ocupadas, posiciones_bloqueadas, orient
 def palabra_formada(letras, posiciones_ocupadas):
   """
   Función que retorna un string con la palabra formada por el jugador.
+
+  Parámetros:
+    - letras (list): fichas del jugador.
+    - posiciones_ocupadas (OrderedDict): diccionario ordenado cuyas llaves son tuplas con la posición de la ficha
+      y sus llaves son la ficha.
+
+  Retorna:
+    - (str): la palabra formada.
   """
 
   return reduce(lambda anterior, posicion: anterior + letras[posicion], posiciones_ocupadas.values(), '')
@@ -59,6 +78,13 @@ def verificar_palabra(parametros, tablero):
   """"
   Función que verifica si la casilla de inicio está ocupada en caso de que sea la primer
   jugada de la partida, y que la palabra sea válida para el nivel.
+
+  Parámetros:
+      - parametros (dict): diccionario con párametros que controlan la lógica del juego.
+      - tablero (dict): diccionario con la información del tablero.
+
+  Retorna:
+    - (bool): indica si la jugada es válida.
   """
   
   if (tablero['primer_jugada'] and not tablero['centro'] in parametros['jugada']):
@@ -79,6 +105,11 @@ def verificar_palabra(parametros, tablero):
 def confirmar_palabra(window, parametros, tablero):
     """
     Función usada para confirmar la palabra ingresada por el jugador.
+
+    Parámetros:
+      - window (sg.Window): ventana del tablero.
+      - parametros (dict): diccionario con párametros que controlan la lógica del juego.
+      - tablero (dict): diccionario con la información del tablero.
     """
     
     jugada = parametros['jugada']
@@ -114,6 +145,12 @@ def confirmar_palabra(window, parametros, tablero):
 def colocar_ficha(window, parametros, tablero, event):
     """
     Función usada para que el usuario coloque la ficha seleccionada en el tablero.
+
+    Parámetros:
+      - window (sg.Window): ventana del tablero.
+      - parametros (dict): diccionario con párametros que controlan la lógica del juego.
+      - tablero (dict): diccionario con la información del tablero.
+      - event (tuple): tupla con la ubicación de la ficha en el tablero.
     """
 
     if parametros['letra_seleccionada']:

@@ -11,6 +11,12 @@ from componentes.ventanas.tablero.logica.funciones import *
 def crear_ventana_cambio_fichas(letras_jugador):
     """
     Función usada para crear la ventana de cambio de fichas.
+
+    Parámetros:
+        - letras_jugador (list): lista con las fichas del jugador.
+
+    Retorna:
+        - (sg.Window): ventana de cambio de fichas.
     """
 
     layout_cambiar_fichas = [[sg.Text('Seleccione las fichas que quiere intercambiar')],
@@ -24,6 +30,15 @@ def crear_ventana_cambio_fichas(letras_jugador):
 def cambiar_todas(window, bolsa_de_fichas, parametros, letras_jugador):
     """
     Función para que el jugador cambie todas sus fichas.
+
+    Parámetros:
+        - window (sg.Window): ventana del tablero.
+        - bolsa_de_fichas (dict): diccionario con las fichas en la bolsa.
+        - parametros (dict): diccionario con párametros que controlan la lógica del juego.
+        - letras_jugador (list): lista de las fichas del jugador.
+
+    Retorna:
+        - (bool): devuelve si se pudieron cambiar las fichas.
     """
 
     if (len(fichas_totales(bolsa_de_fichas)) >= 7):
@@ -42,7 +57,19 @@ def cambiar_todas(window, bolsa_de_fichas, parametros, letras_jugador):
 
 
 def cambiar_seleccionadas(window, bolsa_de_fichas, seleccionadas, letras_jugador, parametros):
+    """
+    Función para que el jugador algunas todas sus fichas.
 
+    Parámetros:
+        - window (sg.Window): ventana del tablero.
+        - bolsa_de_fichas (dict): diccionario con las fichas en la bolsa.
+        - seleccionadas (list): lista con las fichas elegidas para cambiar.
+        - letras_jugador (list): lista de las fichas del jugador.
+        - parametros (dict): diccionario con párametros que controlan la lógica del juego.
+
+    Retorna:
+        - (bool): devuelve si se pudieron cambiar las fichas.
+    """
     if (not seleccionadas):
         sg.Popup('Debe seleccionar alguna letra', **parametros_popup)
         return False
@@ -61,7 +88,15 @@ def cambiar_seleccionadas(window, bolsa_de_fichas, seleccionadas, letras_jugador
 
 
 def seleccionar_ficha(ventana, event, seleccionadas, ficha):
+    """
+    Función para que el jugador seleccione que fichas quiere cambiar.
 
+    Parámetros:
+        - ventana (sg.Window): ventana de cambio de fichas.
+        - event (int): ficha a seleccionar.
+        - seleccionadas (list): lista donde se guardan las fichas seleccionadas.
+        - ficha (str): letra de la ficha a seleccionar.
+    """
     if (event in seleccionadas):
         ventana[event].Update(button_color = ('white', 'green'))
         del seleccionadas[event]
@@ -71,7 +106,16 @@ def seleccionar_ficha(ventana, event, seleccionadas, ficha):
 
 
 def actualizar_tablero(window, tablero, cambio, parametros, jugador):
+    """
+    Función para actualizar la ventana del tablero con el cambio de fichas.
 
+    Parámetros:
+        - window (sg.Window): ventana del tablero.
+        - tablero (dict): diccionario con la información del tablero.
+        - cambio (bool): indica si se cambiaron fichas.
+        - parametros (dict): diccionario con párametros que controlan la lógica del juego.
+        - jugador (Jugador): instancia de Jugador que representa al usuario.
+    """
     if cambio:  
         jugador.cambios_restantes -= 1
         actualizar_tabla(window, jugador, tablero['computadora'])

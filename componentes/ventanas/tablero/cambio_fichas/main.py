@@ -12,6 +12,11 @@ from componentes.ventanas.tablero.cambio_fichas.funciones import *
 def main(window, tablero, parametros):
   """
   Función que muestra una ventana donde el jugador puede cambiar algunas o todas sus fichas.
+
+  Parámetros:
+    - window (sg.Window): ventana del tablero.
+    - tablero (dict): diccionario con la información del tablero.
+    - parametros (dict): diccionario con párametros que controlan la lógica del juego.
   """
 
   jugador = tablero['jugador']

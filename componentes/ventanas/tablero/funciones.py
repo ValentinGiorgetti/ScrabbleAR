@@ -13,6 +13,14 @@ from componentes.ventanas.tablero.logica.funciones import fichas_totales, repart
 def crear_ventana_tablero(tablero, parametros, partida_anterior):
     """
     Función usada para crear la ventana del tablero.
+
+    Parámetros:
+      - tablero (dict): diccionario con la información del tablero.
+      - parametros (dict): diccionario con párametros que controlan la lógica del juego.
+      - partida_anterior (dict): diccionario con el tablero de la partida anterior.
+
+    Retorna:
+      - (sg.Window): ventana del tablero.
     """
 
     tablero_juego = [
@@ -91,6 +99,13 @@ def crear_ventana_tablero(tablero, parametros, partida_anterior):
 def colocar_posiciones_especiales(window, tablero):
   """
   Función que coloca todas las casillas especiales en el tablero.
+
+  Parámetros:
+    - window (sg.Window): ventana del tablero.
+    - tablero (dict): diccionario con la información del tablero.
+
+  Retorna:
+    - (dict): diccionario con las casillas especiales.
   """
   
   malas_nivel_facil =[(4, 8), (5, 9), (4, 10), (3, 9), (8, 14), (9, 13), (10, 14), (9, 15)]
@@ -152,6 +167,10 @@ def colocar_posiciones_especiales(window, tablero):
 def restaurar_tablero(window, posiciones):
     """
     Función que restaura el tablero al estado de la partida anterior.
+
+    Parámetros:
+      - window (sg.Window): ventana del tablero.
+      - posiciones (list): lista con las posiciones a restaurar.
     """
 
     for posicion in posiciones:
@@ -204,6 +223,14 @@ def inicializar_parametros(configuracion, partida_anterior):
             "centro" : tupla que indica la posición de la casilla central del tablero,
             "palabras_validas" : string que indica las palabras válidas para el nivel
             }
+
+  Parámetros:
+    - configuracion (dict): diccionario con la configuración del juego.
+    - partida_anterior (dict): diccionario con el tablero de la partida anterior.
+
+  Retorna:
+    - (dict): diccionario con la información del tablero.
+    - (dict): diccionario con párametros que controlan la lógica del juego.
   """
 
   if not partida_anterior:
@@ -243,6 +270,14 @@ def inicializar_parametros(configuracion, partida_anterior):
 def iniciar_partida(window, parametros, partida_anterior):
     """
     Función que inicia la partida.
+
+    Parámetros:
+      - window (sg.Window): ventana del tablero.
+      - parametros (dict): diccionario con párametros que controlan la lógica del juego.
+      - partida_anterior (dict): diccionario con el tablero de la partida anterior.
+
+    Retorna:
+      - (bool): siempre devuelve true, se utiliza para marcar que la partida inició.
     """
 
     parametros['historial'] += '\n\n - El jugador ' + ('reanudó' if partida_anterior else 'inició') + ' la partida.'
@@ -257,6 +292,13 @@ def iniciar_partida(window, parametros, partida_anterior):
 def pausar(window, comenzar):
     """
     Función usada para pausar la partida.
+
+    Parámetros:
+      - window (sg.Window): ventana del tablero.
+      - comenzar (bool): indica si la partida está iniciada o no. 
+
+    Retorna:
+      - (bool): devuelve lo opuesto al parámetro comenzar, se utiliza para reanudar o pausar.
     """
     
     window["Pausa"].Update(button_color = ("white", "red") if comenzar else sg.DEFAULT_BUTTON_COLOR)
@@ -269,6 +311,14 @@ def pausar(window, comenzar):
 def posponer(tablero, jugada):
     """
     Función usada para posponer la partida.
+
+    Parámetros:
+      - tablero (dict): diccionario con la información del tablero.
+      - jugada (OrderedDict): almacena la jugada del jugador.
+
+    Retorna:
+      - (bool): indica si se puede posponer la partida o no.
+      - (dict): devuelve el tablero.
     """
 
     if (not jugada):
@@ -282,6 +332,11 @@ def posponer(tablero, jugada):
 def pasar(window, parametros, tablero):
     """
     Función usada para pasar el turno a la computadora
+
+    Parámetros:
+      - window (sg.Window): ventana del tablero.
+      - parametros (dict): diccionario con párametros que controlan la lógica del juego.
+      - tablero (dict): diccionario con la información del tablero.
     """
 
     if parametros['jugada']:
@@ -297,6 +352,11 @@ def pasar(window, parametros, tablero):
 def seleccionar_ficha(window, parametros, event):
     """
     Función usada para que el usuario seleccione una ficha.
+
+    Parámetros:
+      - window (sg.Window): ventana del tablero.
+      - parametros (dict): diccionario con párametros que controlan la lógica del juego.
+      - event (int): indica la ficha del usuario a seleccionar.
     """
 
     if parametros['letra_seleccionada']:
@@ -311,6 +371,13 @@ def finalizar_partida(window, tablero):
   Función que muestra el mensaje de fin de la partida.
   
   Se informa el ganador o si hubo un empate.
+
+  Parámetros:
+    - window (sg.Window): ventana del tablero.
+    - tablero (dict): diccionario con la información del tablero.
+
+  Retorna:
+    - (bool): siempre devuelve false, modifica el estado de la partida.
   """
   
   jugador = tablero['jugador']

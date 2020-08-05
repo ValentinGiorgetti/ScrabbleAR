@@ -11,6 +11,11 @@ from componentes.ventanas.tablero.logica.funciones import *
 def jugar_computadora(window, parametros, tablero):
   """
   Función que permite que la computadora pueda colocar una palabra en el tablero y sumar puntos.
+
+  Parámetros:
+    - window (sg.Window): ventana del tablero.
+    - parametros (dict): diccionario con párametros que controlan la lógica del juego.
+    - tablero (dict): diccionario con la información del tablero.
   """
   
   for key in ('Posponer', 'Pausa', 'Terminar', 'confirmar', 'cambiar', 'Pasar'):
@@ -43,6 +48,14 @@ def jugar_computadora(window, parametros, tablero):
 def buscar_ubicacion_mas_larga(tablero, window):
   """
   Función que retorna la ubicación más larga donde se pueda colocar una palabra.
+
+  Parámetros:
+    - tablero (dict): diccionario con la información del tablero.
+    - window (sg.Window): ventana del tablero.
+
+  Retorna:
+    - (bool): indica si se debe terminar el juego.
+    - (list): lista con las posiciones de las fichas.
   """
 
   fin_juego = False
@@ -81,6 +94,15 @@ def buscar_ubicacion_mas_larga(tablero, window):
 def buscar_palabra(longitud, tablero, window):
   """
   Función para buscar una palabra válida a partir de las fichas de la computadora.
+
+  Parámetros:
+    - longitud (int): longitud máxima de la palabra a buscar.
+    - tablero (dict): diccionario con la información del tablero.
+    - window (sg.Window): ventana del tablero.
+
+  Retorna:
+    - (bool): indica si se debe terminar el juego.
+    - (str): devuelve la palabra encontrada.
   """
 
   encontrada = ''
@@ -101,6 +123,13 @@ def buscar_palabra(longitud, tablero, window):
 def ubicar_palabra(window, palabra, tablero, parametros, posiciones_ocupadas_pc):
     """
     Función que coloca en el tablero la palabra encontrada por la computadora.
+
+    Parámetros:
+      - window (sg.Window): ventana del tablero.
+      - palabra (str): palabra a ubicar.
+      - tablero (dict): diccionario con la información del tablero.
+      - parametros (dict): diccionario con párametros que controlan la lógica del juego.
+      - posiciones_ocupadas_pc(list): posiciones ocupadas por la palabra.
     """
 
     bolsa_de_fichas = tablero['bolsa_de_fichas']
@@ -135,6 +164,11 @@ def ubicar_palabra(window, palabra, tablero, parametros, posiciones_ocupadas_pc)
 def repartir_nuevas_fichas(tablero, parametros, window):
     """
     Función usada para repartir nuevas fichas a la computadora.
+
+    Parámetros:
+      - tablero (dict): diccionario con la información del tablero.
+      - parametros (dict): diccionario con párametros que controlan la lógica del juego.
+      - window (sg.Window): ventana del tablero.
     """
 
     bolsa_de_fichas = tablero['bolsa_de_fichas']

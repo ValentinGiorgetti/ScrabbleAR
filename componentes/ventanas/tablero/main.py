@@ -13,6 +13,15 @@ from componentes.ventanas.general import leer_evento
 def main(configuracion, partida_anterior = None):
     """
     Función donde se muestra el tablero de juego y se leen los diferentes eventos.
+
+    Parámetros:
+      - configuracion (dict): diccionario con la configuración del juego.
+      - partida_anterior (dict): diccionario con el tablero de la partida anterior.
+
+    Retorna:
+      - (dict): diccionario con la partida jugada.
+      - (Jugador): instancia de Jugador que representa al usuario.
+      - (Jugador): instancia de Jugador que representa a la computadora.
     """
     
     tablero, parametros = inicializar_parametros(configuracion, partida_anterior)
