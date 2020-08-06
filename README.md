@@ -8,7 +8,7 @@
 
 *~* Versión de PySimpleGUI usada: 4.26.0
 
-*~* Versión de Pattern usada: 2.6
+*~* Versión de Pattern usada: 3.6
 
 *~* Versión de Python usada: 3.6.8
 
@@ -17,6 +17,8 @@
 Instalar con el comando: "sudo apt install libcairo2-dev libgirepository1.0-dev gir1.2-gtk-3.0".
 - En Arch Linux: "python-gobject".
 Instalar con el comando: "sudo pacman -S python-gobject".
+
+*~* La imagen utilizada en el menú principal es propia. Los sonidos utilizados fueron buscados en la web "freesound.org" (Creative Commons Licensed).
 
 *~* Para usar el programa se debe ejecutar el archivo "ScrabbleAR.py".
 
@@ -50,13 +52,15 @@ En cualquier momento de la partida, el jugador puede presionar el botón “Camb
 
 #### Niveles del juego
 
-• Nivel fácil: el jugador puede colocar cualquier tipo de palabra: sustantivos, adjetivos o verbos. El tamaño del tablero es 19 x 19, tiene muchas casillas con premios y muy pocas con descuentos.
+• Nivel fácil: las palabras válidas son sustantivos, adjetivos y verbos. El tamaño del tablero es 19 x 19, tiene muchas casillas con premios y muy pocas con descuentos.
 
 • Nivel medio: las palabras permitidas en este nivel son adjetivos y verbos. El tamaño del tablero es 17 x 17 y tiene más casillas con descuentos.
 
 • Nivel difícil: en este nivel, el tipo de palabra permitida se selecciona aleatoriamente entre adjetivos y verbos. Es decir, durante la partida sólo se podrán formar adjetivos o verbos, dependiendo del resultado de la elección aleatoria para la misma. El tamaño del tablero es 15 x 15, hay algunas casillas con premios y muchas con descuentos.
 
 #### Casillas especiales
+
+• La casilla de inicio suma 1 punto a la palabra formada.
 
 • Las casillas azules rotuladas "F x3" y "F x2" multiplican por 3 o por 2 respectivamente, el puntaje de la ficha colocada en esa posición.
 
@@ -66,16 +70,13 @@ En cualquier momento de la partida, el jugador puede presionar el botón “Camb
 
 En todo momento estará visible el puntaje del jugador y de la computadora. Para calcular el puntaje de una jugada se suma el puntaje de cada letra. Si la palabra está ubicada en una casilla especial, se aplicará el modificador correspondiente. El puntaje mínimo de una jugada es 0 (cero).  
 
-
 #### Fin de la partida
 
 *~* La partida finaliza cuando ocurre alguna de las siguientes situaciones:
 
-• La casilla de inicio suma 1 punto a la palabra formada.
-
 • El jugador presiona el botón “Terminar”.
 
-• La computadora no puede formar ninguna palabra y no dispone de cambios ㅤsuficientes para recibir nuevas fichas.
+• La computadora no puede formar ninguna palabra y no dispone de cambios suficientes para recibir nuevas fichas.
 
 • No hay suficientes fichas en la bolsa para repartir a los jugadores.
 
