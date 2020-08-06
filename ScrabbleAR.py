@@ -17,9 +17,9 @@ def main():
     Muestra un menú con opciones para acceder a la ventana de configuración, reglas, top de
     puntajes, reanundar o iniciar una partida nueva.
     """
-    
+
     partida_guardada = leer_partida_guardada()
-    
+
     configuracion_seleccionada = leer_ultima_configuracion()
 
     ventana_principal = crear_ventana_main(partida_guardada)
@@ -43,5 +43,5 @@ def main():
 
     ventana_principal.Close()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
