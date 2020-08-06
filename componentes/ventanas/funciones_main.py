@@ -3,12 +3,13 @@ Módulo que contiene las funciones utilizadas por la ventana principal.
 """
 
 
+import pickle, PySimpleGUI as sg
 from componentes.ventanas.configuracion.main import main as configuracion
+from componentes.ventanas.configuracion.funciones import establecer_palabras_validas
 from componentes.ventanas.tablero.main import main as jugar
 from componentes.ventanas.general import parametros_ventana
 from componentes.ventanas.top_puntajes.funciones import actualizar_top
 from os.path import join
-import pickle, random, PySimpleGUI as sg
 
 
 def crear_ventana_main(partida_guardada):
@@ -16,26 +17,27 @@ def crear_ventana_main(partida_guardada):
     Función que crea la ventana principal.
 
     Parámetros:
-        - partida_guardada (dict): diccionario con la información del tablero de la partida guardada.
+        - partida_guardada (dict): diccionario con la información de la partida guardada.
 
     Retorna:
         - (sg.Window): ventana principal.
     """
     
-    tamanio = (25, 1)
+    parametros = {'size' : (25, 1), 'font' : ('None', 11)}
     layout = [
         [sg.Text("")],
         [sg.Image(join('componentes', 'imagenes', 'logo.png'))],
         [sg.Text("")],
-        [sg.Button("Configuración", size = tamanio, key= 'configuracion')],
-        [sg.Button("Reglas del juego", size = tamanio, key= 'reglas')],
-        [sg.Button("Top de puntajes", size = tamanio, key='top_puntajes')],
-        [sg.Button("Reanudar partida", size = tamanio, key="reanudar", disabled= not partida_guardada)],
-        [sg.Button("Nueva partida", size = tamanio, key='jugar')],
-        [sg.Button("Salir", size = tamanio)],
+        [sg.Button("Configuración", key= 'configuracion', **parametros)],
+        [sg.Button("Reglas del juego", key= 'reglas', **parametros)],
+        [sg.Button("Top de puntajes", key='top_puntajes', **parametros)],
+        [sg.Button("Reanudar partida", key="reanudar", disabled = not partida_guardada, **parametros)],
+        [sg.Button("Nueva partida", key='jugar', **parametros)],
+        [sg.Button("Salir", **parametros)],
         [sg.Text("")],
     ]
-    return sg.Window("ScrabbleAR", layout, **parametros_ventana)
+
+    return sg.Window("  ScrabbleAR", layout, **parametros_ventana)
     
     
 def leer_partida_guardada():
@@ -43,7 +45,7 @@ def leer_partida_guardada():
     Función que retorna la partida guardada.
 
     Retorna:
-        - (dict): diccionario con la información del tablero de la partida guardada.
+        - (dict): diccionario con la información de la partida guardada.
     """
 
     try:
@@ -62,10 +64,10 @@ def guardar_partida(partida_guardada):
     Función usada para guardar los datos de la partida.
     
     En caso de que la partida haya terminado se guardará None. Si la partida fue pospuesta, se
-    guardará un diccionario con la información del tablero.
+    guardará un diccionario con la información de la partida.
 
     Parámetros:
-        - partida_guardada (dict): diccionario con la información del tablero de la partida a guardar.
+        - partida_guardada (dict): diccionario con la información de la partida a guardar.
     """
     
     with open(join("componentes", "informacion_guardada", "partida_guardada"), "wb") as f:
@@ -98,29 +100,29 @@ def comenzar_juego(configuracion_seleccionada, partida_guardada, ventana_princip
     que si inicia una nueva se borrará la anterior.
     
     Retorna None en caso de que la partida haya terminado o un diccionario con la información
-    del tablero en caso de que la partida haya sido pospuesta.
+    de la partida en caso de que haya sido pospuesta.
 
     Parámetros:
         - configuracion_seleccionada (dict): diccionario con la configuración seleccionada.
-        - partida_guardada (dict): diccionario con la información del tablero de la partida guardada.
+        - partida_guardada (dict): diccionario con la información de la partida guardada.
         - ventana_principal (sg.Window): ventana principal.
 
     Retorna:
-        - (dict): diccionario con la partida jugada.
+        - (dict): diccionario con información de la partida.
     """
 
     opcion = 'Continuar'
     if partida_guardada:
-        opcion = sg.Popup('Se encontró una partida guardada, si inicia una nueva no podrá continuar con la anterior', custom_text = ('Continuar', 'Cancelar'), title = 'Atención') 
+        opcion = sg.Popup('Se encontró una partida guardada, si inicia una nueva no podrá continuar con la anterior.\n', custom_text = ('Continuar', 'Cancelar'), title = 'Atención') 
     if opcion == "Continuar":
         ventana_principal.Hide()
         partida_guardada, jugador, computadora = jugar(configuracion_seleccionada, None)
-        fin_partida(jugador, computadora, configuracion_seleccionada, partida_guardada)
+        fin_partida(jugador, computadora, configuracion_seleccionada, partida_guardada, ventana_principal)
         
     return partida_guardada
     
     
-def reanudar_juego(configuracion_seleccionada, partida_guardada):
+def reanudar_juego(configuracion_seleccionada, partida_guardada, ventana_principal):
     """
     Función usada para reaundar una partida, en caso de que exista una partida guardada.
     
@@ -129,18 +131,19 @@ def reanudar_juego(configuracion_seleccionada, partida_guardada):
 
     Parámetros:
         - configuracion_seleccionada (dict): diccionario con la configuración seleccionada.
-        - partida_guardada (dict): diccionario con la información del tablero de la partida guardada.
+        - partida_guardada (dict): diccionario con la información de la partida guardada.
+        - ventana_principal (sg.Window): ventana principal.
 
     Retorna:
         - (dict): diccionario con la partida jugada.
     """
     partida_guardada, jugador, computadora = jugar(configuracion_seleccionada, partida_guardada)
-    fin_partida(jugador, computadora, configuracion_seleccionada, partida_guardada)
+    fin_partida(jugador, computadora, configuracion_seleccionada, partida_guardada, ventana_principal)
     
     return partida_guardada
     
     
-def fin_partida(jugador, computadora, configuracion_seleccionada, partida_guardada):
+def fin_partida(jugador, computadora, configuracion_seleccionada, partida_guardada, ventana_principal):
     """
     Función ejecutada al posponer o terminar una partida.
     
@@ -154,10 +157,11 @@ def fin_partida(jugador, computadora, configuracion_seleccionada, partida_guarda
         - computadora (Jugador): instancia de Jugador que representa a la computadora.
         - configuracion_seleccionada (dict): diccionario con la configuración seleccionada.
         - partida_guardada (dict): diccionario con la información del tablero de la partida.
+        - ventana_principal (sg.Window): ventana principal.
     """
 
     if not partida_guardada:
-      actualizar_top(jugador, computadora, configuracion_seleccionada["nivel"])
-      if configuracion_seleccionada["nivel"] == "difícil":
-        configuracion_seleccionada["palabras_validas"] = random.choice(["Adjetivos", "Verbos"])
+      actualizar_top(jugador, computadora, configuracion_seleccionada["nivel_seleccionado"])
+      establecer_palabras_validas(configuracion_seleccionada)
+    ventana_principal['reanudar'].Update(disabled = not partida_guardada)
     guardar_partida(partida_guardada)

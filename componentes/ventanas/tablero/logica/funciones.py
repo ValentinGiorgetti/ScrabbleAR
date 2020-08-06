@@ -16,7 +16,7 @@ def es_palabra(nivel, palabras_validas, palabra):
 
   Parámetros:
     - nivel (str): nivel de la partida ('fácil', 'medio', 'difícil').
-    - palabras_validas (str): si la partida está en difícil, indica el tipo de palabras elegido.
+    - palabras_validas (str): indica el tipo de palabras válidas.
     - palabra (str): palabra a verificar.
 
   Retorna:
@@ -38,6 +38,24 @@ def es_palabra(nivel, palabras_validas, palabra):
     return analisis(palabra).find(tipo) != -1
 
 
+def es_repetida(palabra, palabras_ingresadas):
+    """
+    Función que verifica si una palabra ya había sido ingresada durante la partida.
+
+    Parámetros:
+      - palabra (str): palabra a verificar.
+
+    Retorna:
+      - (bool): indica si la palabra es repetida.
+    """
+
+    for i in palabras_ingresadas:
+        if palabra in i:
+            return True
+
+    return False
+
+
 def fichas_totales(bolsa_de_fichas):
     """
     Función que retorna un string con todas las fichas de la bolsa.
@@ -57,8 +75,8 @@ def repartir_fichas(bolsa_de_fichas, letras):
   Función que reparte 7 fichas de la bolsa en forma aleatoria.
 
   Parámetros:
-      - bolsa_de_fichas (dict): contiene información de las fichas en la bolsa.
-      - letras (list): lista donde se reparten las fichas.
+    - bolsa_de_fichas (dict): contiene información de las fichas en la bolsa.
+    - letras (list): lista donde se reparten las nuevas fichas.
   """
   
   letras.clear()
@@ -67,19 +85,26 @@ def repartir_fichas(bolsa_de_fichas, letras):
     letras += [letra]
 
 
-def actualizar_tabla(window, jugador, computadora):
+def actualizar_tabla(jugador, computadora, window = None):
     """
     Función que actualiza la tabla que muestra el puntaje y los cambios restantes
     de los jugadores.
 
     Parámetros:
+      - jugador (Jugador): instancia de la clase Jugador que representa al usuario.
+      - computadora (Jugador): instancia de la clase Jugador que representa a la computadora.
       - window (sg.Window): ventana del tablero.
-      - jugador (Jugador): instancia de Jugador que representa al usuario.
-      - computadora (Jugador): instancia de Jugador que representa a la computadora.
+
+    Retorna:
+      - tabla (list): lista con informacion de los jugadores. 
     """
 
     tabla = sorted([jugador.informacion(), computadora.informacion()], key = lambda x : x[1], reverse = True)
-    window["tabla"].Update(tabla)
+    if window:
+      window["tabla"].Update(tabla)
+      window.Refresh()
+
+    return tabla
 
 
 def actualizar_tiempo(window, contador, tiempo):
@@ -93,7 +118,7 @@ def actualizar_tiempo(window, contador, tiempo):
 
     Retorna:
       - (bool): indica si termino la partida.
-      - (int): segundos restantes de la partida actualizados.
+      - contador (int): segundos restantes de la partida actualizados.
     """
 
     temp = round(contador - tiempo)
@@ -122,13 +147,13 @@ def reproducir_sonido_palabra(es_correcta):
     Función que reproduce un sonido para el caso de que la palabra sea correcta o incorrecta.
 
     Parámetros:
-      - es_correcta (bool): indica el sonido de palabra a reproducir.
+      - es_correcta (bool): indica si la palabra es correcta.
     """
     
     reproducir(join("componentes", "sonidos", "palabra_correcta.mp3" if es_correcta else "palabra_incorrecta.mp3"))
 
 
-def sumar_casilla(casillas_especiales, posicion, letra, puntos_jugada, multiplicador, tablero):
+def sumar_casilla(casillas_especiales, posicion, letra, puntos_jugada, multiplicador, tablero, jugador):
   """
   Función que actualiza la cantidad de puntos de la jugada, obtenidos al pasar por una casilla, 
   sumando el puntaje de la ficha. Si la casilla es especial, también se suma el modificador 
@@ -141,13 +166,14 @@ def sumar_casilla(casillas_especiales, posicion, letra, puntos_jugada, multiplic
     - puntos_jugada (int): la cantidad de puntos de la jugada.
     - multiplicador (int): el multiplicador acumulado de la jugada.
     - tablero (dict): diccionario con la información del tablero.
+    - jugador (Jugador): instancia de la clase Jugador que representa al usuario o la computadora.
 
   Retorna:
-    - (int): el nuevo multiplicador.
-    - (int): el nuevo puntaje de la jugada.
+    - multiplicador (int): el nuevo multiplicador de la palabra.
+    - puntos_jugada (int): el nuevo puntaje de la jugada.
   """
   
-  tablero['posiciones_ocupadas'][posicion] = letra
+  tablero['posiciones_ocupadas'][posicion] = {'text' : letra, 'button_color' : jugador.color}
   temp = tablero['bolsa_de_fichas'][letra]['puntaje']
   if (posicion in casillas_especiales):
     if (casillas_especiales[posicion]['modificador'] < 10):
@@ -163,26 +189,26 @@ def sumar_casilla(casillas_especiales, posicion, letra, puntos_jugada, multiplic
   return multiplicador, puntos_jugada
   
 
-def contar_jugada(window, palabra, posiciones_tablero, tablero, casillas_especiales):
+def contar_jugada(window, palabra, posiciones_tablero, tablero, casillas_especiales, jugador):
     """
     Función para contar los puntos obtenidos al formar una palabra.
 
     Parámetros:
       - window (sg.Window): ventana del tablero.
       - palabra (str): palabra formada en la jugada.
-      - posiciones_tablero (list): posiciones del tablero de las letras.
+      - posiciones_tablero (list): lista de tuplas que indican las posiciones del tablero de las fichas.
       - tablero (dict): diccionario con la información del tablero.
       - casillas_especiales (dict): diccionario con las casillas especiales.
 
     Retorna:
-      - (list): lista con las posiciones ocupadas por la palabra.
-      - (int): puntos de la jugada.
+      - posiciones_ocupadas (list): lista de tuplas que indican las posiciones ocupadas por la palabra.
+      - puntos_jugada (int): puntos obtenidos por la jugada.
     """
 
     posiciones_ocupadas = []
     multiplicador = puntos_jugada = 0
     for letra, posicion in zip(palabra, posiciones_tablero):
-        multiplicador, puntos_jugada = sumar_casilla(casillas_especiales, posicion, letra, puntos_jugada, multiplicador, tablero) 
+        multiplicador, puntos_jugada = sumar_casilla(casillas_especiales, posicion, letra, puntos_jugada, multiplicador, tablero, jugador) 
         posiciones_ocupadas += [posicion]
     puntos_jugada = 0 if puntos_jugada < 0 else (puntos_jugada if multiplicador == 0 else puntos_jugada * multiplicador)
     
@@ -217,8 +243,8 @@ def finalizar_jugada(window, parametros, tablero, palabra, puntos_jugada, jugado
       - tablero (dict): diccionario con la información del tablero.
       - palabra (str): palabra formada en la jugada.
       - puntos_jugada (int): puntos de la jugada.
-      - jugador (Jugador): instancia de Jugador que representa al usuario.
-      - texto (str): sujeto de la acción a agregar al historial.
+      - jugador (Jugador): instancia de la clase Jugador que representa al usuario o la computadora.
+      - texto (str): indica quien realizó la jugada.
     """
 
     tipo = parse(palabra.lower(), chunks = False).split('/')[1] 
@@ -227,4 +253,5 @@ def finalizar_jugada(window, parametros, tablero, palabra, puntos_jugada, jugado
     window['historial'].Update(parametros['historial'])
     jugador.puntaje += puntos_jugada
     tablero['primer_jugada'] = False
-    actualizar_tabla(window, tablero['jugador'], tablero['computadora'])
+    actualizar_tabla(tablero['jugador'], tablero['computadora'], window)
+    tablero['palabras_ingresadas'] += [[palabra, tipo_palabra.capitalize(), puntos_jugada, jugador.nick]]

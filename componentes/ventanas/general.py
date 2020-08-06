@@ -24,10 +24,14 @@ parametros_ventana = {'element_justification' : 'center',
 parametros_columna = {'justification' : 'left', 
                       'element_justification' : 'center'}
 
-parametros_popup = {"title" : "Atención", 
+parametros_popup = {"title" : "  Atención", 
                     "non_blocking" : True, 
                     "auto_close_duration" : 5, 
                     "auto_close" : True}
+
+colores = {'Fácil' : ("white", "green"), 
+           'Medio' : ("white", "orange"), 
+           'Difícil' : ('white', 'red')}
                     
                     
 def leer_evento(window, tiempo = None, key = ''):
@@ -39,13 +43,13 @@ def leer_evento(window, tiempo = None, key = ''):
 
     Parámetros:
         - window (sg.Window): ventana sobre la cuál se lee el evento.
-        - tiempo (None/int/float): máximo tiempo a esperar.
-        - key: evento a usar si se llega al timeout.
-
+        - tiempo (None / int): máximo tiempo a esperar.
+        - key: evento a retornar si se llega al timeout.
+        
     Retorna:
         - el evento recibido.
-        - (dict): los valores de los widgets recibidos con el evento.
-        - (int): el tiempo que tardó en llegar el evento.
+        - (dict): los valores de los widgets de la ventana.
+        - (int): tiempo transcurrido hasta que se leyó un evento.
     """
     
     inicio = time.time()

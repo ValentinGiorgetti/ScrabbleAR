@@ -2,6 +2,7 @@
 Módulo principal de la ventana de configuración.
 """
 
+
 from componentes.ventanas.configuracion.funciones import *
 from componentes.ventanas.general import leer_evento
 
@@ -17,24 +18,21 @@ def main():
     por defecto. El usuario tiene la posibilidad de reestablecer las configuraciones a valores por defecto. 
     
     Retorna:
-        - (dict): contiene la configuración seleccionada para la ventana principal.
+        - configuracion_seleccionada (dict): diccionario que contiene la configuración seleccionada.
     """
 
     configuracion_seleccionada = leer_ultima_configuracion()
-    ultimo_presionado = configuracion_seleccionada['nivel'].capitalize()
 
-    configuracion_predeterminada = leer_configuracion_predeterminada()
+    ultimo_presionado = configuracion_seleccionada['nivel_seleccionado'].capitalize()
     
-    colores = {'Fácil' : ("white", "green"), 'Medio' : ("white", "orange"), 'Difícil' : ('white', 'red')}
-    
-    window = crear_ventana_configuracion(colores, ultimo_presionado, informacion_letras(configuracion_seleccionada["fichas"]), configuracion_seleccionada)
+    window = crear_ventana_configuracion(ultimo_presionado, configuracion_seleccionada)
 
     while True:
         event, values, tiempo = leer_evento(window)
         if event in (None, "Aceptar"):
             break
         elif event == "restablecer":
-            ultimo_presionado, configuracion_seleccionada = restablecer_configuracion(window, configuracion_predeterminada, ultimo_presionado, colores)
+            ultimo_presionado, configuracion_seleccionada = restablecer_configuracion(window, ultimo_presionado)
         elif event == "confirmar_tiempo":
             confirmar_tiempo(values["tiempo"], configuracion_seleccionada, window)
         elif event == "confirmar_letra":
@@ -42,11 +40,9 @@ def main():
         elif event == "confirmar_nick":	
             confirmar_nick(values, configuracion_seleccionada, window)
         elif event in ("Fácil", "Medio", "Difícil"):
-            ultimo_presionado = seleccionar_dificultad(configuracion_seleccionada, ultimo_presionado, event, colores[event], window)
+            ultimo_presionado = seleccionar_dificultad(configuracion_seleccionada, ultimo_presionado, event, window)
 
     window.Close()
-
-    establecer_palabras_validas(configuracion_seleccionada)
 
     guardar_ultima_configuracion(configuracion_seleccionada)
 

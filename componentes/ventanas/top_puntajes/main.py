@@ -11,7 +11,7 @@ def main():
     """
     Función que muestra la ventana de top de puntajes.
     
-    El usuario puede ver el top de todos los niveles y un top general (todos los niveles).
+    El usuario puede ver el top de todos los niveles y un top general (incluye todos los niveles).
     """
     
     ultimo_presionado = 'general'
@@ -30,4 +30,5 @@ def main():
         resetear(top, tabla, ultimo_presionado, window)
       else:
         ultimo_presionado = mostrar_top(ultimo_presionado, event, tabla[event], window)
+
     window.Close()

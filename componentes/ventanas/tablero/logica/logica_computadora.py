@@ -18,25 +18,30 @@ def jugar_computadora(window, parametros, tablero):
     - tablero (dict): diccionario con la información del tablero.
   """
   
-  for key in ('Posponer', 'Pausa', 'Terminar', 'confirmar', 'cambiar', 'Pasar'):
+  for key in ('Posponer', 'Pausa', 'Terminar', 'confirmar', 'cambiar', 'Pasar', 'palabras_ingresadas'):
     window[key].Update(button_color = sg.DEFAULT_BUTTON_COLOR, disabled = True)
 
   parametros['fin_juego'], ubicacion_mas_larga = buscar_ubicacion_mas_larga(tablero, window)
   if not parametros['fin_juego']:
     parametros['fin_juego'], palabra = buscar_palabra(len(ubicacion_mas_larga), tablero, window)
-  if (palabra and not parametros['fin_juego']):
-    posiciones_ocupadas_pc, puntos_jugada = contar_jugada(window, palabra, ubicacion_mas_larga, tablero, parametros['casillas_especiales'])
-    ubicar_palabra(window, palabra, tablero, parametros, posiciones_ocupadas_pc)
-    reproducir_sonido_palabra(True)
-    finalizar_jugada(window, parametros, tablero, palabra, puntos_jugada, tablero['computadora'], 'La computadora')
-    # if (parametros['fin_juego']):
-    #     parametros['historial'] += '\n\n - Fin de la partida. No hay fichas suficientes para repartir.'
-    #     window['historial'].Update(parametros['historial'])
   else:
     reproducir_sonido_palabra(False)
-    repartir_nuevas_fichas(tablero, parametros, window)
+  if not parametros['fin_juego']:
+    if (palabra):
+      posiciones_ocupadas_pc, puntos_jugada = contar_jugada(window, palabra, ubicacion_mas_larga, tablero, parametros['casillas_especiales'], tablero['computadora'])
+      ubicar_palabra(window, palabra, tablero, parametros, posiciones_ocupadas_pc)
+      if (not parametros['fin_juego']):
+        reproducir_sonido_palabra(True)
+        finalizar_jugada(window, parametros, tablero, palabra, puntos_jugada, tablero['computadora'], 'La computadora')
+      else:
+        reproducir_sonido_palabra(False)
+    else:
+      reproducir_sonido_palabra(False)
+      repartir_nuevas_fichas(tablero, parametros, window)
+  else:
+    reproducir_sonido_palabra(False)
 
-  for key in ('Posponer', 'Pausa', 'Terminar', 'confirmar', 'Pasar'):
+  for key in ('Posponer', 'Pausa', 'Terminar', 'confirmar', 'Pasar', 'palabras_ingresadas'):
     window[key].Update(button_color = sg.DEFAULT_BUTTON_COLOR, disabled = False)
   if (tablero['jugador'].cambios_restantes):
     window['cambiar'].Update(disabled = False)
@@ -54,8 +59,9 @@ def buscar_ubicacion_mas_larga(tablero, window):
     - window (sg.Window): ventana del tablero.
 
   Retorna:
-    - (bool): indica si se debe terminar el juego.
-    - (list): lista con las posiciones de las fichas.
+    - fin_juego (bool): indica si se debe terminar el juego.
+    - ubicacion_mas_larga (list): lista de tuplas que indica la posición de mayor longitud
+                                  para ubicar una palabra.
   """
 
   fin_juego = False
@@ -99,10 +105,10 @@ def buscar_palabra(longitud, tablero, window):
     - longitud (int): longitud máxima de la palabra a buscar.
     - tablero (dict): diccionario con la información del tablero.
     - window (sg.Window): ventana del tablero.
-
+    
   Retorna:
-    - (bool): indica si se debe terminar el juego.
-    - (str): devuelve la palabra encontrada.
+    - fin_juego (bool): indica si se debe terminar el juego.
+    - encontrada (str): la palabra encontrada.
   """
 
   encontrada = ''
@@ -111,12 +117,13 @@ def buscar_palabra(longitud, tablero, window):
     permutaciones = set("".join(permutacion) for permutacion in permutations(tablero['computadora'].fichas, i))
     tiempo_inicio = time.time()
     for permutacion in permutaciones:
-      if es_palabra(tablero['nivel'], tablero['palabras_validas'], permutacion) and not fin_juego:
+      if not fin_juego and not es_repetida(permutacion, tablero['palabras_ingresadas']) and es_palabra(tablero['nivel'], tablero['palabras_validas'], permutacion):
         encontrada = permutacion
         break
     fin_juego, tablero['contador'] = actualizar_tiempo(window, tablero['contador'], time.time() - tiempo_inicio)
     if (encontrada or fin_juego):
       break
+
   return fin_juego, encontrada
 
 
@@ -129,7 +136,7 @@ def ubicar_palabra(window, palabra, tablero, parametros, posiciones_ocupadas_pc)
       - palabra (str): palabra a ubicar.
       - tablero (dict): diccionario con la información del tablero.
       - parametros (dict): diccionario con párametros que controlan la lógica del juego.
-      - posiciones_ocupadas_pc(list): posiciones ocupadas por la palabra.
+      - posiciones_ocupadas_pc (list): lista de tuplas que indican las posiciones ocupadas por la palabra.
     """
 
     bolsa_de_fichas = tablero['bolsa_de_fichas']
@@ -145,7 +152,7 @@ def ubicar_palabra(window, palabra, tablero, parametros, posiciones_ocupadas_pc)
       nuevas_fichas.remove(letra)
       x = posiciones_atril[letra][0]
       posiciones_atril[letra].remove(x)
-      window[x].Update(button_color = ('white', 'red'))
+      window[x].Update(button_color = computadora.color)
       window[posicion].Update(letra, button_color = computadora.color)
       time.sleep(1)
       parametros['fin_juego'], tablero['contador'] = actualizar_tiempo(window, tablero['contador'], 1)
@@ -184,7 +191,7 @@ def repartir_nuevas_fichas(tablero, parametros, window):
         repartir_fichas(bolsa_de_fichas, computadora.fichas)
         parametros['historial'] += '\n\n - La computadora no pudo formar ninguna palabra, se le repartieron nuevas fichas.'
         window['historial'].Update(parametros['historial'])
-        actualizar_tabla(window, tablero['jugador'], tablero['computadora'])
+        actualizar_tabla(tablero['jugador'], tablero['computadora'], window)
       else:
         parametros['fin_juego'] = True
         parametros['historial'] += '\n\n - Fin de la partida. La computadora no pudo formar ninguna palabra y no dispone de cambios suficientes.'

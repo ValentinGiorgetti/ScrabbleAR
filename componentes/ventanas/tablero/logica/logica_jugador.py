@@ -16,15 +16,16 @@ def posicion_valida(posicion, posiciones_ocupadas, posiciones_bloqueadas, orient
   Se comprueba que se respete la orientación elegida y que la casilla no esté ocupada.
 
   Parámetros:
-    - posicion (tuple): tupla que indica la posición a verificar.
-    - posiciones_ocupadas (OrderedDict): diccionario ordenado cuyas llaves son tuplas con la posición de la ficha
-      y sus llaves son la ficha.
-    - posiciones_bloqueadas (list): lista de posiciones bloqueadas.
+    - posicion (tuple): tupla que indica la posición del tablero a verificar.
+    - posiciones_ocupadas (OrderedDict): diccionario ordenado donde las claves son las posiciones del tablero
+                                         ocupadas en la jugada (tuplas) y el valor es la posición del atril de 
+                                         la letra ubicada en la casilla correspondiente.
+    - posiciones_bloqueadas (list): lista de tuplas que indican las posiciones bloqueadas.
     - orientacion (str): string que indica la orientación de la jugada.
 
   Retorna:
     - (str): orientación de la jugada.
-    - (bool): indica si la posición es válida.
+    - (bool): indica si la posición es válida
   """
   
   misma_orientacion = False
@@ -64,41 +65,44 @@ def palabra_formada(letras, posiciones_ocupadas):
 
   Parámetros:
     - letras (list): fichas del jugador.
-    - posiciones_ocupadas (OrderedDict): diccionario ordenado cuyas llaves son tuplas con la posición de la ficha
-      y sus llaves son la ficha.
+    - posiciones_ocupadas (OrderedDict): diccionario ordenado donde las claves son las posiciones del tablero
+                                         ocupadas en la jugada (tuplas) y el valor es la posición del atril de 
+                                         la letra ubicada en la casilla correspondiente.
 
   Retorna:
-    - (str): la palabra formada.
+    - (str): la palabra formada por la jugada.
   """
 
   return reduce(lambda anterior, posicion: anterior + letras[posicion], posiciones_ocupadas.values(), '')
 
 
 def verificar_palabra(parametros, tablero):
-  """"
+  """
   Función que verifica si la casilla de inicio está ocupada en caso de que sea la primer
   jugada de la partida, y que la palabra sea válida para el nivel.
 
   Parámetros:
-      - parametros (dict): diccionario con párametros que controlan la lógica del juego.
-      - tablero (dict): diccionario con la información del tablero.
-
+    - parametros (dict): diccionario con párametros que controlan la lógica del juego.
+    - tablero (dict): diccionario con la información del tablero.
   Retorna:
     - (bool): indica si la jugada es válida.
   """
   
+  palabra = palabra_formada(tablero['jugador'].fichas, parametros['jugada'])
+  if (es_repetida(palabra, tablero['palabras_ingresadas'])):
+    sg.Popup('No se pueden ingresar palabras repetidas', **parametros_popup)
+    return False
   if (tablero['primer_jugada'] and not tablero['centro'] in parametros['jugada']):
     sg.Popup('La casilla de inicio de juego no está ocupada', **parametros_popup)
     return False
   if (len(parametros['jugada']) < 2):
-    sg.Popup('Palabra inválida', **parametros_popup)
+    sg.Popup('Palabra inválida, vuelva a intentarlo', **parametros_popup)
     return False
   else:
-    palabra = palabra_formada(tablero['jugador'].fichas, parametros['jugada'])
     if (es_palabra(tablero['nivel'], tablero['palabras_validas'], palabra)):
       return True
     else:
-      sg.Popup('Palabra inválida', **parametros_popup)
+      sg.Popup('Palabra inválida, vuelva a intentarlo', **parametros_popup)
       return False
 
 
@@ -112,9 +116,10 @@ def confirmar_palabra(window, parametros, tablero):
       - tablero (dict): diccionario con la información del tablero.
     """
     
+    jugador = tablero['jugador']
     jugada = parametros['jugada']
     quedan_fichas = len(fichas_totales(tablero['bolsa_de_fichas'])) >= len(jugada)
-    letras_jugador = tablero['jugador'].fichas
+    letras_jugador = jugador.fichas
     es_correcta = verificar_palabra(parametros, tablero)
     if parametros['letra_seleccionada']:
         window[parametros['letra']].Update(button_color = ("white", "green"))
@@ -122,8 +127,8 @@ def confirmar_palabra(window, parametros, tablero):
     if es_correcta:        
         tablero['primer_jugada'] = False
         palabra = palabra_formada(letras_jugador, jugada)
-        puntos_jugada = contar_jugada(window, palabra, list(jugada.keys()), tablero, parametros['casillas_especiales'])[1]
-        finalizar_jugada(window, parametros, tablero, palabra, puntos_jugada, tablero['jugador'], 'El jugador')
+        puntos_jugada = contar_jugada(window, palabra, list(jugada.keys()), tablero, parametros['casillas_especiales'], jugador)[1]
+        finalizar_jugada(window, parametros, tablero, palabra, puntos_jugada, jugador, 'El jugador')
         reiniciar_parametros(parametros)
         if quedan_fichas:
             for posicion in jugada:
@@ -138,7 +143,7 @@ def confirmar_palabra(window, parametros, tablero):
             parametros['fin_juego'] = True
             parametros['historial'] += '\n\n - Fin de la partida. No quedan suficientes fichas para repartir.'
             window['historial'].Update(parametros['historial'])
-        actualizar_tabla(window, tablero['jugador'], tablero['computadora'])
+        actualizar_tabla(jugador, tablero['computadora'], window)
     reproducir_sonido_palabra(es_correcta)
 
 
@@ -150,7 +155,7 @@ def colocar_ficha(window, parametros, tablero, event):
       - window (sg.Window): ventana del tablero.
       - parametros (dict): diccionario con párametros que controlan la lógica del juego.
       - tablero (dict): diccionario con la información del tablero.
-      - event (tuple): tupla con la ubicación de la ficha en el tablero.
+      - event (tuple): tupla que indica la posición del tablero donde colocar la ficha.
     """
 
     if parametros['letra_seleccionada']:
@@ -160,7 +165,7 @@ def colocar_ficha(window, parametros, tablero, event):
                 window[parametros['jugada'][event]].Update(button_color = ("white", "green"), disabled = False)
             else:
                 parametros['ultima_posicion'] = event
-            window[event].Update(tablero['jugador'].fichas[parametros['letra']], button_color = ("white", "red"))
+            window[event].Update(tablero['jugador'].fichas[parametros['letra']], button_color = tablero['jugador'].color)
             parametros['jugada'][event] = parametros['letra']
             window[parametros['letra']].Update(disabled = True)
             parametros['letra_seleccionada'] = False

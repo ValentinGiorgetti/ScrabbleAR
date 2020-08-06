@@ -33,15 +33,18 @@ def crear_ventana_tops(tabla):
         [sg.Button('Resetear', key = 'resetear', disabled = tabla[0][1] == '', size = tamanio), sg.Button("Volver")],
     ]
 
-    return sg.Window("Top puntajes", layout, **parametros_ventana)
+    return sg.Window("  Top puntajes", layout, **parametros_ventana)
     
 
 def leer_top():
     """
-    Función usada para leer el top de puntajes desde un archivo binario.
+    Función que retorna el top de puntajes.
+
+    Abre un archivo binario que contiene un diccionario con el top de cada nivel, en caso de que
+    no exista se crea uno nuevo con los tops vacíos.
 
     -Retorna:
-        - (dict): un diccionario que contiene el top de puntajes por nivel.
+        - top (dict): un diccionario que contiene el top de puntajes de cada nivel.
     """
     
     try:
@@ -60,7 +63,7 @@ def guardar_top(top):
     Función usada para guardar el top de puntajes en un archivo binario.
 
     Parámetros:
-        - top (dict): un diccionario que contiene el top de puntajes por nivel.
+        - top (dict): diccionario que contiene el top de puntajes de cada nivel.
     """
 
     with open(join("componentes", "informacion_guardada", "top_puntajes"), "wb") as f:
@@ -69,15 +72,15 @@ def guardar_top(top):
         
 def generar_tabla(top):
     """
-    Función que genera la tabla para mostrar el top de puntajes.
+    Función que genera la tabla para mostrar el top de puntajes del nivel correspondiente.
     
     Primero genera una tabla vacía y luego la completa con los valores del top.
 
     Parámetros:
-        - top (list): una lista con el top de puntajes.
+        - top (list): lista con el top de puntajes de un nivel.
 
     Retorna:
-        - (list): una tabla con el top de puntajes para ser mostrados en un widget 'sg.Table'.
+        - tabla (list): lista con el top de puntajes para ser mostrados en un widget de tipo 'sg.Table'.
     """
 
     tabla = [[i, "", "", "", ""] for i in range(1, 11)]
@@ -92,7 +95,7 @@ def cargar_tabla():
     Función que genera las 4 tablas del top.
 
     Retorna:
-        - (dict): un diccionario que contiene una tabla del top de puntajes por nivel.
+        - tabla (dict): diccionario que contiene el top de puntajes de cada nivel.
     """
 
     top = leer_top()
@@ -103,14 +106,14 @@ def cargar_tabla():
         
 def resetear(top, tabla, nivel, ventana_tops):
     """
-    Función usada para resetear un top.
+    Función usada para resetear el top de un nivel.
     
     Muestra un mensaje para que el usuario confirme la operación, luego actualiza
     el top y los widgets de la ventana.
 
     Parámetros:
-        - top (dict): un diccionario que contiene el top de puntajes por nivel.
-        - tabla (dict): un diccionario que contiene una tabla del top de puntajes por nivel.
+        - top (dict): diccionario que contiene el top de puntajes por nivel.
+        - tabla (dict): diccionario que contiene una tabla del top de puntajes por nivel.
         - nivel (str): el nivel de dificultad actual ('general', 'fácil', 'medio', 'difícil').
         - ventanta_tops (sg.Window): ventanta del top de puntajes.
     """
@@ -130,15 +133,15 @@ def mostrar_top(ultimo_presionado, event, top, ventana_tops):
     Función usada para mostrar el top de puntajes de un nivel determinado.
 
     Parámetros:
-        - ultimo_presionado (str): el anterior nivel de dificultad ('general', 'fácil', 'medio', 'difícil').
-        - event (str): el nuevo nivel de dificultad ('general', 'fácil', 'medio', 'difícil').
-        - top (list): una tabla con el top de puntajes para ser mostrados en un widget 'sg.Table'.
+        - ultimo_presionado (str): el anterior nivel seleccionado.
+        - event (str): el nuevo nivel seleccionado.
+        - top (list): una lista con el top de puntajes para ser mostrados en un widget de tipo "sg.Table".
         - ventanta_tops (sg.Window): ventana del top de puntajes.
 
     Retorna:
-        - (str): el parametro event (nuevo nivel de dificultad).
+        - event (str): nivel seleccionado.
     """
-    colores = {'general' : ('white', 'blue'), 'fácil' : ("white", "green"), 'medio' : ("white", "orange"), 'difícil' : ('white', 'red')}
+    colores['general'] = ('white', 'blue')
 
     ventana_tops[ultimo_presionado].Update(button_color = sg.DEFAULT_BUTTON_COLOR)
     ventana_tops[event].Update(button_color = colores[event])
@@ -153,9 +156,9 @@ def actualizar_top(jugador, computadora, nivel):
     Función usada para actualizar el top de los 10 mejores puntajes.
 
     Parámetros:
-        - jugador (Jugador): una clase que representa al jugador.
-        - computadora (Jugador): una clase que representa a la computadora.
-        - nivel (str): el nivel de dificultad.
+        - jugador (Jugador): objeto que representa al jugador.
+        - computadora (Jugador): objeto que representa a la computadora.
+        - nivel (str): nivel de dificultad.
     """
     
     fecha = datetime.now().strftime('%d/%m/%Y a las %H:%M')

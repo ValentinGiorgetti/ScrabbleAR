@@ -4,7 +4,7 @@ Módulo que contiene las funciones usadas por la ventana de reglas.
 
 
 import PySimpleGUI as sg
-from componentes.ventanas.general import parametros_ventana
+from componentes.ventanas.general import parametros_ventana, colores, titulos
     
 
 def crear_ventana_reglas():
@@ -15,20 +15,21 @@ def crear_ventana_reglas():
         - (sg.Window): la ventana de reglas.
     """
 
+    tamanio = (7, 1)
     layout = [
-        [sg.Text("Reglas del juego", size=(60, 1), justification = 'center', background_color = '#1d3557')],
+        [sg.Text("Reglas del juego", **titulos)],
         [sg.Text('')],
-        [sg.Button("Fácil", size=(7, 1)), sg.Button("Medio", size=(7, 1)), sg.Button("Difícil", size=(7, 1))],
+        [sg.Button("Fácil", size=tamanio), sg.Button("Medio", size=tamanio), sg.Button("Difícil", size=tamanio)],
         [sg.Text('')],
-        [sg.Multiline("Seleccione un nivel", key="nivel", disabled=True, size = (60, 3))],
+        [sg.Multiline("Seleccione un nivel", key="nivel", disabled=True, size = (60, 4))],
         [sg.Text('')],
-        [sg.Button("Volver", size=(7, 1))],
+        [sg.Button("Volver", size=tamanio)],
     ]
     
-    return sg.Window("Reglas", layout, **parametros_ventana)
+    return sg.Window("  Reglas", layout, **parametros_ventana)
     
     
-def mostrar_texto(ventana_reglas, event, color, texto, ultimo_presionado):
+def mostrar_texto(ventana_reglas, event, ultimo_presionado):
     """
     Función usada para mostrar las reglas de un nivel.
     
@@ -37,19 +38,21 @@ def mostrar_texto(ventana_reglas, event, color, texto, ultimo_presionado):
 
     Parámetros:
         - ventana_reglas (sg.Window): ventana de reglas.
-        - event (str): botón de dificultad presionado.
-        - color (str): color de la dificultad seleccionada.
-        - texto (str): texto sobre la dificultad seleccionada.
-        - ultimo_presionado (str): el anterior botón de dificultad presionado.
+        - event (str): dificultad seleccionada.
+        - ultimo_presionado (str): anterior dificultad seleccionada.
 
     Retorna:
-        - (str): parametro event (botón de dificultad presionado).
+        - ultimo_presionado (str): dificultad seleccionada.
     """
 
-    if ultimo_presionado != "":
+    textos = {'Fácil' : "Palabras válidas: adjetivos, sustantivos y verbos.\n\nTamaño del tablero: 19 x 19.",
+             'Medio' : "Palabras válidas: adjetivos y verbos.\n\nTamaño del tablero: 17 x 17.",
+             'Difícil': "Palabras válidas: adjetivos o verbos, se selecciona en forma aleatoria.\n\nTamaño del tablero: 15 x 15."}
+
+    if ultimo_presionado:
         ventana_reglas[ultimo_presionado].Update(button_color=sg.DEFAULT_BUTTON_COLOR)
-    ventana_reglas[event].Update(button_color=color)
+    ventana_reglas[event].Update(button_color=colores[event])
     ultimo_presionado = event
-    ventana_reglas["nivel"].Update(texto)
+    ventana_reglas["nivel"].Update(textos[event])
     
     return ultimo_presionado

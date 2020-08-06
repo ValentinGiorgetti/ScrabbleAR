@@ -14,9 +14,9 @@ def main(window, tablero, parametros):
   Función que muestra una ventana donde el jugador puede cambiar algunas o todas sus fichas.
 
   Parámetros:
-    - window (sg.Window): ventana del tablero.
-    - tablero (dict): diccionario con la información del tablero.
-    - parametros (dict): diccionario con párametros que controlan la lógica del juego.
+      - window (sg.Window): ventana del tablero.
+      - tablero (dict): diccionario con la información del tablero.
+      - parametros (dict): diccionario con párametros que controlan la lógica del juego.
   """
 
   jugador = tablero['jugador']
@@ -24,7 +24,7 @@ def main(window, tablero, parametros):
   bolsa_de_fichas = tablero['bolsa_de_fichas']
   
   if parametros['jugada']:
-    sg.Popup("Primero debe levantar sus fichas", **parametros_popup)
+    sg.Popup("Primero debe levantar sus fichas\n", **parametros_popup)
     return
 
   ventana = crear_ventana_cambio_fichas(letras_jugador)
