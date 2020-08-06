@@ -207,11 +207,11 @@ def repartir_nuevas_fichas(tablero, parametros, window):
             parametros["fin_juego"] = True
             parametros[
                 "historial"
-            ] += "\n\n - Fin de la partida. La computadora no pudo formar ninguna palabra y no dispone de cambios suficientes."
+            ] += "\n\n - La computadora no pudo formar ninguna palabra y no dispone de cambios suficientes."
             window["historial"].Update(parametros["historial"])
     else:
         parametros[
             "historial"
-        ] += "\n\n - Fin de la partida. La computadora no pudo formar ninguna palabra y no hay fichas suficientes para repartir."
+        ] += "\n\n - La computadora no pudo formar ninguna palabra y no hay fichas suficientes para repartir."
         window["historial"].Update(parametros["historial"])
         parametros["fin_juego"] = True
