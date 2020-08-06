@@ -2,7 +2,7 @@
   "nivel_seleccionado": "fácil",
   "fácil": {
     "nick": "Jugador",
-    "palabras_validas": "adjetivos, sustantivos y verbos",
+    "palabras_validas": "Adjetivos, sustantivos y verbos",
     "tiempo": 60,
     "fichas": {
       "A": {
