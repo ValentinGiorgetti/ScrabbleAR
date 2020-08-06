@@ -38,9 +38,8 @@ def main():
         elif event == "jugar":
             partida_guardada = comenzar_juego(configuracion_seleccionada, partida_guardada, ventana_principal)
         elif event == "reanudar":
-            partida_guardada = reanudar_juego(configuracion_seleccionada, partida_guardada)
+            partida_guardada = reanudar_juego(configuracion_seleccionada, partida_guardada, ventana_principal)
         ventana_principal.UnHide()
-        ventana_principal["reanudar"].Update(disabled= not partida_guardada)
 
     ventana_principal.Close()
 
