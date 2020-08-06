@@ -6,7 +6,7 @@ Módulo que contiene las funciones usadas por la ventana de top de puntajes.
 import pickle, PySimpleGUI as sg
 from datetime import datetime
 from componentes.jugador import Jugador
-from componentes.ventanas.general import parametros_ventana
+from componentes.ventanas.general import parametros_ventana, colores
 from os.path import join
 
 
