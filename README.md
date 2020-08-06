@@ -11,6 +11,13 @@
 
 *~* Versión de Python usada: 3.6.8
 
+
+*~* El módulo "playsound" necesita los siguientes paquetes para funcionar:
+- En Ubuntu: "libcairo2-dev", "libgirepository1.0-dev" y "gir1.2-gtk-3.0".
+Instalar con el comando: "sudo apt install libcairo2-dev libgirepository1.0-dev gir1.2-gtk-3.0".
+- En Arch Linux: "python-gobject".
+Instalar con el comando: "sudo pacman -S python-gobject".
+
 *~* Para usar el programa se debe ejecutar el archivo "ScrabbleAR.py".
 
 *~* El usuario puede configurar distintos parámetros de la partida, tales como el nivel, tiempo límite, el puntaje y la cantidad de fichas de cada letra. Existe una configuración por defecto para que el usuario pueda iniciar una partida rápidamente. La última configuración elegida será guardada. 
