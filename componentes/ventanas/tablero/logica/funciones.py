@@ -212,7 +212,8 @@ def contar_jugada(window, palabra, posiciones_tablero, tablero, casillas_especia
             casillas_especiales, posicion, letra, puntos_jugada, multiplicador, tablero, jugador
         )
         posiciones_ocupadas += [posicion]
-        jugador.fichas.remove(letra)
+        if jugador.nick == "Computadora":
+            jugador.fichas.remove(letra)
     puntos_jugada = 0 if puntos_jugada < 0 else (puntos_jugada if multiplicador == 0 else puntos_jugada * multiplicador)
 
     return posiciones_ocupadas, puntos_jugada
