@@ -150,7 +150,8 @@ def reproducir_sonido_palabra(es_correcta):
       - es_correcta (bool): indica si la palabra es correcta.
     """
     
-    reproducir(join("componentes", "sonidos", "palabra_correcta.mp3" if es_correcta else "palabra_incorrecta.mp3"))
+    #reproducir(join("componentes", "sonidos", "palabra_correcta.mp3" if es_correcta else "palabra_incorrecta.mp3"))
+    pass
 
 
 def sumar_casilla(casillas_especiales, posicion, letra, puntos_jugada, multiplicador, tablero, jugador):
