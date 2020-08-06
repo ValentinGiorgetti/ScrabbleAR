@@ -158,6 +158,7 @@ def colocar_ficha(window, parametros, tablero, event):
         - event (tuple): tupla que indica la posición del tablero donde colocar la ficha.
     """
 
+    casilla_vacia = {"text" : " ", "button_color" : ("white", "green")}
     if parametros["letra_seleccionada"]:
         parametros["orientacion"], es_valida = posicion_valida(
             event, parametros["jugada"], tablero["posiciones_ocupadas"], parametros["orientacion"]
@@ -176,13 +177,8 @@ def colocar_ficha(window, parametros, tablero, event):
     else:
         if event in (parametros["primer_posicion"], parametros["ultima_posicion"]):
             casillas_especiales = parametros["casillas_especiales"]
-            window[event].Update(
-                casillas_especiales[event]["texto"] if event in casillas_especiales else " ",
-                button_color=casillas_especiales[event]["color"]
-                if event in casillas_especiales
-                else ("white", "green"),
-                disabled=False,
-            )
+            param = casillas_especiales[event]["parametros_boton"] if event in casillas_especiales else casilla_vacia
+            window[event].Update(**param, disabled=False)
             window[parametros["jugada"][event]].Update(button_color=("white", "green"), disabled=False)
             del parametros["jugada"][event]
             if len(parametros["jugada"]) <= 1:

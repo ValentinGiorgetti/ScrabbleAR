@@ -174,17 +174,12 @@ def sumar_casilla(casillas_especiales, posicion, letra, puntos_jugada, multiplic
     """
 
     tablero["posiciones_ocupadas"][posicion] = {"text": letra, "button_color": jugador.color}
-    temp = tablero["bolsa_de_fichas"][letra]["puntaje"]
+    puntaje_ficha = tablero["bolsa_de_fichas"][letra]["puntaje"]
     if posicion in casillas_especiales:
-        if casillas_especiales[posicion]["modificador"] < 10:
-            puntos_jugada += temp + casillas_especiales[posicion]["modificador"]
-        elif casillas_especiales[posicion]["modificador"] < 20:
-            puntos_jugada += temp * (casillas_especiales[posicion]["modificador"] % 10)
-        else:
-            puntos_jugada += temp
-            multiplicador += casillas_especiales[posicion]["modificador"] % 10
+        multiplicador, puntaje_ficha = casillas_especiales[posicion]["modificador"](multiplicador, puntaje_ficha)
+        puntos_jugada += puntaje_ficha
     else:
-        puntos_jugada += temp
+        puntos_jugada += puntaje_ficha
 
     return multiplicador, puntos_jugada
 
@@ -212,7 +207,7 @@ def contar_jugada(window, palabra, posiciones_tablero, tablero, casillas_especia
             casillas_especiales, posicion, letra, puntos_jugada, multiplicador, tablero, jugador
         )
         posiciones_ocupadas += [posicion]
-        if jugador.nick == "Computadora":
+        if jugador.nick == 'Computadora':
             jugador.fichas.remove(letra)
     puntos_jugada = 0 if puntos_jugada < 0 else (puntos_jugada if multiplicador == 0 else puntos_jugada * multiplicador)
 
@@ -255,7 +250,7 @@ def finalizar_jugada(window, parametros, tablero, palabra, puntos_jugada, jugado
     tipo_palabra = "sustantivo" if tipo.find("NN") != -1 else ("verbo" if tipo.find("VB") != -1 else "adjetivo")
     parametros[
         "historial"
-    ] += f'\n\n   - {texto} formó la palabara "{palabra}" ({tipo_palabra}) y sumó {puntos_jugada} puntos.'
+    ] += f'\n\n - {texto} formó la palabara "{palabra}" ({tipo_palabra}) y sumó {puntos_jugada} puntos.'
     window["historial"].Update(parametros["historial"])
     jugador.puntaje += puntos_jugada
     tablero["primer_jugada"] = False
