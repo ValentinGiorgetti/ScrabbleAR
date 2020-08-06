@@ -14,7 +14,7 @@ def main():
     Informa el tipo de palabras válidas y tamaño del tablero de acuerdo
     al nivel seleccionado.
     """
-             
+
     ultimo_presionado = ""
 
     window = crear_ventana_reglas()
@@ -24,5 +24,5 @@ def main():
         if event in (None, "Volver"):
             break
         else:
-          ultimo_presionado = mostrar_texto(window, event, ultimo_presionado)
+            ultimo_presionado = mostrar_texto(window, event, ultimo_presionado)
     window.Close()

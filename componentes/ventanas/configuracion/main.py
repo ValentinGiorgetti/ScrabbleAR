@@ -23,8 +23,8 @@ def main():
 
     configuracion_seleccionada = leer_ultima_configuracion()
 
-    ultimo_presionado = configuracion_seleccionada['nivel_seleccionado'].capitalize()
-    
+    ultimo_presionado = configuracion_seleccionada["nivel_seleccionado"].capitalize()
+
     window = crear_ventana_configuracion(ultimo_presionado, configuracion_seleccionada)
 
     while True:
@@ -37,7 +37,7 @@ def main():
             confirmar_tiempo(values["tiempo"], configuracion_seleccionada, window)
         elif event == "confirmar_letra":
             confirmar_letra(values, configuracion_seleccionada, window)
-        elif event == "confirmar_nick":	
+        elif event == "confirmar_nick":
             confirmar_nick(values, configuracion_seleccionada, window)
         elif event in ("Fácil", "Medio", "Difícil"):
             ultimo_presionado = seleccionar_dificultad(configuracion_seleccionada, ultimo_presionado, event, window)

@@ -43,7 +43,7 @@ def leer_evento(window, tiempo = None, key = ''):
 
     Parámetros:
         - window (sg.Window): ventana sobre la cuál se lee el evento.
-        - tiempo (None / int): máximo tiempo a esperar.
+        - tiempo (int): máximo tiempo a esperar.
         - key: evento a retornar si se llega al timeout.
         
     Retorna:
@@ -54,7 +54,7 @@ def leer_evento(window, tiempo = None, key = ''):
     
     inicio = time.time()
     event, values = window.Read(timeout = tiempo, timeout_key = key)  
-    #if (event != key):
-        #reproducir(join("componentes", "sonidos", "boton.mp3"))
+    if (event != key):
+        reproducir(join("componentes", "sonidos", "boton.mp3"))
         
     return event, values, round(time.time() - inicio)
