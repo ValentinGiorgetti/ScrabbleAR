@@ -54,7 +54,7 @@ def leer_evento(window, tiempo = None, key = ''):
     
     inicio = time.time()
     event, values = window.Read(timeout = tiempo, timeout_key = key)  
-    if (event != key):
-        reproducir(join("componentes", "sonidos", "boton.mp3"))
+    #if (event != key):
+        #reproducir(join("componentes", "sonidos", "boton.mp3"))
         
     return event, values, round(time.time() - inicio)
