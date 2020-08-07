@@ -109,7 +109,7 @@ def crear_ventana_tablero(tablero, parametros, partida_anterior):
 
     parametros["casillas_especiales"] = colocar_posiciones_especiales(
         window, tablero
-    )  # {(i, j) : {'color' : ('white', 'blue'), 'texto' : 'F +2', 'modificador' : 2}}
+    )  
 
     if partida_anterior:
         restaurar_tablero(window, tablero["posiciones_ocupadas"])
@@ -454,7 +454,7 @@ def seleccionar_ficha(window, parametros, event, color):
     parametros["letra_seleccionada"] = True
 
 
-def finalizar_partida(window, tablero, parametros, fichas_pc=None):
+def finalizar_partida(window, tablero, parametros):
     """
     Función que muestra el mensaje de fin de la partida.
 
@@ -478,7 +478,7 @@ def finalizar_partida(window, tablero, parametros, fichas_pc=None):
 
     for usuario in (jugador, computadora):
         for letra in usuario.fichas:
-            usuario.puntaje   -= bolsa_de_fichas[letra]["puntaje"]
+            usuario.puntaje -= bolsa_de_fichas[letra]["puntaje"]
 
     actualizar_tabla(jugador, computadora, window)
 
