@@ -663,6 +663,7 @@ Also add information on how to contact you by electronic and paper mail.
 notice like this when it starts in an interactive mode:
 
     ScrabbleAR  Copyright (C) 2020  Garea Antonella
+    ScrabbleAR  Copyright (C) 2020  Garofalo Pedro
     ScrabbleAR  Copyright (C) 2020  Giorgetti Valentín
     This program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
     This is free software, and you are welcome to redistribute it
