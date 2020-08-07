@@ -11,7 +11,7 @@ class Jugador:
     
     def __init__(self, nick, color_ficha):
         """
-        Inicializa el objeto de tipo jugador.
+        Inicializa la instancia de la clase Jugador.
         
         Parámetros:
             - nick (str): nombre del jugador.
