@@ -141,6 +141,7 @@ def reanudar_juego(configuracion_seleccionada, partida_guardada, ventana_princip
     Retorna:
         - (dict): diccionario con la partida jugada.
     """
+    
     partida_guardada, jugador, computadora = jugar(configuracion_seleccionada, partida_guardada)
     fin_partida(jugador, computadora, configuracion_seleccionada, partida_guardada, ventana_principal)
 
