@@ -95,7 +95,7 @@ def crear_ventana_tablero(tablero, parametros, partida_anterior):
         [
             sg.Button("Confirmar palabra", key="confirmar", disabled=True),
             sg.Button("Cambiar fichas", key="cambiar", disabled=True),
-            sg.Button("Pasar", disabled=True),
+            sg.Button("Pasar", visible = False),
         ],
     ]
 
