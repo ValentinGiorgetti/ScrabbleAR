@@ -6,11 +6,11 @@
 
 #### Consideraciones a tener en cuenta
 
+*~* Versión de Python usada: 3.6.8
+
 *~* Versión de PySimpleGUI usada: 4.26.0
 
 *~* Versión de Pattern usada: 3.6
-
-*~* Versión de Python usada: 3.6.8
 
 *~* Versión de PlaySound usada: 1.2.2. Necesita los siguientes paquetes para funcionar:
 - En Ubuntu: "libcairo2-dev", "libgirepository1.0-dev" y "gir1.2-gtk-3.0".
