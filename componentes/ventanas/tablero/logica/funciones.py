@@ -44,6 +44,7 @@ def es_repetida(palabra, palabras_ingresadas):
 
     Parámetros:
         - palabra (str): palabra a verificar.
+        - palabras_ingresadas (list): lista que contiene las palabras ingresadas.
 
     Retorna:
         - (bool): indica si la palabra es repetida.
@@ -194,6 +195,7 @@ def contar_jugada(window, palabra, posiciones_tablero, tablero, casillas_especia
         - posiciones_tablero (list): lista de tuplas que indican las posiciones del tablero de las fichas.
         - tablero (dict): diccionario con la información del tablero.
         - casillas_especiales (dict): diccionario con las casillas especiales.
+        - jugador (Jugador): instancia de la clase Jugador que representa al usuario o la computadora.
 
     Retorna:
         - posiciones_ocupadas (list): lista de tuplas que indican las posiciones ocupadas por la palabra.
