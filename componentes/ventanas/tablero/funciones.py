@@ -120,7 +120,7 @@ def crear_ventana_tablero(tablero, parametros, partida_anterior):
     return window
 
 
-def ventana_palabras_ingresadas(window, tablero, parametros):
+def ventana_palabras_ingresadas(window, tablero, parametros, comenzar):
     """
     Función que muestra una ventana con información sobre las palabras formadas
     durante la partida.
@@ -129,6 +129,7 @@ def ventana_palabras_ingresadas(window, tablero, parametros):
         - window (sg.Window): ventana del tablero.
         - tablero (dict): diccionario que contiene información del tablero.
         - parametros (dict): diccionario que contiene párametros usados para controlar la lógica del juego.
+        - comenzar (bool): indica si la partida está pausada.
     """
 
     palabras_ingresadas = tablero["palabras_ingresadas"]
@@ -155,7 +156,7 @@ def ventana_palabras_ingresadas(window, tablero, parametros):
 
     while True:
         event, values, tiempo = leer_evento(ventana, 1000)
-        if not partida_finalizada:
+        if not partida_finalizada and comenzar:
             parametros["fin_juego"], tablero["contador"] = actualizar_tiempo(window, tablero["contador"], tiempo)
             if parametros["fin_juego"]:
                 break
