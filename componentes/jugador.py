@@ -5,8 +5,7 @@ Módulo donde se define la clase Jugador.
 
 class Jugador:
     """
-    Clase Jugador con métodos para obtener y actualizar el puntaje
-    y los cambios restantes del mismo.
+    Clase donde se definen los métodos y propiedades de un jugador.
     """
 
     def __init__(self, nick, color_ficha):
@@ -17,6 +16,7 @@ class Jugador:
             - nick (str): nombre del jugador.
             - color_ficha (tuple): color de las fichas del jugador.
         """
+        
         self._puntaje = 0
         self._cambios_restantes = 3
         self._fichas = []
@@ -31,6 +31,7 @@ class Jugador:
         Retorna:
             - (int): puntaje del jugador.
         """
+        
         return self._puntaje
 
     @puntaje.setter
@@ -41,9 +42,11 @@ class Jugador:
         Parámetros:
             - puntaje (int): puntaje del jugador.
         """
+        
         self._puntaje = puntaje
         if self._puntaje < 0:
             self._puntaje = 0
+            
 
     @property
     def cambios_restantes(self):
@@ -54,6 +57,7 @@ class Jugador:
             - (int): cantidad de cambios restantes.
         """
         return self._cambios_restantes
+    
 
     @cambios_restantes.setter
     def cambios_restantes(self, cambios):
@@ -64,6 +68,7 @@ class Jugador:
             - cambios (int): cantidad de cambios restantes.
         """
         self._cambios_restantes = cambios
+        
 
     @property
     def fichas(self):
@@ -74,6 +79,7 @@ class Jugador:
             - (list): fichas del jugador.
         """
         return self._fichas
+    
 
     @fichas.setter
     def fichas(self, fichas):
@@ -84,6 +90,7 @@ class Jugador:
             - fichas (list): fichas del jugador.
         """
         self._fichas = fichas
+        
 
     @property
     def nick(self):
@@ -104,6 +111,7 @@ class Jugador:
             - (tuple): color de ficha del jugador (fondo y letra).
         """
         return self._color
+    
 
     def informacion(self):
         """
