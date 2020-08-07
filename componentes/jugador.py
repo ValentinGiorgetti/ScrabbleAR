@@ -59,6 +59,7 @@ class Jugador:
         Retorna:
             - (int): cantidad de cambios restantes.
         """
+        
         return self._cambios_restantes
     
 
@@ -70,6 +71,7 @@ class Jugador:
         Parámetros:
             - cambios (int): cantidad de cambios restantes.
         """
+        
         self._cambios_restantes = cambios
         
 
@@ -81,6 +83,7 @@ class Jugador:
         Retorna:
             - (list): fichas del jugador.
         """
+        
         return self._fichas
     
 
@@ -92,6 +95,7 @@ class Jugador:
         Parámetros:
             - fichas (list): fichas del jugador.
         """
+        
         self._fichas = fichas
         
 
@@ -103,6 +107,7 @@ class Jugador:
         Retorna:
             - (str): nombre del jugador.
         """
+        
         return self._nick
     
 
@@ -114,6 +119,7 @@ class Jugador:
         Retorna:
             - (tuple): color de ficha del jugador (fondo y letra).
         """
+        
         return self._color
     
 
@@ -124,4 +130,5 @@ class Jugador:
         Retorna:
             - (list): lista con la información del jugador.
         """
+        
         return [self._nick, self._puntaje, self._cambios_restantes]
