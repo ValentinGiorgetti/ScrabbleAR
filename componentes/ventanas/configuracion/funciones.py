@@ -1,4 +1,7 @@
 """
+Autores: Garea Antonella, Garofalo Pedro y Giorgetti Valentín
+Licencia: GNU General Public License
+
 Módulo que contiene las funciones usadas por la ventana de configuración.
 """
 
