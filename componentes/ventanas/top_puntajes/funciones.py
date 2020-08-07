@@ -6,7 +6,7 @@ Módulo que contiene las funciones usadas por la ventana de top de puntajes.
 import pickle, PySimpleGUI as sg
 from datetime import datetime
 from componentes.jugador import Jugador
-from componentes.ventanas.general import parametros_ventana, colores
+from componentes.ventanas.general import parametros_ventana, colores, titulos
 from os.path import join
 
 
@@ -24,7 +24,7 @@ def crear_ventana_tops(tabla):
     tamanio = (13, 1)
 
     layout = [
-        [sg.Text("Top 10 de los mejores puntajes", size = (58,1), justification = 'center', background_color = '#1d3557')],
+        [sg.Text("Top 10 de los mejores puntajes", **titulos)],
         [sg.Text('')],
         [sg.Button('General', key = 'general', button_color = ('white', 'blue'), size = tamanio), sg.Button('Nivel fácil', key = 'fácil', size = tamanio), sg.Button('Nivel medio', key = 'medio', size = tamanio), sg.Button('Nivel difícil', key = 'difícil', size = tamanio)],
         [sg.Text('')],
