@@ -25,4 +25,5 @@ def main():
             break
         else:
             ultimo_presionado = mostrar_texto(window, event, ultimo_presionado)
+            
     window.Close()
