@@ -84,6 +84,7 @@ def verificar_palabra(parametros, tablero):
     Parámetros:
         - parametros (dict): diccionario con párametros que controlan la lógica del juego.
         - tablero (dict): diccionario con la información del tablero.
+        
     Retorna:
         - (bool): indica si la jugada es válida.
     """
