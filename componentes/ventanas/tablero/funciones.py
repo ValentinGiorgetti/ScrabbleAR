@@ -1,4 +1,7 @@
 """
+Autores: Garea Antonella, Garofalo Pedro y Giorgetti Valentín
+Licencia: GNU General Public License
+
 Módulo con las funciones usadas por la ventana del tablero.
 """
 
