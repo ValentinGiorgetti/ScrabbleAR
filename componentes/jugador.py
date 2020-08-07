@@ -8,6 +8,7 @@ class Jugador:
     Clase donde se definen los métodos y propiedades de un jugador.
     """
 
+    
     def __init__(self, nick, color_ficha):
         """
         Inicializa el objeto de tipo jugador.
@@ -22,6 +23,7 @@ class Jugador:
         self._fichas = []
         self._nick = nick
         self._color = color_ficha
+        
 
     @property
     def puntaje(self):
@@ -33,6 +35,7 @@ class Jugador:
         """
         
         return self._puntaje
+    
 
     @puntaje.setter
     def puntaje(self, puntaje):
@@ -101,6 +104,7 @@ class Jugador:
             - (str): nombre del jugador.
         """
         return self._nick
+    
 
     @property
     def color(self):
