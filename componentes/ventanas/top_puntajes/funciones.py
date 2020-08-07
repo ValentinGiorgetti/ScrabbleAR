@@ -141,6 +141,7 @@ def mostrar_top(ultimo_presionado, event, top, ventana_tops):
     Retorna:
         - event (str): nivel seleccionado.
     """
+    
     colores['General'] = ('white', 'blue')
 
     ventana_tops[ultimo_presionado].Update(button_color = sg.DEFAULT_BUTTON_COLOR)
