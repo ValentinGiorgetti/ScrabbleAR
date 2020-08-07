@@ -144,6 +144,10 @@ def ubicar_palabra(window, palabra, tablero, parametros, posiciones_ocupadas_pc,
         - tablero (dict): diccionario con la información del tablero.
         - parametros (dict): diccionario con párametros que controlan la lógica del juego.
         - posiciones_ocupadas_pc (list): lista de tuplas que indican las posiciones ocupadas por la palabra.
+        - copia_fichas (list): lista que contiene una copia de las fichas de la computadora.
+    
+    Retorna:
+        - (list): lista que contiene las nuevas fichas de la pc.    
     """
 
     bolsa_de_fichas = tablero["bolsa_de_fichas"]
