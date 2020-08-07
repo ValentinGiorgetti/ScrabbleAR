@@ -42,7 +42,7 @@ def main(configuracion, partida_anterior):
         elif event == "Pausa":
             comenzar = pausar(window, comenzar)
         elif event == "palabras_ingresadas":
-            ventana_palabras_ingresadas(window, tablero, parametros)
+            ventana_palabras_ingresadas(window, tablero, parametros, comenzar)
         elif event == "Posponer":
             salir, partida_guardada = posponer(tablero, parametros["jugada"])
             if salir:
