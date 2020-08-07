@@ -12,7 +12,7 @@
 
 *~* Versión de Python usada: 3.6.8
 
-*~* El módulo "playsound" necesita los siguientes paquetes para funcionar:
+*~* Versión de PlaySound usada: 1.2.2. Necesita los siguientes paquetes para funcionar:
 - En Ubuntu: "libcairo2-dev", "libgirepository1.0-dev" y "gir1.2-gtk-3.0".
 Instalar con el comando: "sudo apt install libcairo2-dev libgirepository1.0-dev gir1.2-gtk-3.0".
 - En Arch Linux: "python-gobject".
