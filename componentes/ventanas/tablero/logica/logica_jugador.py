@@ -30,7 +30,9 @@ def posicion_valida(posicion, posiciones_ocupadas, posiciones_bloqueadas, orient
         - (str): orientación de la jugada.
         - (bool): indica si la posición es válida
     """
-
+    
+    if posicion in range(8, 15):
+        return orientacion, False
     misma_orientacion = False
     if not posicion in posiciones_bloqueadas:
         if not posiciones_ocupadas or posicion in posiciones_ocupadas:
