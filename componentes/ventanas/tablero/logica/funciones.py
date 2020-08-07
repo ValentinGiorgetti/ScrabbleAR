@@ -1,4 +1,7 @@
 """
+Autores: Garea Antonella, Garofalo Pedro y Giorgetti Valentín
+Licencia: GNU General Public License
+
 Módulo que contiene funciones usadas por el jugador y la computadora.
 """
 
