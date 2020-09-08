@@ -7,8 +7,11 @@ Módulo que contiene las funciones usadas en la ventana de cambio de fichas.
 
 
 import random, PySimpleGUI as sg
-from componentes.ventanas.general import parametros_popup, parametros_ventana
-from componentes.ventanas.tablero.logica.funciones import *
+from componentes.ventanas.general import parametros_popup, parametros_ventana, titulos
+from componentes.ventanas.tablero.logica.funciones import (
+    repartir_fichas, letra_random, fichas_totales, 
+    reiniciar_parametros, actualizar_tabla
+)
 
 
 def crear_ventana_cambio_fichas(letras_jugador):
@@ -20,20 +23,20 @@ def crear_ventana_cambio_fichas(letras_jugador):
 
     Retorna:
         - (sg.Window): ventana de cambio de fichas.
-    """
+    """ 
 
     layout_cambiar_fichas = [
-        [sg.Text("Seleccione las fichas que quiere intercambiar")],
+        [sg.Text("Seleccione las fichas a intercambiar", **titulos, size = (40, 1))],
         [sg.Text("")],
         [
             sg.Button(letras_jugador[i], size=(3, 1), key=i, pad=(0.5, 0.5), button_color=("white", "green"))
             for i in range(7)
         ],
         [sg.Text("")],
-        [sg.Button("Aceptar"), sg.Button("Cambiar todas", key="todas"), sg.Button("Cancelar")],
+        [sg.Button(" Cambiar ", key = "algunas", disabled = True), sg.Button(" Cambiar todas ", key="todas"), sg.Button(" Cancelar ", key = "cancelar")],
     ]
 
-    return sg.Window("  Cambiar fichas", layout_cambiar_fichas, **parametros_ventana)
+    return sg.Window(" Cambiar fichas", layout_cambiar_fichas, **parametros_ventana)
 
 
 def cambiar_todas(window, bolsa_de_fichas, parametros, letras_jugador):
@@ -59,9 +62,12 @@ def cambiar_todas(window, bolsa_de_fichas, parametros, letras_jugador):
             window[i].Update(letras_jugador[i], button_color=("white", "green"))
         parametros["historial"] += "\n\n - Se cambiaron todas las fichas del jugador."
         window["historial"].Update(parametros["historial"])
+        
         return True
+        
     else:
         sg.Popup("No quedan suficientes fichas en la bolsa\n", **parametros_popup)
+        
         return False
 
 
@@ -80,9 +86,6 @@ def cambiar_seleccionadas(window, bolsa_de_fichas, seleccionadas, letras_jugador
         - (bool): devuelve si se pudieron cambiar las fichas.
     """
 
-    if not seleccionadas:
-        sg.Popup("Debe seleccionar alguna letra\n", **parametros_popup)
-        return False
     if len(fichas_totales(bolsa_de_fichas)) >= len(seleccionadas):
         for i in seleccionadas:
             bolsa_de_fichas[seleccionadas[i]]["cantidad_fichas"] += 1
@@ -91,9 +94,12 @@ def cambiar_seleccionadas(window, bolsa_de_fichas, seleccionadas, letras_jugador
             letras_jugador[i] = letra
         parametros["historial"] += "\n\n - Se cambiaron algunas fichas del jugador."
         window["historial"].Update(parametros["historial"])
+        
         return True
+        
     else:
-        sg.Popup("No quedan suficientes fichas en la bolsa", **parametros_popup)
+        sg.Popup("No quedan suficientes fichas en la bolsa\n", **parametros_popup)
+        
         return False
 
 
@@ -114,25 +120,32 @@ def seleccionar_ficha(ventana, event, seleccionadas, ficha):
     else:
         ventana[event].Update(button_color=("white", "red"))
         seleccionadas[event] = ficha
+        
+    ventana["algunas"].Update(disabled = not seleccionadas)
 
 
-def actualizar_tablero(window, tablero, cambio, parametros, jugador):
+def actualizar_tablero(window, tablero, parametros, jugador):
     """
     Función para actualizar la ventana del tablero con el cambio de fichas.
 
     Parámetros:
         - window (sg.Window): ventana del tablero.
         - tablero (dict): diccionario con la información del tablero.
-        - cambio (bool): indica si se cambiaron fichas.
         - parametros (dict): diccionario con párametros que controlan la lógica del juego.
         - jugador (Jugador): instancia de la clase Jugador que representa al usuario.
     """
 
-    if cambio:
-        jugador.cambios_restantes -= 1
-        actualizar_tabla(jugador, tablero["computadora"], window)
-        reiniciar_parametros(parametros)
-        if not jugador.cambios_restantes:
-            window["cambiar"].Update(disabled=True)
-        tablero["turno"] = "Computadora"
-        window["turno"].Update("Computadora")
+    jugador.cambios_restantes -= 1
+    actualizar_tabla(jugador, tablero["computadora"], window)
+    
+    if not jugador.cambios_restantes:
+        window["cambiar"].Update(disabled=True)
+        
+    tablero["turno"] = "Computadora"
+    window["turno"].Update("Computadora")
+    
+    if parametros["letra_seleccionada"]:
+        window[parametros["letra"]].Update(button_color=("white", "green"))
+        parametros["letra"] = -1
+        
+    reiniciar_parametros(parametros)
