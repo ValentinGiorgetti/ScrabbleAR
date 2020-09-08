@@ -191,7 +191,7 @@ def restablecer_configuracion(window, ultimo_presionado, configuracion_seleccion
     
     nivel = configuracion_seleccionada["nivel_seleccionado"]
     
-    if sg.Popup(f"¿Está seguro de que desea resetear la configuración del nivel {nivel}?\n", 
+    if sg.Popup(f"¿Está seguro de que desea restablecer la configuración del nivel {nivel}?\n", 
                 title = " Atención", custom_text = (" Si ", " No ")) == " Si ": 
         configuracion_seleccionada[nivel] = leer_configuracion_predeterminada()[nivel]
         window["tiempo_seleccionado"].Update(str(configuracion_seleccionada[nivel]["tiempo"]) + " minutos")
