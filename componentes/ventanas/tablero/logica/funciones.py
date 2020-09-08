@@ -262,7 +262,7 @@ def finalizar_jugada(window, parametros, tablero, palabra, puntos_jugada, jugado
 
     tipo = parse(palabra.lower(), chunks=False).split("/")[1]
     tipo_palabra = "sustantivo" if tipo.find("NN") != -1 else ("verbo" if tipo.find("VB") != -1 else "adjetivo")
-    parametros["historial"] += f"\n\n - {texto} formó la palabara "{palabra}" ({tipo_palabra}) y sumó {puntos_jugada} puntos."
+    parametros["historial"] += f'\n\n - {texto} formó la palabara "{palabra}" ({tipo_palabra}) y sumó {puntos_jugada} puntos.'
     window["historial"].Update(parametros["historial"])
     jugador.puntaje += puntos_jugada
     tablero["primer_jugada"] = False
