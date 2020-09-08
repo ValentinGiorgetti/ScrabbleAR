@@ -6,11 +6,12 @@ Módulo principal del programa.
 """
 
 
-from componentes.ventanas.funciones_main import *
 from componentes.ventanas.configuracion.funciones import leer_ultima_configuracion
 from componentes.ventanas.reglas.main import main as reglas
 from componentes.ventanas.top_puntajes.main import main as top_puntajes
 from componentes.ventanas.general import leer_evento
+from componentes.ventanas.configuracion.main import main as cargar_configuracion
+from componentes.ventanas.funciones_main import crear_ventana_main, comenzar_juego, reanudar_juego, leer_partida_guardada
 
 
 def main():

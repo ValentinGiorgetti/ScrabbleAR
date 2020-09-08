@@ -24,11 +24,11 @@ Instalar con el comando: "sudo pacman -S python-gobject".
 
 #### Introducción
 
-El trabajo final de la materia “Seminario de Lenguajes” consiste en implementar el conocido juego “Scrabble” usando el lenguaje de programación Python. 
+El trabajo final de la materia “Seminario de Lenguajes” consiste en implementar el conocido juego “Scrabble” usando el lenguaje de programación Python, aplicando los conocimientos adquiridos durante la cursada de la materia.  
 
 La versión implementada del juego tiene algunas diferencias respecto al original. El nombre elegido para la versión desarrollada es “ScrabbleAR”. Se juega contra la computadora y el jugador puede modificar varios parámetros de la partida.
 
-Las palabras con las que se juegan son sustantivos, adjetivos y verbos. Para el análisis sintáctico de las palabras usadas en el juego se utilizó el módulo Pattern, y para el diseño de la interfaz gráfica se usó la librería PySimpleGUI. También se añadieron sonidos haciendo uso del módulo PlaySound.
+Las palabras con las que se juegan son sustantivos, adjetivos y verbos. Para el análisis sintáctico de las palabras usadas en el juego se utilizó la librería Pattern, y para el diseño de la interfaz gráfica se usó PySimpleGUI. También se añadieron sonidos haciendo uso de la librería PlaySound.
 
 El objetivo del juego es intentar ganar más puntos que la computadora, formando palabras sobre un tablero, tratando de aprovechar las casillas especiales ubicadas en el mismo.
 
@@ -72,7 +72,7 @@ En todo momento estará visible el puntaje del jugador y de la computadora. Para
 
 #### Fin de la partida
 
-*~* La partida finaliza cuando ocurre alguna de las siguientes situaciones:
+La partida finaliza cuando ocurre alguna de las siguientes situaciones:
 
 • El jugador presiona el botón “Terminar”.
 
@@ -83,3 +83,25 @@ En todo momento estará visible el puntaje del jugador y de la computadora. Para
 • Se acaba el tiempo límite de la partida.
 
 Una vez finalizada la partida, se revelan las fichas del atril de la computadora y al puntaje final de cada jugador se le resta el puntaje de las fichas que quedaron en sus atriles.
+
+#### Algunas imágenes del juego
+
+Menú principal
+
+![](https://i.imgur.com/9a8o7Lf.png)
+
+Ventana de configuración
+
+![](https://i.imgur.com/rv9MwUL.png)
+
+Ventana de reglas 
+
+![](https://i.imgur.com/lE8jbf5.png)
+
+Ventana del top de puntajes
+
+![](https://i.imgur.com/PDdmMUa.png)
+
+Ventana de juego
+
+![](https://i.imgur.com/cmUni9G.png)
