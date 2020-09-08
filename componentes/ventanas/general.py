@@ -7,7 +7,7 @@ Módulo que contiene parámetros usados para la creación de ventanas y una func
 
 
 import time
-from os.path import join
+from os.path import isfile, join
 from playsound import playsound as reproducir
 
 
@@ -43,6 +43,9 @@ def leer_evento(window, tiempo = None, key = ""):
     """
     Función usada para leer un evento. 
     
+    Reproduce un sonido en caso de haber leído un evento. En caso de 
+    que no se encuentre el archivo de sonido no se reproducirá.
+    
     Retorna el evento, valores y el tiempo transcurrido hasta que
     se leyó el evento.
 
@@ -59,9 +62,11 @@ def leer_evento(window, tiempo = None, key = ""):
     
     inicio = time.time()
     
-    event, values = window.Read(timeout = tiempo, timeout_key = key)  
+    event, values = window.Read(timeout = tiempo, timeout_key = key)
+
+    ruta_sonido = join("componentes", "sonidos", "boton.mp3")
     
-    if (event != key):
-        reproducir(join("componentes", "sonidos", "boton.mp3"))
+    if (event != key and isfile(ruta_sonido)):
+        reproducir(ruta_sonido)
         
     return event, values, round(time.time() - inicio)
