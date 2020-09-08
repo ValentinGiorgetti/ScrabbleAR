@@ -7,7 +7,7 @@ Módulo que contiene funciones usadas por el jugador y la computadora.
 
 
 import random, datetime
-from os.path import join
+from os.path import isfile, join
 from collections import OrderedDict
 from playsound import playsound as reproducir
 from pattern.es import parse, verbs, spelling, lexicon
@@ -157,13 +157,18 @@ def reiniciar_parametros(parametros):
 
 def reproducir_sonido_palabra(es_correcta):
     """
-    Función que reproduce un sonido para el caso de que la palabra sea correcta o incorrecta.
+    Función que reproduce un sonido correspondiente a que la palabra ingresada sea correcta o incorrecta.
+    
+    En caso de que no se encuentre el archivo de sonido, el mismo no se reproducirá.
 
     Parámetros:
         - es_correcta (bool): indica si la palabra es correcta.
     """
-
-    reproducir(join("componentes", "sonidos", "palabra_correcta.mp3" if es_correcta else "palabra_incorrecta.mp3"))
+    
+    ruta_sonido = join("componentes", "sonidos", "palabra_correcta.mp3" if es_correcta else "palabra_incorrecta.mp3")
+    
+    if isfile(ruta_sonido):
+        reproducir(ruta_sonido)
 
 
 def sumar_casilla(casillas_especiales, posicion, letra, puntos_jugada, multiplicador, tablero, jugador):
