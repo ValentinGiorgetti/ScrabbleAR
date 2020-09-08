@@ -44,7 +44,7 @@ def leer_evento(window, tiempo = None, key = ""):
     Función usada para leer un evento. 
     
     Reproduce un sonido en caso de haber leído un evento. En caso de 
-    que no se encuentre el archivo de sonido no se reproducirá.
+    que no se encuentre el archivo de sonido, el mismo no se reproducirá.
     
     Retorna el evento, valores y el tiempo transcurrido hasta que
     se leyó el evento.
