@@ -20,16 +20,16 @@ def crear_ventana_reglas():
 
     tamanio = (7, 1)
     layout = [
-        [sg.Text("Reglas del juego", **titulos)],
+        [sg.Text("Reglas del juego", **titulos, size = (49, 1))],
         [sg.Text("")],
         [sg.Button("Fácil", size=tamanio), sg.Button("Medio", size=tamanio), sg.Button("Difícil", size=tamanio)],
         [sg.Text("")],
         [sg.Multiline("Seleccione un nivel", key="nivel", disabled=True, size=(60, 4))],
         [sg.Text("")],
-        [sg.Button("Volver", size=tamanio)],
+        [sg.Button("Volver", size=tamanio)]
     ]
 
-    return sg.Window("  Reglas", layout, **parametros_ventana)
+    return sg.Window(" Reglas", layout, **parametros_ventana)
 
 
 def mostrar_texto(ventana_reglas, event, ultimo_presionado):

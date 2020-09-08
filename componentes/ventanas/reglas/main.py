@@ -6,8 +6,8 @@ Módulo principal de la ventana de reglas.
 """
 
 
-from componentes.ventanas.reglas.funciones import *
 from componentes.ventanas.general import leer_evento
+from componentes.ventanas.reglas.funciones import crear_ventana_reglas, mostrar_texto
 
 
 def main():
