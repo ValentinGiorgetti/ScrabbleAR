@@ -216,7 +216,7 @@ def confirmar_tiempo(tiempo, configuracion_seleccionada, ventana_configuracion):
     """
 
     if not tiempo:
-        sg.Popup("El campo está vacío\n", **parametros_popup)
+        sg.Popup("El campo está vacíoㅤㅤ\n", **parametros_popup)
     else:
         try:
             tiempo = int(tiempo)
@@ -249,9 +249,9 @@ def confirmar_letra(values, configuracion_seleccionada, window):
     cantidad_fichas = values["fichas"]
     nivel = configuracion_seleccionada["nivel_seleccionado"]
     if len(letra) > 1 or not letra.isalpha():
-        sg.Popup("Ingrese una letra válida\n", **parametros_popup)
+        sg.Popup("Ingrese una letra válidaㅤㅤ\n", **parametros_popup)
     elif not puntaje and not cantidad_fichas:
-        sg.Popup("Los campos están vacíos\n", **parametros_popup)
+        sg.Popup("Los campos están vacíosㅤㅤ\n", **parametros_popup)
     else:
         try:
             puntaje = int(puntaje) if puntaje != "" else puntaje
@@ -284,7 +284,7 @@ def confirmar_nick(values, configuracion_seleccionada, window):
 
     nick = values["nick"]
     if not nick:
-        sg.Popup("Ingrese un nick válido")
+        sg.Popup("Ingrese un nick válidoㅤㅤ", **parametros_popup)
     else:
         nivel = configuracion_seleccionada["nivel_seleccionado"]
         configuracion_seleccionada[nivel]["nick"] = nick
