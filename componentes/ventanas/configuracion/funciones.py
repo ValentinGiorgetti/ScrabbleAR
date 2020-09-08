@@ -7,8 +7,11 @@ Módulo que contiene las funciones usadas por la ventana de configuración.
 
 
 import json, random, PySimpleGUI as sg
-from componentes.ventanas.general import *
 from os.path import join
+from componentes.ventanas.general import (
+    titulos, colores, parametros_columna, 
+    parametros_ventana, parametros_popup, cartel
+)
 
 
 def crear_ventana_configuracion(ultimo_presionado, configuracion_seleccionada):
@@ -23,45 +26,47 @@ def crear_ventana_configuracion(ultimo_presionado, configuracion_seleccionada):
         - window (sg.Window): la ventana de configuración creada.
     """
 
-    tamanio = (4, 2)
+    tamanio_input = (4, 2)
+    tamanio_texto = (47, 1)
+    tamanio_boton = (7, 1)
+    
     layout_configuracion = [
-        [sg.Text("Nivel de la partida", **titulos)],
+        [sg.Text("Nivel de la partida", **titulos, size = tamanio_texto)],
         [sg.Text("")],
-        [sg.Button("Fácil"), sg.Button("Medio"), sg.Button("Difícil"),],
+        [sg.Button("Fácil", size = tamanio_boton), sg.Button("Medio", size = tamanio_boton), sg.Button("Difícil", size = tamanio_boton),],
         [sg.Text("")],
-        [sg.Text("Tiempo de la partida", **titulos)],
+        [sg.Text("Tiempo de la partida", **titulos, size = tamanio_texto)],
         [sg.Text("")],
         [
-            sg.Input(" ", size=tamanio, key="tiempo"),
+            sg.Input("", size=tamanio_input, key="tiempo"),
             sg.Text("minutos"),
-            sg.Button("Confirmar", key="confirmar_tiempo"),
+            sg.Button(" Confirmar ", key="confirmar_tiempo"),
         ],
         [sg.Text("")],
-        [sg.Text("Configuración de las fichas para todos los niveles", **titulos)],
+        [sg.Text("Configuración de las fichas", **titulos, size = tamanio_texto)],
         [sg.Text("")],
         [
             sg.Text("Letra"),
-            sg.Input("", size=tamanio, key="letra",),
+            sg.Input("", size=tamanio_input, key="letra",),
             sg.Text("Puntaje"),
-            sg.Input("", size=tamanio, key="puntaje"),
+            sg.Input("", size=tamanio_input, key="puntaje"),
             sg.Text("Cantidad de fichas"),
-            sg.Input("", size=tamanio, key="fichas"),
-            sg.Button("Confirmar", key="confirmar_letra"),
+            sg.Input("", size=tamanio_input, key="fichas"),
+            sg.Button(" Confirmar ", key="confirmar_letra"),
         ],
         [sg.Text("")],
-        [sg.Text("Nick del jugador", **titulos)],
+        [sg.Text("Nick del jugador", **titulos, size = tamanio_texto)],
         [sg.Text("")],
-        [sg.Input("", size=(10, 2), key="nick"), sg.Button("Confirmar", key="confirmar_nick")],
-        [sg.Text("")],
-        [sg.Button("Restablecer configuración", key="restablecer")],
+        [sg.Input("", size=(10, 2), key="nick"), sg.Button(" Confirmar ", key="confirmar_nick")]       
     ]
-
+    
     columna_configuracion = sg.Column(layout_configuracion, **parametros_columna)
 
     nivel = configuracion_seleccionada["nivel_seleccionado"]
     tabla = informacion_letras(configuracion_seleccionada[nivel]["fichas"])
+    
     layout_configuracion_actual = [
-        [sg.Text("Configuración actual", **titulos)],
+        [sg.Text("Configuración actual", **titulos, size = tamanio_texto)],
         [sg.Text("")],
         [sg.Text("Nivel:",), sg.Text(nivel + "   ", key="nivel_seleccionado"),],
         [sg.Text("Palabaras válidas:"), sg.Text("                                           ", key="palabras_validas")],
@@ -69,20 +74,18 @@ def crear_ventana_configuracion(ultimo_presionado, configuracion_seleccionada):
             sg.Text("Tiempo:",),
             sg.Text(str(configuracion_seleccionada[nivel]["tiempo"]) + " minutos    ", key="tiempo_seleccionado",),
         ],
-        [sg.Text("Nick: "), sg.Text(configuracion_seleccionada[nivel]["nick"] + "    ", key="nick_seleccionado")],
+        [sg.Text("Nick:"), sg.Text(configuracion_seleccionada[nivel]["nick"] + "    ", key="nick_seleccionado")],
         [sg.Text("")],
         [sg.Table(tabla, ["Letra", "Puntaje", "Cantidad fichas"], justification="center", key="letras_modificadas")],
         [sg.Text("")],
-        [sg.Button("Aceptar")],
+        [sg.Button(" Aceptar "), sg.Text("  "), sg.Button("Restablecer configuración", key="restablecer")]
     ]
 
     columna_configuracion_actual = sg.Column(layout_configuracion_actual, **parametros_columna)
 
-    window = sg.Window("Configuración", [[columna_configuracion, columna_configuracion_actual]], **parametros_ventana)
+    window = sg.Window(" Configuración", [[columna_configuracion, columna_configuracion_actual]], **parametros_ventana)
 
-    window[ultimo_presionado].update(
-        button_color=colores[configuracion_seleccionada["nivel_seleccionado"].capitalize()]
-    )
+    window[ultimo_presionado].update(button_color=colores[configuracion_seleccionada["nivel_seleccionado"].capitalize()])
 
     establecer_palabras_validas(configuracion_seleccionada, window)
 
@@ -104,10 +107,7 @@ def leer_ultima_configuracion():
         with open(join("componentes", "informacion_guardada", "ultima_configuracion.json"), encoding="UTF-8") as f:
             configuracion_seleccionada = json.load(f)
     except FileNotFoundError:
-        sg.Popup(
-            "No se encontró el archivo con la última configuración seleccionada, se cargó la configuración por defecto \n",
-            title="Atención",
-        )
+        sg.Popup("No se encontró el archivo con la última configuración seleccionada, se cargó la configuración por defecto\n", **cartel)
         configuracion_seleccionada = leer_configuracion_predeterminada()
 
     return configuracion_seleccionada
@@ -144,7 +144,7 @@ def leer_configuracion_predeterminada():
         ) as f:
             configuracion_predeterminada = json.load(f)
     except FileNotFoundError:
-        sg.Popup("No se encontró el archivo con la configuración predeterminada, se creó uno nuevo\n", title="Atención")
+        sg.Popup("No se encontró el archivo con la configuración predeterminada, se creó uno nuevo\n", **cartel)
         configuracion_predeterminada = crear_configuracion_predeterminada()
 
     return configuracion_predeterminada
@@ -177,32 +177,30 @@ def crear_configuracion_predeterminada():
     return configuracion_predeterminada
 
 
-def restablecer_configuracion(window, ultimo_presionado):
+def restablecer_configuracion(window, ultimo_presionado, configuracion_seleccionada):
     """
-    Función usada para restablecer la configuración.
+    Función usada para restablecer la configuración del nivel seleccionado.
     
     Actualiza la configuracion seleccionada y los widgets de la ventana con la configuración predeterminada.
 
     Parámetros:
         - window (sg.Window): ventana de configuración.
         - ultimo_presionado (str): último nivel de dificultad presionado (Fácil, Medio, Difícil).
-
-    Retorna:
-        - (str): el nivel de dificultad predeterminado.
-        - configuracion_seleccionada (dict): diccionario con la nueva configuración predeterminada.
+        - configuracion_seleccionada (dict): diccionario que almacena la configuración seleccionada
     """
-
-    configuracion_seleccionada = leer_configuracion_predeterminada().copy()
+    
     nivel = configuracion_seleccionada["nivel_seleccionado"]
-    window["tiempo_seleccionado"].Update(str(configuracion_seleccionada[nivel]["tiempo"]) + " minutos")
-    window["letras_modificadas"].Update(informacion_letras(configuracion_seleccionada[nivel]["fichas"]))
-    window["nivel_seleccionado"].Update(nivel)
-    window[ultimo_presionado].Update(button_color=sg.DEFAULT_BUTTON_COLOR)
-    window[nivel.capitalize()].Update(button_color=colores[nivel.capitalize()])
-    window["nick_seleccionado"].Update(configuracion_seleccionada[nivel]["nick"])
-    establecer_palabras_validas(configuracion_seleccionada, window)
-
-    return nivel.capitalize(), configuracion_seleccionada
+    
+    if sg.Popup(f"¿Está seguro de que desea resetear la configuración del nivel {nivel}?\n", 
+                title = " Atención", custom_text = (" Si ", " No ")) == " Si ": 
+        configuracion_seleccionada[nivel] = leer_configuracion_predeterminada()[nivel]
+        window["tiempo_seleccionado"].Update(str(configuracion_seleccionada[nivel]["tiempo"]) + " minutos")
+        window["letras_modificadas"].Update(informacion_letras(configuracion_seleccionada[nivel]["fichas"]))
+        window["nivel_seleccionado"].Update(nivel)
+        window[ultimo_presionado].Update(button_color=sg.DEFAULT_BUTTON_COLOR)
+        window[nivel.capitalize()].Update(button_color=colores[nivel.capitalize()])
+        window["nick_seleccionado"].Update(configuracion_seleccionada[nivel]["nick"])
+        establecer_palabras_validas(configuracion_seleccionada, window)
 
 
 def confirmar_tiempo(tiempo, configuracion_seleccionada, ventana_configuracion):
@@ -218,7 +216,7 @@ def confirmar_tiempo(tiempo, configuracion_seleccionada, ventana_configuracion):
     """
 
     if not tiempo:
-        sg.Popup("El campo está vacío", **parametros_popup)
+        sg.Popup("El campo está vacío\n", **parametros_popup)
     else:
         try:
             tiempo = int(tiempo)
@@ -251,26 +249,26 @@ def confirmar_letra(values, configuracion_seleccionada, window):
     cantidad_fichas = values["fichas"]
     nivel = configuracion_seleccionada["nivel_seleccionado"]
     if len(letra) > 1 or not letra.isalpha():
-        sg.Popup("Ingrese una letra válida", **parametros_popup)
+        sg.Popup("Ingrese una letra válida\n", **parametros_popup)
     elif not puntaje and not cantidad_fichas:
-        sg.Popup("Los campos están vacíos", **parametros_popup)
+        sg.Popup("Los campos están vacíos\n", **parametros_popup)
     else:
         try:
             puntaje = int(puntaje) if puntaje != "" else puntaje
             cantidad_fichas = int(cantidad_fichas) if cantidad_fichas != "" else cantidad_fichas
         except (ValueError):
-            sg.Popup("Los datos ingresados deben ser válidos", **parametros_popup)
+            sg.Popup("Los datos ingresados deben ser válidos\n", **parametros_popup)
         else:
             if puntaje != "":
                 if puntaje >= 1:
                     configuracion_seleccionada[nivel]["fichas"][letra]["puntaje"] = puntaje
                 else:
-                    sg.Popup("El puntaje debe ser mayor o igual a 1", **parametros_popup)
+                    sg.Popup("El puntaje debe ser mayor o igual a 1\n", **parametros_popup)
             if cantidad_fichas != "":
                 if cantidad_fichas >= 1:
                     configuracion_seleccionada[nivel]["fichas"][letra]["cantidad_fichas"] = int(cantidad_fichas)
                 else:
-                    sg.Popup("La cantidad de fichas debe ser mayor o igual a 1", **parametros_popup)
+                    sg.Popup("La cantidad de fichas debe ser mayor o igual a 1\n", **parametros_popup)
             window["letras_modificadas"].Update(informacion_letras(configuracion_seleccionada[nivel]["fichas"]))
 
 

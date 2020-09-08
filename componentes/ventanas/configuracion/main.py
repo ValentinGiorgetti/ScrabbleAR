@@ -6,8 +6,12 @@ Módulo principal de la ventana de configuración.
 """
 
 
-from componentes.ventanas.configuracion.funciones import *
 from componentes.ventanas.general import leer_evento
+from componentes.ventanas.configuracion.funciones import (
+    leer_ultima_configuracion, crear_ventana_configuracion, restablecer_configuracion, 
+    confirmar_tiempo, confirmar_letra, confirmar_nick, 
+    seleccionar_dificultad, seleccionar_dificultad, guardar_ultima_configuracion
+)
 
 
 def main():
@@ -32,10 +36,10 @@ def main():
 
     while True:
         event, values, tiempo = leer_evento(window)
-        if event in (None, "Aceptar"):
+        if event in (None, " Aceptar "):
             break
         elif event == "restablecer":
-            ultimo_presionado, configuracion_seleccionada = restablecer_configuracion(window, ultimo_presionado)
+            restablecer_configuracion(window, ultimo_presionado, configuracion_seleccionada)
         elif event == "confirmar_tiempo":
             confirmar_tiempo(values["tiempo"], configuracion_seleccionada, window)
         elif event == "confirmar_letra":
