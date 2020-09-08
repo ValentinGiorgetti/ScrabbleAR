@@ -7,7 +7,7 @@ Módulo que contiene las funciones utilizadas por la ventana principal.
 
 
 import pickle, PySimpleGUI as sg
-from os.path import join
+from os.path import isfile, join
 from componentes.ventanas.configuracion.main import main as configuracion
 from componentes.ventanas.configuracion.funciones import establecer_palabras_validas
 from componentes.ventanas.tablero.main import main as jugar
@@ -18,6 +18,8 @@ from componentes.ventanas.top_puntajes.funciones import actualizar_top
 def crear_ventana_main(partida_guardada):
     """
     Función que crea la ventana principal.
+    
+    En caso de que no se encuentre la imagen utilizada, se informará en pantalla.
 
     Parámetros:
         - partida_guardada (dict): diccionario con la información de la partida guardada.
@@ -27,9 +29,17 @@ def crear_ventana_main(partida_guardada):
     """
 
     parametros = {"size": (25, 1), "font": ("None", 11)}
+    ruta_imagen = join("componentes", "imagenes", "logo.png")
+    
+    if isfile(ruta_imagen):
+        imagen = [sg.Image(join("componentes", "imagenes", "logo.png"))]
+    else:
+        imagen = []
+        sg.Popup("No se encontró la imagen del menú principal\n", **cartel)
+        
     layout = [
         [sg.Text("")],
-        [sg.Image(join("componentes", "imagenes", "logo.png"))],
+        imagen,
         [sg.Text("")],
         [sg.Button("Configuración", key="configuracion", **parametros)],
         [sg.Button("Reglas del juego", key="reglas", **parametros)],
