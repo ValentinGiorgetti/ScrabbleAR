@@ -8,14 +8,13 @@ Módulo con las funciones usadas por la ventana del tablero.
 
 import random, datetime, PySimpleGUI as sg
 from collections import OrderedDict
+from copy import deepcopy as copiar
 from componentes.jugador import Jugador
-from componentes.ventanas.general import *
+from componentes.ventanas.general import titulos, parametros_columna, parametros_ventana, parametros_popup, cartel, leer_evento
 from componentes.ventanas.tablero.logica.funciones import (
-    fichas_totales,
-    repartir_fichas,
-    actualizar_tiempo,
-    actualizar_tabla,
-    reproducir_sonido_palabra,
+    fichas_totales, repartir_fichas,
+    actualizar_tiempo, actualizar_tabla,
+    reproducir_sonido_palabra
 )
 
 
@@ -31,17 +30,17 @@ def crear_ventana_tablero(tablero, parametros, partida_anterior):
     Retorna:
         - window (sg.Window): ventana del tablero.
     """
-
+    
     tablero_juego = [
         [
-            sg.Button("", size=(3, 1), key=(i, j), pad=(0.5, 0.5), button_color=("white", "green"),)
+            sg.Button("", size=(3, 1), key=(i, j), pad=(0.5, 0.5), button_color=("white", "green"))
             for j in range(tablero["tamanio"])
         ]
         for i in range(tablero["tamanio"])
     ]
 
     fichas_jugador = [
-        sg.Button(tablero["jugador"].fichas[i], size=(3, 1), key=i, pad=(0.5, 0.5), button_color=("white", "green"),)
+        sg.Button(tablero["jugador"].fichas[i], size=(3, 1), key=i, pad=(0.5, 0.5), button_color=("white", "green"))
         for i in range(7)
     ]
 
@@ -49,37 +48,35 @@ def crear_ventana_tablero(tablero, parametros, partida_anterior):
         sg.Button("?", size=(3, 1), key=i + 8, pad=(0.5, 0.5), button_color=("white", "green")) for i in range(7)
     ]
 
-    layout_columna1 = (
+    columna1 = (
         [[sg.Text("Fichas de la computadora")]] + [fichas_pc] + [[sg.Text(" ")]] + [x for x in tablero_juego]
     )
-    layout_columna1 += [[sg.Text("")]] + [[sg.Text("Fichas del jugador")]] + [fichas_jugador] + [[sg.Text("")]]
-    layout_columna1 += [
+    columna1 += [[sg.Text("")]] + [[sg.Text("Fichas del jugador")]] + [fichas_jugador] + [[sg.Text("")]]
+    columna1 += [
         [
-            sg.Button("Iniciar",),
-            sg.Button("Posponer"),
-            sg.Button("Pausa", disabled=True),
-            sg.Button("Palabras ingresadas", key="palabras_ingresadas", disabled=True),
-            sg.Button("Terminar", visible=False),
-            sg.Button("Salir"),
+            sg.Button(" Iniciar ", key = "Iniciar"),
+            sg.Button(" Posponer ", key = "Posponer"),
+            sg.Button(" Pausa ", key = "Pausa", disabled=True),
+            sg.Button(" Palabras ingresadas ", key="palabras_ingresadas", disabled=True),
+            sg.Button(" Terminar ", key = "Terminar", visible=False),
+            sg.Button(" Salir ", key = "Salir")
         ]
     ]
 
-    columna1 = layout_columna1
-
-    titulo = {"font": ("Consolas", 12), "background_color": "#1d3557", "size": (40, 1)}
     fuente = ("Helvetica", 11)
     nivel = tablero["nivel"]
-
+    tamanio = (35, 1)
+    
     columna2 = [
-        [sg.Text("Tiempo restante", **titulo)],
+        [sg.Text("Tiempo restante", **titulos, size = tamanio)],
         [sg.Text(datetime.timedelta(seconds=tablero["contador"]), key="tiempo", font=fuente)],
-        [sg.Text("Nivel", **titulo)],
+        [sg.Text("Nivel", **titulos, size = tamanio)],
         [sg.Text(nivel.capitalize(), font=fuente)],
-        [sg.Text("Palabras válidas", **titulo)],
+        [sg.Text("Palabras válidas", **titulos, size = tamanio)],
         [sg.Text(tablero["palabras_validas"], font=fuente)],
-        [sg.Text("Cantidad de fichas en la bolsa", **titulo)],
-        [sg.Text(len(fichas_totales(tablero["bolsa_de_fichas"])), font=fuente, key="cantidad_fichas")],
-        [sg.Text("Turno", **titulo)],
+        [sg.Text("Cantidad de fichas en la bolsa", **titulos, size = tamanio)],
+        [sg.Text(len(fichas_totales(tablero["bolsa_de_fichas"])), key="cantidad_fichas", font=fuente)],
+        [sg.Text("Turno", **titulos, size = tamanio)],
         [sg.Text("                       ", key="turno", font=fuente)],
         [sg.Text("")],
         [
@@ -89,30 +86,28 @@ def crear_ventana_tablero(tablero, parametros, partida_anterior):
                 key="tabla",
                 justification="center",
                 num_rows=2,
-                hide_vertical_scroll=True,
+                hide_vertical_scroll=True
             )
         ],
         [sg.Text("")],
-        [sg.Multiline(parametros["historial"], size=(37, 10), key="historial", disabled=True, autoscroll=True)],
+        [sg.Multiline(parametros["historial"], size=(42, 10), key="historial", disabled=True, autoscroll=True)],
         [sg.Text("")],
         [
-            sg.Button("Confirmar palabra", key="confirmar", disabled=True),
-            sg.Button("Cambiar fichas", key="cambiar", disabled=True),
-            sg.Button("Pasar", visible = False),
-        ],
+            sg.Button(" Confirmar palabra ", key="confirmar", disabled=True),
+            sg.Button(" Cambiar fichas ", key="cambiar", disabled=True),
+            sg.Button("Pasar", visible = False)
+        ]
     ]
 
     layout = [
-        [sg.Column(columna1, **parametros_columna), sg.Column(columna2, pad=((20, 0), (0, 0)), **parametros_columna)]
+        [sg.Column(columna1, **parametros_columna), sg.Column(columna2, pad=((25, 0), (0, 0)), **parametros_columna)]
     ]
 
-    window = sg.Window("  Tablero", layout, **parametros_ventana)
+    window = sg.Window(" Tablero", layout, disable_close = True, **parametros_ventana)
 
     window["turno"].Update(tablero["turno"])
 
-    parametros["casillas_especiales"] = colocar_posiciones_especiales(
-        window, tablero
-    )  
+    parametros["casillas_especiales"] = colocar_posiciones_especiales(window, tablero)  
 
     if partida_anterior:
         restaurar_tablero(window, tablero["posiciones_ocupadas"])
@@ -136,21 +131,23 @@ def ventana_palabras_ingresadas(window, tablero, parametros, comenzar):
 
     if not palabras_ingresadas:
         sg.Popup("No se ingresó ninguna palabra\n", **parametros_popup)
+        
         return
 
     layout = [
-        [sg.Text("Palabras ingresadas durante la partida")],
+        [sg.Text("Palabras ingresadas durante la partida", **titulos, size = (40,1))],
         [sg.Text("")],
         [
             sg.Table(
                 sorted(palabras_ingresadas, key=lambda x: x[2], reverse=True),
-                ["Palabra", "Clasifiación", "Puntos", "Usuario"],
+                [" Palabra ", "Clasifiación", "Puntos", "Usuario"],
                 justification="center",
             )
         ],
-        [sg.Button("Volver")],
+        [sg.Text("")],
+        [sg.Button(" Volver ")]
     ]
-    ventana = sg.Window("  Palabras ingresadas", layout, **parametros_ventana)
+    ventana = sg.Window(" Palabras ingresadas", layout, **parametros_ventana)
 
     partida_finalizada = parametros["fin_juego"]
 
@@ -160,7 +157,7 @@ def ventana_palabras_ingresadas(window, tablero, parametros, comenzar):
             parametros["fin_juego"], tablero["contador"] = actualizar_tiempo(window, tablero["contador"], tiempo)
             if parametros["fin_juego"]:
                 break
-        if event in ("Volver", None):
+        if event in (" Volver ", None):
             break
 
     ventana.Close()
@@ -278,14 +275,14 @@ def inicializar_parametros(configuracion, partida_anterior):
 
     parametros = {
                    "letra_seleccionada" : booleano que indica si el jugador seleccionó una letra de su atril,
-                   "orientacion" : string que indica la orientación elegida para ubicar las fichas en el tablero ('horizontal' o 'vertical'),
+                   "orientacion" : string que indica la orientación elegida para ubicar las fichas en el tablero ("horizontal" o "vertical"),
                    "primer_posicion" : tupla que indica la posición de la primer ficha que el usuario ubicó en el tablero,
                    "ultima_posicion" : tupla que indica la posición de la última ficha que el usuario ubicó en el tablero,
                    "jugada" : diccionario ordenado (OrderedDict) que almacena la jugada del jugador. Las claves son las posiciones del tablero
                               ocupadas en la jugada (tuplas) y el valor es la posición del atril de la letra ubicada en la casilla correspondiente,
                    "letra" : entero que indica la posición de la letra seleccionada en el atril del jugador,
                    "historial" : string que indica lo ocurrido durante la partida (palabras formadas, puntos, etc.),
-                   "fichas_totales" : string que contiene todas las fichas de la bolsa ('AAABBBCC...')
+                   "fichas_totales" : string que contiene todas las fichas de la bolsa ("AAABBBCC...")
                    "fin_juego" : booleano usado para controlar el fin de la partida
                }
              
@@ -293,16 +290,15 @@ def inicializar_parametros(configuracion, partida_anterior):
 
     tablero = {
                 "posiciones_ocupadas" : diccionario que almacena todas las casillas ocupadas del tablero. Las claves son las posiciones (tupla)
-                                        y el valor es la letra ubicada en la casilla,
-                "palabras_usadas" : lista que contiene las palabras usadas durante el juego,
+                                        y el valor es la un diccionario con la letra y su color correspondiente,
                 "jugador" : referencia al jugador (instancia de la clase Jugador),
                 "computadora" : referencia a la computadora (instancia de la clase Jugador),
-                "turno" : string que indica el turno ('computadora' o 'jugador'),
+                "turno" : string que indica el turno ("Computadora" o "Jugador"),
                 "contador" : almacena la cantidad máxima de segundos de la partida,
                 "bolsa_de_fichas" : diccionario que almacena información sobre las fichas. Las claves son las letras y el valor es otro diccionario
                                     que almacena el puntaje y cantidad de fichas de la letra,
                 "primer_jugada" : booleano que indica si se realizó alguna jugada o no,
-                "nivel" : string que indica el nivel de la partida ('fácil', 'medio' o 'difícil'),
+                "nivel" : string que indica el nivel de la partida ("fácil", "medio" o "difícil"),
                 "tamanio" : entero que indica la cantidad de filas y columnas del tablero,
                 "centro" : tupla que indica la posición de la casilla central del tablero,
                 "palabras_validas" : string que indica las palabras válidas para el nivel,
@@ -329,13 +325,13 @@ def inicializar_parametros(configuracion, partida_anterior):
             "computadora": Jugador("Computadora", ("white", "orange")),
             "turno": random.choice(("Computadora", "Jugador")),
             "contador": configuracion["tiempo"] * 60,
-            "bolsa_de_fichas": configuracion["fichas"],
+            "bolsa_de_fichas": copiar(configuracion["fichas"]),
             "primer_jugada": True,
             "nivel": nivel,
             "tamanio": 15 if nivel == "difícil" else (17 if nivel == "medio" else 19),
             "centro": (7, 7) if nivel == "difícil" else ((8, 8) if nivel == "medio" else (9, 9)),
             "palabras_validas": configuracion["palabras_validas"],
-            "palabras_ingresadas": [],
+            "palabras_ingresadas": []
         }
         repartir_fichas(tablero["bolsa_de_fichas"], tablero["jugador"].fichas)
         repartir_fichas(tablero["bolsa_de_fichas"], tablero["computadora"].fichas)
@@ -345,11 +341,11 @@ def inicializar_parametros(configuracion, partida_anterior):
     parametros = {
         "letra_seleccionada": False,
         "orientacion": "",
-        "primer_posicion": "",
-        "ultima_posicion": "",
+        "primer_posicion": (),
+        "ultima_posicion": (),
         "jugada": OrderedDict(),
-        "letra": "",
-        "historial": "                  Historial de la partida",
+        "letra": -1,
+        "historial": "                        Historial de la partida",
         "fin_juego": False,
     }
 
@@ -413,10 +409,12 @@ def posponer(tablero, jugada):
     """
 
     if not jugada:
-        sg.Popup("Se guardaron los datos de la partida\n", title="  Atención")
+        sg.Popup("Se guardaron los datos de la partida\n", **cartel)
+        
         return True, tablero
     else:
-        sg.Popup("Primero debe levantar sus fichas\n", title="  Atención")
+        sg.Popup("Primero debe levantar sus fichas\n", **parametros_popup)
+        
         return False, None
 
 
@@ -431,7 +429,7 @@ def pasar(window, parametros, tablero):
     """
 
     if parametros["jugada"]:
-        sg.Popup("Primero debe levantar sus fichas\n")
+        sg.Popup("Primero debe levantar sus fichas\n", **parametros_popup)
     else:
         if parametros["letra_seleccionada"]:
             window[parametros["letra"]].Update(button_color=("white", "green"))
@@ -440,22 +438,22 @@ def pasar(window, parametros, tablero):
         window["turno"].Update("Computadora")
 
 
-def seleccionar_ficha(window, parametros, event, color):
+def confirmar_salir(partida_finalizada):
     """
-    Función usada para que el usuario seleccione una ficha.
-
+    Función para confirmar si el usuario desea salir de la partida.
+    
     Parámetros:
-        - window (sg.Window): ventana del tablero.
-        - parametros (dict): diccionario con párametros que controlan la lógica del juego.
-        - event (int): indica la posición de la letra seleccionada en el atril del jugador.
-        - color (tuple): tupla que indica el color de las fichas del usuario.
+        - partida_finalizada (boolean): indica si la partida finalizó.
+        
+    Retorna:
+        - (bool): retorna verdadero en caso de que el usuario confirme que
+                  desea salir de la partida, falso en caso contrario.
     """
-
-    if parametros["letra_seleccionada"]:
-        window[parametros["letra"]].Update(button_color=("white", "green"))
-    window[event].Update(button_color=color)
-    parametros["letra"] = event
-    parametros["letra_seleccionada"] = True
+    
+    if not partida_finalizada:
+        return sg.Popup("¿Desea salir sin guardar la partida?\n", title = " Atención", custom_text = (" Si ", " No ")) == " Si "
+    else:
+        return True
 
 
 def finalizar_partida(window, tablero, parametros):
@@ -470,9 +468,11 @@ def finalizar_partida(window, tablero, parametros):
         - parametros (dict): diccionario con párametros que controlan la lógica del juego.
 
     Retorna:
-        - (bool): siempre devuelve false, indica que la partida terminó.
+        - (bool): siempre devuelve False, indica que la partida terminó.
     """
-
+    
+    parametros["fin_juego"] = True
+    
     if parametros["jugada"]:
         reproducir_sonido_palabra(False)
 
@@ -501,7 +501,7 @@ def finalizar_partida(window, tablero, parametros):
         mensaje += f"Ganó la computadora con {computadora.puntaje} puntos."
     else:
         mensaje += "Hubo un empate."
-    sg.Popup(mensaje + "\n", title="  Fin de la partida")
+    sg.Popup(mensaje + "\n", title=" Fin de la partida", custom_text = (" Aceptar ", None))
 
     historial = parametros["historial"]
     historial += "\n\n - " + mensaje

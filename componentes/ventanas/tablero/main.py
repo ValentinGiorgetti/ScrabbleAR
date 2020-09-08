@@ -6,11 +6,16 @@ Módulo principal de la ventana del tablero de juego.
 """
 
 
-from componentes.ventanas.tablero.funciones import *
+from componentes.ventanas.general import leer_evento
 from componentes.ventanas.tablero.cambio_fichas.main import main as cambiar_fichas
 from componentes.ventanas.tablero.logica.logica_computadora import jugar_computadora
-from componentes.ventanas.tablero.logica.logica_jugador import *
-from componentes.ventanas.general import leer_evento
+from componentes.ventanas.tablero.logica.funciones import actualizar_tiempo, fichas_totales
+from componentes.ventanas.tablero.logica.logica_jugador import seleccionar_ficha, colocar_ficha, confirmar_palabra
+from componentes.ventanas.tablero.funciones import (
+    inicializar_parametros, crear_ventana_tablero, 
+    iniciar_partida, pausar, ventana_palabras_ingresadas, 
+    posponer, finalizar_partida, pasar, confirmar_salir
+)
 
 
 def main(configuracion, partida_anterior):
@@ -23,19 +28,19 @@ def main(configuracion, partida_anterior):
 
     Retorna:
         - partida_guardada (dict): diccionario con la partida jugada.
-        - tablero['jugador'] (Jugador): instancia de la clase Jugador que representa al usuario.
-        - tablero['computadora'] (Jugador): instancia de la clase Jugador que representa a la computadora.
+        - tablero["jugador"] (Jugador): instancia de la clase Jugador que representa al usuario.
+        - tablero["computadora"] (Jugador): instancia de la clase Jugador que representa a la computadora.
     """
 
     tablero, parametros = inicializar_parametros(configuracion, partida_anterior)
 
     window = crear_ventana_tablero(tablero, parametros, partida_anterior)
 
-    comenzar = partida_guardada = None
+    comenzar = partida_guardada = partida_finalizada = None
 
     while True:
         event, values, tiempo = leer_evento(window, 1000)
-        if event in (None, "Salir"):
+        if event == "Salir" and confirmar_salir(parametros["fin_juego"]):
             break
         elif event == "Iniciar":
             comenzar = iniciar_partida(window, parametros, partida_anterior)
