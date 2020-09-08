@@ -9,7 +9,11 @@ Módulo que contiene funciones usadas por el jugador.
 import PySimpleGUI as sg
 from functools import reduce
 from componentes.ventanas.general import parametros_popup
-from componentes.ventanas.tablero.logica.funciones import *
+from componentes.ventanas.tablero.logica.funciones import (
+    es_palabra, es_repetida, fichas_totales, 
+    actualizar_tabla, reproducir_sonido_palabra, contar_jugada, 
+    letra_random, reiniciar_parametros, finalizar_jugada
+)
 
 
 def posicion_valida(posicion, posiciones_ocupadas, posiciones_bloqueadas, orientacion):
@@ -57,10 +61,10 @@ def posicion_valida(posicion, posiciones_ocupadas, posiciones_bloqueadas, orient
                 mensaje = "Solo se pueden agregar letras en forma vertical, de arriba hacia abajo"
             else:
                 mensaje = "Las letras sólo se pueden agregar de izquierda a derecha o de abajo hacia arriba"
-            sg.Popup(mensaje, **parametros_popup)
+            sg.Popup(mensaje + "\n", **parametros_popup)
             return orientacion, False
     else:
-        sg.Popup("La casilla está ocupada", **parametros_popup)
+        sg.Popup("La casilla está ocupada\n", **parametros_popup)
         return orientacion, False
 
 
@@ -95,20 +99,30 @@ def verificar_palabra(parametros, tablero):
     """
 
     palabra = palabra_formada(tablero["jugador"].fichas, parametros["jugada"])
+    
     if es_repetida(palabra, tablero["palabras_ingresadas"]):
-        sg.Popup("No se pueden ingresar palabras repetidas", **parametros_popup)
+        sg.Popup("No se pueden ingresar palabras repetidas\n", **parametros_popup)
+        
         return False
+        
     if tablero["primer_jugada"] and not tablero["centro"] in parametros["jugada"]:
-        sg.Popup("La casilla de inicio de juego no está ocupada", **parametros_popup)
+        sg.Popup("La casilla de inicio no está ocupada\n", **parametros_popup)
+        
         return False
+        
     if len(parametros["jugada"]) < 2:
-        sg.Popup("Palabra inválida, vuelva a intentarlo", **parametros_popup)
+        sg.Popup("Palabra inválida, vuelva a intentarlo\n", **parametros_popup)
+        
         return False
+        
     else:
         if es_palabra(tablero["nivel"], tablero["palabras_validas"], palabra):
+        
             return True
+            
         else:
-            sg.Popup("Palabra inválida, vuelva a intentarlo", **parametros_popup)
+            sg.Popup("Palabra inválida, vuelva a intentarlo\n", **parametros_popup)
+            
             return False
 
 
@@ -146,11 +160,36 @@ def confirmar_palabra(window, parametros, tablero):
             tablero["turno"] = "Computadora"
             window["turno"].Update("Computadora")
         else:
+            for letra in palabra:
+                letras_jugador.remove(letra)
             parametros["fin_juego"] = True
             parametros["historial"] += "\n\n - Fin de la partida. No quedan suficientes fichas para repartir."
             window["historial"].Update(parametros["historial"])
         actualizar_tabla(jugador, tablero["computadora"], window)
     reproducir_sonido_palabra(es_correcta)
+    
+    
+def seleccionar_ficha(window, parametros, event, color):
+    """
+    Función usada para que el usuario seleccione una ficha.
+
+    Parámetros:
+        - window (sg.Window): ventana del tablero.
+        - parametros (dict): diccionario con párametros que controlan la lógica del juego.
+        - event (int): indica la posición de la letra seleccionada en el atril del jugador.
+        - color (tuple): tupla que indica el color de las fichas del usuario.
+    """
+
+    if parametros["letra_seleccionada"]:
+        window[parametros["letra"]].Update(button_color=("white", "green"))
+        
+    if parametros["letra"] != event:
+        window[event].Update(button_color=color)
+        parametros["letra"] = event
+        parametros["letra_seleccionada"] = True
+    else:
+        parametros["letra"] = -1
+        parametros["letra_seleccionada"] = False
 
 
 def colocar_ficha(window, parametros, tablero, event):
@@ -177,6 +216,7 @@ def colocar_ficha(window, parametros, tablero, event):
             window[event].Update(tablero["jugador"].fichas[parametros["letra"]], button_color=tablero["jugador"].color)
             parametros["jugada"][event] = parametros["letra"]
             window[parametros["letra"]].Update(disabled=True)
+            parametros["letra"] = -1
             parametros["letra_seleccionada"] = False
             if len(parametros["jugada"]) == 1:
                 parametros["primer_posicion"] = parametros["ultima_posicion"] = event

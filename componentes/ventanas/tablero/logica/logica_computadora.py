@@ -9,7 +9,12 @@ Módulo que contiene funciones usadas por la computadora.
 import time, random, PySimpleGUI as sg
 from pattern.es import parse
 from itertools import permutations
-from componentes.ventanas.tablero.logica.funciones import *
+from componentes.ventanas.tablero.logica.funciones import (
+    es_palabra, es_repetida, fichas_totales, 
+    repartir_fichas, actualizar_tabla, actualizar_tiempo, 
+    reproducir_sonido_palabra, contar_jugada, letra_random, 
+    finalizar_jugada
+)
 
 
 def jugar_computadora(window, parametros, tablero):
@@ -26,7 +31,7 @@ def jugar_computadora(window, parametros, tablero):
         window[key].Update(button_color=sg.DEFAULT_BUTTON_COLOR, disabled=True)
 
     parametros["fin_juego"], ubicacion_mas_larga = buscar_ubicacion_mas_larga(tablero, window)
-    if not parametros["fin_juego"]:
+    if not parametros["fin_juego"] and len(ubicacion_mas_larga) >= 2:
         parametros["fin_juego"], palabra = buscar_palabra(len(ubicacion_mas_larga), tablero, window)
     else:
         reproducir_sonido_palabra(False)
@@ -75,8 +80,9 @@ def buscar_ubicacion_mas_larga(tablero, window):
     centro = tablero["centro"]
     orientacion = random.choice(("v", "h"))
     if tablero["primer_jugada"]:
-        i = centro[0]
-        j = centro[1]
+        desplazamiento = random.randint(0, 1)
+        i = centro[0] - desplazamiento if orientacion == "v" else centro[0]
+        j = centro[1] - desplazamiento if orientacion == "h" else centro[0]
         ubicacion_mas_larga = [(i, j + x) if orientacion == "h" else (i + x, j) for x in range(7)]
     else:
         ubicacion_mas_larga = []
@@ -85,7 +91,7 @@ def buscar_ubicacion_mas_larga(tablero, window):
         while not encontre and not fin_juego:
             tiempo_inicio = time.time()
             i = random.randint(0, tamanio - 1)
-            j = random.randint(0, tamanio - 3)
+            j = random.randint(0, tamanio - 1)
             cant += 1
             temp = []
             for x in range(7):
@@ -94,11 +100,10 @@ def buscar_ubicacion_mas_larga(tablero, window):
                     temp += [posicion]
                 else:
                     break
-            if len(temp) >= 2:
-                ubicacion_mas_larga = temp
-            if cant > 100 or len(ubicacion_mas_larga) == 7:
-                encontre = True
+            ubicacion_mas_larga = temp if len(temp) >= len(ubicacion_mas_larga) else ubicacion_mas_larga
+            encontre = cant > 100 or len(ubicacion_mas_larga) == 7
             fin_juego, tablero["contador"] = actualizar_tiempo(window, tablero["contador"], time.time() - tiempo_inicio)
+            orientacion = random.choice(("v", "h"))
 
     return fin_juego, ubicacion_mas_larga
 
@@ -114,10 +119,10 @@ def buscar_palabra(longitud, tablero, window):
 
     Retorna:
         - fin_juego (bool): indica si se debe terminar el juego.
-        - encontrada (str): la palabra encontrada.
+        - palabra (str): la palabra encontrada.
     """
 
-    encontrada = ""
+    palabra = ""
     fin_juego = False
     for i in range(longitud, 1, -1):
         permutaciones = set("".join(permutacion) for permutacion in permutations(tablero["computadora"].fichas, i))
@@ -128,13 +133,13 @@ def buscar_palabra(longitud, tablero, window):
                 and not es_repetida(permutacion, tablero["palabras_ingresadas"])
                 and es_palabra(tablero["nivel"], tablero["palabras_validas"], permutacion)
             ):
-                encontrada = permutacion
+                palabra = permutacion
                 break
         fin_juego, tablero["contador"] = actualizar_tiempo(window, tablero["contador"], time.time() - tiempo_inicio)
-        if encontrada or fin_juego:
+        if palabra or fin_juego:
             break
 
-    return fin_juego, encontrada
+    return fin_juego, palabra
 
 
 def ubicar_palabra(window, palabra, tablero, parametros, posiciones_ocupadas_pc, copia_fichas):
@@ -177,10 +182,12 @@ def ubicar_palabra(window, palabra, tablero, parametros, posiciones_ocupadas_pc,
             for i in range(8, 15):
                 window[i].Update(button_color=("white", "green"))
             parametros["fichas_reales_pc"] = computadora.fichas
+            
             return computadora.fichas
         else:
             parametros["fin_juego"] = True
             parametros["fichas_reales_pc"] = copia_fichas
+            
             return copia_fichas
 
 

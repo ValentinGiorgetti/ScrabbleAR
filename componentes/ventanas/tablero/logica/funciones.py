@@ -18,7 +18,7 @@ def es_palabra(nivel, palabras_validas, palabra):
     Función que verifica que la palabra sea válida correspondiente al nivel de la partida.
 
     Parámetros:
-        - nivel (str): nivel de la partida ('fácil', 'medio', 'difícil').
+        - nivel (str): nivel de la partida ("fácil", "medio", "difícil").
         - palabras_validas (str): indica el tipo de palabras válidas.
         - palabra (str): palabra a verificar.
 
@@ -27,18 +27,25 @@ def es_palabra(nivel, palabras_validas, palabra):
     """
 
     palabra = palabra.lower()
+    
     if not (palabra in verbs or (palabra in spelling and palabra in lexicon)):
+    
         return False
-    analisis = lambda palabra: parse(palabra, chunks=False).split("/")[1]
+        
+    tipo = parse(palabra, chunks=False).split("/")[1]
+    
     if nivel == "fácil":
-        tipo = analisis(palabra)
+        
         return tipo.find("NN") != -1 or tipo.find("VB") != -1 or tipo.find("JJ") != -1
+        
     elif nivel == "medio":
-        tipo = analisis(palabra)
+        
         return tipo.find("JJ") != -1 or tipo.find("VB") != -1
+        
     elif nivel == "difícil":
-        tipo = "JJ" if palabras_validas == "Adjetivos" else "VB"
-        return analisis(palabra).find(tipo) != -1
+        tipo_valido = "JJ" if palabras_validas == "Adjetivos" else "VB"
+        
+        return tipo.find(tipo_valido) != -1
 
 
 def es_repetida(palabra, palabras_ingresadas):
@@ -55,6 +62,7 @@ def es_repetida(palabra, palabras_ingresadas):
 
     for i in palabras_ingresadas:
         if palabra in i:
+        
             return True
 
     return False
@@ -142,7 +150,8 @@ def reiniciar_parametros(parametros):
     """
 
     parametros["letra_seleccionada"] = False
-    parametros["orientacion"] = parametros["primer_posicion"] = parametros["ultima_posicion"] = ""
+    parametros["orientacion"] = ""
+    parametros["primer_posicion"] = parametros["ultima_posicion"] = ()
     parametros["jugada"] = OrderedDict()
 
 
@@ -212,7 +221,7 @@ def contar_jugada(window, palabra, posiciones_tablero, tablero, casillas_especia
             casillas_especiales, posicion, letra, puntos_jugada, multiplicador, tablero, jugador
         )
         posiciones_ocupadas += [posicion]
-        if jugador.nick == 'Computadora':
+        if jugador.nick == "Computadora":
             jugador.fichas.remove(letra)
     puntos_jugada = 0 if puntos_jugada < 0 else (puntos_jugada if multiplicador == 0 else puntos_jugada * multiplicador)
 
@@ -253,9 +262,7 @@ def finalizar_jugada(window, parametros, tablero, palabra, puntos_jugada, jugado
 
     tipo = parse(palabra.lower(), chunks=False).split("/")[1]
     tipo_palabra = "sustantivo" if tipo.find("NN") != -1 else ("verbo" if tipo.find("VB") != -1 else "adjetivo")
-    parametros[
-        "historial"
-    ] += f'\n\n - {texto} formó la palabara "{palabra}" ({tipo_palabra}) y sumó {puntos_jugada} puntos.'
+    parametros["historial"] += f"\n\n - {texto} formó la palabara "{palabra}" ({tipo_palabra}) y sumó {puntos_jugada} puntos."
     window["historial"].Update(parametros["historial"])
     jugador.puntaje += puntos_jugada
     tablero["primer_jugada"] = False
