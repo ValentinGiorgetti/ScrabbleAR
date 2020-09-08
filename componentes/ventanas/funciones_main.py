@@ -7,12 +7,12 @@ Módulo que contiene las funciones utilizadas por la ventana principal.
 
 
 import pickle, PySimpleGUI as sg
+from os.path import join
 from componentes.ventanas.configuracion.main import main as configuracion
 from componentes.ventanas.configuracion.funciones import establecer_palabras_validas
 from componentes.ventanas.tablero.main import main as jugar
-from componentes.ventanas.general import parametros_ventana
+from componentes.ventanas.general import parametros_ventana, parametros_popup, cartel
 from componentes.ventanas.top_puntajes.funciones import actualizar_top
-from os.path import join
 
 
 def crear_ventana_main(partida_guardada):
@@ -37,10 +37,10 @@ def crear_ventana_main(partida_guardada):
         [sg.Button("Reanudar partida", key="reanudar", disabled=not partida_guardada, **parametros)],
         [sg.Button("Nueva partida", key="jugar", **parametros)],
         [sg.Button("Salir", **parametros)],
-        [sg.Text("")],
+        [sg.Text("")]
     ]
 
-    return sg.Window("  ScrabbleAR", layout, **parametros_ventana)
+    return sg.Window(" ScrabbleAR", layout, **parametros_ventana)
 
 
 def leer_partida_guardada():
@@ -55,7 +55,7 @@ def leer_partida_guardada():
         with open(join("componentes", "informacion_guardada", "partida_guardada"), "rb") as f:
             partida = pickle.load(f)
     except FileNotFoundError:
-        sg.Popup("No se encontró el archivo con la última partida guardada.", title="Atención")
+        sg.Popup("No se encontró el archivo con la última partida guardada\n", **cartel)
         partida = None
         guardar_partida(None)
 
@@ -77,24 +77,6 @@ def guardar_partida(partida_guardada):
         pickle.dump(partida_guardada, f)
 
 
-def cargar_configuracion():
-    """
-    Función usada para que el usuario configure los parámetros de la partida.
-    
-    Abre la ventana de configuración y retorna un diccionario con la 
-    configuracion seleccionada.
-
-    Retorna:
-        - (dict): diccionario con la configuración seleccionada.
-    """
-
-    configuracion_temporal = configuracion()
-    if configuracion_temporal:
-        configuracion_seleccionada = configuracion_temporal
-
-    return configuracion_seleccionada
-
-
 def comenzar_juego(configuracion_seleccionada, partida_guardada, ventana_principal):
     """
     Función usada para iniciar una nueva partida. 
@@ -114,14 +96,14 @@ def comenzar_juego(configuracion_seleccionada, partida_guardada, ventana_princip
         - (dict): diccionario con información de la partida.
     """
 
-    opcion = "Continuar"
+    opcion = " Continuar "
     if partida_guardada:
         opcion = sg.Popup(
-            "Se encontró una partida guardada, si inicia una nueva no podrá continuar con la anterior.\n",
-            custom_text=("Continuar", "Cancelar"),
-            title="Atención",
+            "Se encontró una partida guardada, si inicia una nueva no podrá continuar con la anterior\n",
+            custom_text=(" Continuar ", " Cancelar "),
+            title=" Atención"
         )
-    if opcion == "Continuar":
+    if opcion == " Continuar ":
         ventana_principal.Hide()
         partida_guardada, jugador, computadora = jugar(configuracion_seleccionada, None)
         fin_partida(jugador, computadora, configuracion_seleccionada, partida_guardada, ventana_principal)
