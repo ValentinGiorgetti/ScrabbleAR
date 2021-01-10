@@ -46,6 +46,7 @@ def crear_ventana_main(partida_guardada):
         [sg.Button("Top de puntajes", key="top_puntajes", **parametros)],
         [sg.Button("Reanudar partida", key="reanudar", disabled=not partida_guardada, **parametros)],
         [sg.Button("Nueva partida", key="jugar", **parametros)],
+        [sg.Button("GitHub", key="github", **parametros)],
         [sg.Button("Salir", **parametros)],
         [sg.Text("")]
     ]
