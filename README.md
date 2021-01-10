@@ -92,7 +92,7 @@ Una vez finalizada la partida, se revelan las fichas del atril de la computadora
 
 Menú principal
 
-![](https://i.imgur.com/9a8o7Lf.png)
+![](https://i.imgur.com/2V9nLaP.png)
 
 Ventana de configuración
 
@@ -100,7 +100,7 @@ Ventana de configuración
 
 Ventana de reglas 
 
-![](https://i.imgur.com/lE8jbf5.png)
+![](https://i.imgur.com/je5rgEm.png)
 
 Ventana del top de puntajes
 
