@@ -26,7 +26,7 @@ def crear_ventana_reglas():
         [sg.Text("")],
         [sg.Multiline("Seleccione un nivel", key="nivel", disabled=True, size=(60, 4))],
         [sg.Text("")],
-        [sg.Button("Volver", size=tamanio)]
+        [sg.Button(" Más información ", key = "mas_informacion"), sg.Button("Volver", size=tamanio)]
     ]
 
     return sg.Window(" Reglas", layout, **parametros_ventana)
