@@ -6,6 +6,7 @@ Módulo principal de la ventana de reglas.
 """
 
 
+from webbrowser import open
 from componentes.ventanas.general import leer_evento
 from componentes.ventanas.reglas.funciones import crear_ventana_reglas, mostrar_texto
 
@@ -24,6 +25,9 @@ def main():
 
     while True:
         event = leer_evento(window)[0]
+        if event == "mas_informacion":
+            open("github.com/ValentinGiorgetti/ScrabbleAR/blob/master/README.md#reglas-del-juego")
+            continue
         if event in (None, "Volver"):
             break
         else:
