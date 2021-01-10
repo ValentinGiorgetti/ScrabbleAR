@@ -6,6 +6,7 @@ Módulo principal del programa.
 """
 
 
+from webbrowser import open
 from componentes.ventanas.configuracion.funciones import leer_ultima_configuracion
 from componentes.ventanas.reglas.main import main as reglas
 from componentes.ventanas.top_puntajes.main import main as top_puntajes
@@ -32,6 +33,9 @@ def main():
         event = leer_evento(ventana_principal)[0]
         if event in (None, "Salir"):
             break
+        if event == "github":
+           open("github.com/ValentinGiorgetti/ScrabbleAR")
+           continue
         ventana_principal.Hide()
         if event == "reglas":
             reglas()
