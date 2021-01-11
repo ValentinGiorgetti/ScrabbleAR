@@ -26,7 +26,7 @@ def main():
     while True:
         event = leer_evento(window)[0]
         if event == "mas_informacion":
-            open("github.com/ValentinGiorgetti/ScrabbleAR/blob/master/README.md#reglas-del-juego")
+            open("https://github.com/ValentinGiorgetti/ScrabbleAR/blob/master/README.md#reglas-del-juego")
             continue
         if event in (None, "Volver"):
             break
