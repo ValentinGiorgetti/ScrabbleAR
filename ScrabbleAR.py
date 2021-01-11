@@ -34,7 +34,7 @@ def main():
         if event in (None, "Salir"):
             break
         if event == "github":
-           open("github.com/ValentinGiorgetti/ScrabbleAR")
+           open("https://github.com/ValentinGiorgetti/ScrabbleAR")
            continue
         ventana_principal.Hide()
         if event == "reglas":
