@@ -30,6 +30,7 @@ def jugar_computadora(window, parametros, tablero):
     for key in ("Posponer", "Pausa", "Terminar", "confirmar", "cambiar", "Pasar", "palabras_ingresadas"):
         window[key].Update(button_color=sg.DEFAULT_BUTTON_COLOR, disabled=True)
 
+    palabra = ""
     parametros["fin_juego"], ubicacion_mas_larga = buscar_ubicacion_mas_larga(tablero, window)
     if not parametros["fin_juego"] and len(ubicacion_mas_larga) >= 2:
         parametros["fin_juego"], palabra = buscar_palabra(len(ubicacion_mas_larga), tablero, window)
