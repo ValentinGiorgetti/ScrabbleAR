@@ -7,7 +7,7 @@ Módulo principal de la ventana de cambio de fichas.
 
 
 import PySimpleGUI as sg
-from componentes.ventanas.general import leer_evento
+from componentes.ventanas.general import leer_evento, parametros_popup
 from componentes.ventanas.tablero.logica.funciones import fichas_totales, actualizar_tiempo
 from componentes.ventanas.tablero.cambio_fichas.funciones import (
     crear_ventana_cambio_fichas, seleccionar_ficha, cambiar_todas, 
